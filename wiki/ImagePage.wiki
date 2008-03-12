@@ -1,0 +1,9 @@
+#summary Simple image page
+
+The following source generated the image below.
+
+{{{
+--- image kitten.jpg
+    title=zoomed kitten title
+    zoom
+}}}
