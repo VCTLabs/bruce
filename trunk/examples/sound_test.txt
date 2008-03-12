@@ -1,0 +1,9 @@
+--- config
+    logo=pyglet.png
+--- text this is a text page
+--- text this page should have a noise played when it enters
+    sound=beep.wav
+--- text the next page is blank buy should beep
+--- blank
+    sound=beep.wav
+--- text this is a text page

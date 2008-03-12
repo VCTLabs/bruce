@@ -1,0 +1,7 @@
+--- text Courier New
+    text.font_name=Courier New
+--- resource
+ChozCunningham_-_Limberjack.ttf
+--- text !Limberjack
+    text.font_name=!Limberjack
+
