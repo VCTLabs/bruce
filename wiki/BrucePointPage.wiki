@@ -16,8 +16,8 @@ The following source generated the image below (trying to emulate PowerP*int as 
 .(with bullets)
 ..(nested)
 ...(oh my!)
-....It continues! And you could have a whole damn ESSAY in here. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a
-liqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillu
-m dolore eu fugiat nulla pariatur.
+....It continues! And you could have a whole damn ESSAY in here. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 ...(back a level)
 }}}
+
+http://bruce-tpt.googlecode.com/files/bruce-point.png
