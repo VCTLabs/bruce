@@ -1,0 +1,83 @@
+2.0beta2 - 2008-03-11
+
+- add initial text expose effect (fade in)
+- allow configuration to be set per-page and combine page flags and config
+- pause on video EOS
+- allow Pages to communicate back to Presentation through events
+- custom Pages via modules found in resource path
+- resources now much more tightly controlled
+- add Python code + execution page (still has interactivity issues)
+- more robust presentation file parser
+- fix caret positioning on history navigation and in-line editing
+- BrucePoint(tm) styling (bullet points, text page alignment)
+- scale fonts based on the actual viewport size
+
+
+2.0beta1 - 2008-03-02 (complete rewrite)
+
+- audio playback on any page, including blank ones
+- simple point-by-point text display with styling and progressive expose
+- interactive python interpreter with history
+- code display with scrolling
+- unicode escaped chars in ascii file
+- html page display with scrolling
+- image display with optional title and/or caption
+- configuration may be changed inside a presentation, affecting subsequent pages
+- resource location (images, video, sound from zip files etc.)
+- timer and page count display for practicing
+- logo display in the corner of every page
+- may specify which screen to open on in multihead
+- may switch to/from fullscreen
+- HTML output of pages including notes
+- video playback
+
+
+1.3 - unreleased
+
+- Added CUSTOM page type (see doc/socrates.py)
+- Made interpreter pages obey the configured fonts, rather than being fixed
+- Improvements from Chris Beagles:
+
+  - Mouse auto-hides after timeout
+  - Window title set to useful string
+  - Screenshots don't overwrite during a single session
+
+
+1.2.1 - 2007-01-04
+
+- moved some of the smaller examples into doc/examples
+- fix ScratchPad page (thanks Dave Cole)
+
+
+1.2 - 2007-01-02
+
+- added control-F to switch between fullscreen and windowed mode (X11 only)
+- added ShellInterpreterPage and SpawnPage (thanks Anthony Baxter)
+- added socrates.py driver script - see doc/socrates.txt for more
+- many, many new features added - highlighting of code pages, timed 
+  auto-advancing of pages, simple syntax for text page effects, autotyping
+  enhancements... much more. See doc/socrates.txt for more.
+
+
+1.1.1 - 2006-01-24
+
+- catch help() in interpreter until such time that it can be implemented
+- clean up example presentation
+- switch from using "print screen" button to CTRL-P for screenshot
+
+1.1 - 2005-12-13
+
+- Major changes to the way Bruce is invoked to clean it all up
+- Bruce now installs and handles installed data
+
+
+1.0.1 - 2005-12-12
+
+- Hosting at http://bruce.python-hosting.com/ set up
+- Clarifications in README
+
+
+1.0 - 2005-12-09
+
+-  Initial Release
+

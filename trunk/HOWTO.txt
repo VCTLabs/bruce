@@ -1,0 +1,267 @@
+===========================================================
+How to write presenations using Bruce the Presentation Tool
+===========================================================
+
+Configuration
+-------------
+
+Config options::
+
+**bgcolor**
+  Background color for all pages (default is black).
+
+**charset=<charset>**
+  Page content, **including flags** is encoded using the charset
+  (default is ASCII).
+
+**logo=<logo image>**
+  A logo to display in the bottom-right of every page. 
+
+
+Command file syntax
+-------------------
+
+Commands start with a triple-hyphen and space, ``--- ``::
+
+    --- <page type>
+      [page flags, one per line]
+
+    [page content]
+
+The arguments are preceeded by four spaces or a tab.
+
+Every page may include the following flags::
+
+**nofooter**
+  Don't display a footer image
+
+**sound=<sound file>**
+  Sound is played when the page is displayed.
+
+Lines in the input starting with '#' are always left out of displayed
+content, but they are retained for the notes HTML output.
+
+Pages consist of a start marker "--- <some name>" followed by lines of
+content. If the start marker line has content itself, like
+``--- image kitten.jpg`` then that content is considered the first line
+of the page's content. This is convenient for page types that
+only have one line of content like images and code.
+
+Page Types
+----------
+
+**--- text** - a normal text page
+    Each line in the text page is displayed on screen.
+
+    Lines can start with one or more special characters. These include:
+
+    . = display as a title
+    . * display in bold
+    . / display line in italics
+    . : display in fixed width (code) font
+    . < or > smaller or bigger (can have multiple)
+    . . display a bullet mark at the start of the line (can have multiple)
+    . [ left align (overrides page horizontal alignment)
+    . | center align (as above)
+    . ] right align (as above)
+    . - line is hidden. Each 'next' event will display another hidden line.
+    . \ no more special characters will be parsed on this line
+
+    Flags include:
+
+    **valign=<vertical alignment>** - align the whole body of text
+    either center, top or bottom (default center)
+    **halign=<horizontal alignment>** - align the whole body of text
+    either center, left or right (default center)
+
+    For example::
+
+       --- text
+       =The Page Title
+       *a bold thing*
+       -<<*a smaller bold thing not displayed immediately*
+
+    For a truly Powerp*int experience, try:
+
+       --- text
+           valign=top
+           halign=left
+       =|Page Heading
+       .First bullet point
+       ..Nested point
+       ..Nested point
+       .Second top-level point
+       ..Nested point
+       ...Nested, Nested point
+       ....Nested,Nested, Nested point
+
+**--- image**
+    Page content is the filename. The image will be not be scaled without
+    without the zoom flag set.
+
+    Flags include:
+
+    **zoom** - zoom smaller image up to fit in screen
+
+    **title=<text>** - set the image title, will appear above image in same
+    style as text page title
+
+    **caption=<text>** - set the image caption, will appear below the image
+    in same style as text page
+
+    For example::
+
+        ..image
+          zoom
+          caption=A Screenshot
+        screenshot.png
+
+**--- video**
+    Page content is the video filename.
+
+    Flags include:
+
+    **title=<text>** - set the video title, will appear above video
+
+    **caption=<text>** - set the video caption, will appear below the video
+
+    For example::
+
+        ..video
+          caption=A Screenshot
+        video.mpg
+
+**--- code**
+    Display a text file contents. The page content is the filename to read
+    content from.
+
+    Flags can be:
+
+    **title** - a title to display above the code
+
+**--- html**
+    Display a HTML text file contents. The page content is the filename
+    to read content from.
+
+**--- py**
+    Run an interactive Python session.
+
+    Flags can be:
+
+    **title=<text>** - set the page title, will appear above shell in same
+    style as text page title
+
+    **sysver** - display the python version
+
+**--- pycode**
+    Run an editor in which Python program code may be edited. Run the
+    program with F4.
+
+    The display is replaced by a window with output from the program running.
+    Input may be directed to the program.
+
+    Hit <escape> to close the output window when done. This should also
+    kill the program if it's still running.
+
+    **title=<text>** - set the page title, will appear above shell in same
+    style as text page title. Defaults to "BruceEdit(tm) ..." or similar.
+
+**--- resource**
+    Add a directory to the pyglet resources search path - used to find
+    images, html and plugins you reference.
+
+	By default the directory that the presentation script resides in is
+    the only entry on the path.
+
+**--- config**
+    Lines in config section set options for subsequent pages.
+
+    Can specify colours as 0-255 values "R,G,B" or "R,G,B,A"
+
+**--- blank**
+    Nothing is displayed.
+
+**--- plygin:<custom Page module>**
+    Load a Page from the module indicated. It is located on the resource
+    path and must contain a Path class. It may also add configuration
+    information etc. See examples/cube_page.py for an example.
+
+
+
+Custom Pages
+============
+
+Custom pages subclass bruce.Page.
+
+Flags are parsed as NAME=VALUE pairs and passed as keyword arguments to the
+page constructor. The rest of the page is passed as a single string as an
+argument to the page constructor.
+
+Custom pages may define their own configuration variables too.
+
+Bruce structure
+---------------
+
+The basic class is the Page class::
+
+    class Page(object):
+        flags = (
+            # name        , takes arg?
+            ('booleanflag', False),
+            ('stringflag',  True),
+        )
+
+        def __init__(self, viewport, content, **flags):
+            '''Initialise the page given the viewport (width, height) in
+            pixels.
+            '''
+
+        def draw(self):
+            '''Draw self - assume orthographic projection.
+            '''
+
+        def update(self, dt):
+            '''Invoked periodically with the time since the last
+            update()
+            '''
+
+        def on_enter(self, viewport_width, viewport_height):
+            '''Invoked when the page is put up on the screen.
+            '''
+
+		def on_resize(self, viewport_width, viewport_height):
+			'''Invoked when the viewport changes size (most likely switching
+		 	between fullscreen and windowed).
+			'''
+
+        def on_next(self):
+            '''Invoked on the "next" event (cursor right or left mouse
+            button). If the handler returns event.EVENT_HANDLED then
+            the presentation does not leave this page.
+            '''
+
+        def on_previous(self):
+            '''Invoked on the "previous" event (cursor left or right mouse
+            button). If the handler returns event.EVENT_HANDLED then
+            the presentation does not leave this page.
+            '''
+
+        def on_leave(self):
+            '''Invoked when the page is removed from the screen.
+            '''
+
+        def as_html(self):
+            '''Invoked to generate the HTML version of the presentation.
+            '''
+
+The Page is pushed onto the pyglet event stack when it is activated and
+thus may have handlers for any standard pyglet.window events. A page's
+life thus consists of:
+
+1. __init__
+2. on_enter
+3. lots of update / draw
+4. on_next or on_previous and optionally back to #3
+5. on_leave
+
+

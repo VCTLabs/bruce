@@ -1,0 +1,20 @@
+Metadata-Version: 1.0
+Name: bruce
+Version: 1.0
+Summary: Bruce the Presentation Tool
+Home-page: http://www.mechanicalcat.net/tech/bruce
+Author: Richard Jones
+Author-email: richard@mechanicalcat.net
+License: UNKNOWN
+Description: Bruce the Presentation Tool is for Python
+        programmers who are tired of fighting with presentation tools. In its
+        basic form it allows text, code or image pages and even interactive
+        Python sessions. It uses PyGame and is easily extensible to add new
+        page types.
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Topic :: Multimedia :: Graphics :: Presentation
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
