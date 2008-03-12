@@ -1,0 +1,7 @@
+#summary Python interpreter page
+
+The following source generated the image below.
+
+--- py
+    title=This is a title
+    sysver
