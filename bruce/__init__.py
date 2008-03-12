@@ -26,15 +26,15 @@ def _run(win, content, **kw):
     win.push_handlers(p)
     pyglet.app.run()
 
-def run(filename, fullscreen=False, screen=0, **kw):
+def run(filename, fullscreen=False, screen=0, width=1024, height=768, **kw):
     directory = os.path.abspath(os.path.dirname(filename))
     config.set('directory', directory)
     resource.loader.path.append(directory)
     resource.loader.reindex()
-    _run(_window(1024, 768, fullscreen, screen), file(filename).read(), **kw)
+    _run(_window(width, height, fullscreen, screen), file(filename).read(), **kw)
 
-def runstring(content, fullscreen=False, screen=0, **kw):
-    _run(_window(1024, 768, fullscreen, screen), content, **kw)
+def runstring(content, fullscreen=False, screen=0, width=1024, height=768, **kw):
+    _run(_window(width, height, fullscreen, screen), content, **kw)
 
 def notes(filename, out_file='', columns=2):
     directory = os.path.abspath(os.path.dirname(filename))
@@ -142,6 +142,9 @@ if __name__ == '__main__':
     p.add_option("-d", "--display-source", dest="source",
                       action="store_true", default=False,
                       help="display page source in terminal")
+    p.add_option("-w", "--window-size", dest="window_size",
+                      default="1024x768",
+                      help="size of the window when not fullscreen")
 
     '''
     Disabled because it's not pretty
@@ -157,8 +160,9 @@ if __name__ == '__main__':
     elif options.notes:
         notes(args[0], options.out_file, int(options.columns))
     else:
+        width, height = map(int(options.window_size.split('x')))
         run(args[0], fullscreen=options.fullscreen,
             show_timer=options.timer, show_count=options.page_count,
             start_page=int(options.start_page)-1, show_source=options.source,
-            screen=int(options.screen)-1)
+            screen=int(options.screen)-1, width=width, height=height)
 
