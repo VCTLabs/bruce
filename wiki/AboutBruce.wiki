@@ -9,6 +9,10 @@ Anyone interested in extending the software is welcome! Contact me at <richard a
 
 Download at: http://pypi.python.org/pypi/bruce
 
+=Samples=
+
+See BrucePointPage, ImagePage, SampleTextPage and PythonPage.
+
 =Prerequisites=
 
 Bruce requires Python 2.5 and pyglet 1.1 or later.
