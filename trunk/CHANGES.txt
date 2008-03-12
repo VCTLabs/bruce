@@ -1,3 +1,7 @@
+
+- allow command-line to change the size of the window
+
+
 2.0beta2 - 2008-03-11
 
 - add initial text expose effect (fade in)
