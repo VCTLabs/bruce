@@ -1,0 +1,23 @@
+#summary Bruce emulating PowerP*int
+
+The following source generated the image below (trying to emulate PowerP*int as closely as possible). This is just for one page. You could put the configuration stuff in a "config" section so all pages are rendered in the same style.
+
+{{{
+--- text
+    valign=top
+    halign=left
+    title.color=0,0,0
+    text.color=0,0,0
+    bgcolor=255,255,255
+|=Powerpoint style
+
+.This is so totally
+.POWERPOINT!
+.(with bullets)
+..(nested)
+...(oh my!)
+....It continues! And you could have a whole damn ESSAY in here. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a
+liqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillu
+m dolore eu fugiat nulla pariatur.
+...(back a level)
+}}}
