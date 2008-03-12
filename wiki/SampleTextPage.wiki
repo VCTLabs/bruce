@@ -1,0 +1,10 @@
+#summary Basic text page sample and screen shot
+
+
+The following source generated the image below.
+
+{{{
+--- text
+=Welcome to Bruce!
+<<Bruce the Presentation Tool version 2.0, that is
+}}}
