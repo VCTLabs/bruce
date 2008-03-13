@@ -160,7 +160,12 @@ if __name__ == '__main__':
     elif options.notes:
         notes(args[0], options.out_file, int(options.columns))
     else:
-        width, height = map(int(options.window_size.split('x')))
+        display = pyglet.window.get_platform().get_default_display()
+	screen = int(options.screen)-1
+        screen = display.get_screens()[screen]
+        width, height = map(int, options.window_size.split('x'))
+	width = min(width, screen.width)
+	height = min(height, screen.height)
         run(args[0], fullscreen=options.fullscreen,
             show_timer=options.timer, show_count=options.page_count,
             start_page=int(options.start_page)-1, show_source=options.source,
