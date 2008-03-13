@@ -1,5 +1,10 @@
 --- text
 this is a text page
 --- video tada.avi
+--- video tada.avi
+    zoom
+    title=zoomed
+--- video tada.avi
+    zoom
 --- text
 this is a text page

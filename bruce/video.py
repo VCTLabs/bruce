@@ -12,10 +12,10 @@ from bruce import resource
 
 class VideoPage(page.Page):
     config = (
-        #('zoom', bool, False),
         ('title', str, ''),
         ('caption', str, ''),
         # only the following are configurable
+        ('zoom', bool, False),
         ('text.font_name', str, 'Arial'),
         ('text.font_size', float, 64),
         ('text.color', tuple, (255, 255, 255, 255)),
@@ -81,6 +81,7 @@ class VideoPage(page.Page):
         self.player.eos_action = self.player.EOS_PAUSE
         self.player.play()
 
+    scale = 0
     def on_resize(self, vw, vh):
         self.viewport_width, self.viewport_height = vw, vh
 
@@ -97,11 +98,14 @@ class VideoPage(page.Page):
             yoffset += self.caption_label.content_height
 
         w, h = self.video_width, self.video_height
-        self.video_x, self.video_y = vw//2 - w//2, yoffset + (vh//2 - h//2)
 
         # determine whether we're scaling
-        #if self.zoom or w > vw or h > vh:
-        #    self.image.scale = min(vw / float(w), vh / float(h))
+        if self.cfg['zoom'] or w > vw or h > vh:
+            self.scale = min(vw / float(w), vh / float(h))
+	    w *= self.scale
+	    h *= self.scale
+
+        self.video_x, self.video_y = vw//2 - w//2, yoffset + (vh//2 - h//2)
 
     def on_leave(self):
         self.image = None
@@ -114,9 +118,15 @@ class VideoPage(page.Page):
 
         # Video
         if self.player.source and self.player.source.video_format:
+            if self.scale:
+                gl.glPushMatrix()
+                gl.glScalef(self.scale, self.scale, 1)
             self.player.texture.blit(self.video_x,
                                      self.video_y,
                                      width=self.video_width,
                                      height=self.video_height)
+            if self.scale:
+                gl.glPopMatrix()
 
 config.add_section('video', dict((k, v) for k, t, v in VideoPage.config[1:]))
+
