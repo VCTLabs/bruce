@@ -23,12 +23,11 @@ class ClampTextureImageGroup(graphics.Group):
     def unset_state(self):
         gl.glPopAttrib()
 
-class ImagePage(page.Page):
+class ImagePage(page.PageWithTitle, page.Page):
     config = (
         ('zoom', bool, False),
-        ('title', str, ''),
-        ('caption', str, ''),
-        # only the following are configurable
+        ('title', unicode, ''),
+        ('caption', unicode, ''),
         ('text.font_name', str, 'Arial'),
         ('text.font_size', float, 64),
         ('text.color', tuple, (255, 255, 255, 255)),
@@ -50,7 +49,7 @@ class ImagePage(page.Page):
             l.append(flags['caption'])
         return '<br>'.join(l)
 
-    title_label = caption_label = None
+    caption_label = None
     def on_enter(self, vw, vh):
         super(ImagePage, self).on_enter(vw, vh)
 
@@ -70,16 +69,11 @@ class ImagePage(page.Page):
             batch=self.batch)
 
         # if we have a title then generate it
-        if self.title:
-            self.title_label = text.Label(self.title,
-                font_name=self.cfg['title.font_name'],
-                font_size=self.cfg['title.font_size'],
-                color=self.cfg['title.color'],
-                halign='center', valign='bottom', batch=self.batch)
+        self.generate_title()
 
-        # if we have a captio then generate it
-        if self.caption:
-            self.caption_label = text.Label(self.caption,
+        # if we have a caption then generate it
+        if self.cfg['caption']:
+            self.caption_label = text.Label(self.cfg['caption'],
                 font_name=self.cfg['text.font_name'],
                 font_size=self.cfg['text.font_size'],
                 color=self.cfg['text.color'],
@@ -90,10 +84,12 @@ class ImagePage(page.Page):
 
     def on_resize(self, vw, vh):
         self.viewport_width, self.viewport_height = vw, vh
+
         # position the labels and adjust the available viewport height
         if self.title_label:
             self.title_label.x = vw//2
             self.title_label.y = vh = vh - self.title_label.content_height
+
         yoffset = 0
         if self.caption_label:
             self.caption_label.x = vw//2
@@ -124,5 +120,5 @@ class ImagePage(page.Page):
     def draw(self):
         self.batch.draw()
 
-config.add_section('image', dict((k, v) for k, t, v in ImagePage.config[3:]))
+config.add_section('image', dict((k, v) for k, t, v in ImagePage.config))
 

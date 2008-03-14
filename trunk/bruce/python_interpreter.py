@@ -32,14 +32,13 @@ class MyInterpreter(code.InteractiveInterpreter):
         sys.stdout = old_stdout
         return more
 
-class PythonInterpreterPage(page.ScrollableLayoutPage):
+class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
     '''Runs an interactive Python interpreter.
     '''
     config = (
         ('title', str, ''),
         ('sysver', bool, False),
         ('auto', bool, False),
-        # only the following are configurable
         ('title.font_name', str, 'Arial'),
         ('title.font_size', float, 24),
         ('title.color', tuple, (200, 255, 255, 255)),
@@ -95,20 +94,16 @@ class PythonInterpreterPage(page.ScrollableLayoutPage):
 
         self.batch = graphics.Batch()
 
-        if self.title:
-            self.label = text.Label(self.title,
-                font_name=self.cfg['title.font_name'],
-                font_size=self.cfg['title.font_size'],
-                color=self.cfg['title.color'],
-                halign='center', valign='top', batch=self.batch,
-                x=vw//2, y=vh)
+        self.generate_title()
 
         # generate the document
         self.layout = layout.IncrementalTextLayout(self.document,
             vw, vh, multiline=True, batch=self.batch)
+        self.layout.valign = 'top'
 
         self.caret = caret.Caret(self.layout, color=self.cfg['caret.color'])
         self.caret.on_activate()
+
         self.on_resize(vw, vh)
 
         self.start_of_line = len(self.document.text)
@@ -116,15 +111,15 @@ class PythonInterpreterPage(page.ScrollableLayoutPage):
     def on_resize(self, vw, vh):
         self.viewport_width, self.viewport_height = vw, vh
 
-        if self.title:
-            self.label.y = vh
-            self.label.x = vw //2
-            vh -= self.label.content_height
+        if self.title_label:
+            self.title_label.y = vh
+            self.title_label.x = vw //2
+            vh -= self.title_label.content_height
+
         self.layout.begin_update()
         self.layout.height = vh
         self.layout.x = 2
         self.layout.width = vw - 4
-        self.layout.valign = 'top'
         self.layout.y = vh
         self.layout.end_update()
         self.caret.position = len(self.document.text)
@@ -132,7 +127,7 @@ class PythonInterpreterPage(page.ScrollableLayoutPage):
     def on_leave(self):
         self.content = self.document.text
         self.document = None
-        self.label = None
+        self.title_label = None
         self.layout = None
         self.batch = None
         self.caret = None
@@ -230,5 +225,5 @@ class PythonInterpreterPage(page.ScrollableLayoutPage):
     def draw(self):
         self.batch.draw()
 
-config.add_section('py', dict((k, v) for k, t, v in PythonInterpreterPage.config[3:]))
+config.add_section('py', dict((k, v) for k, t, v in PythonInterpreterPage.config))
 

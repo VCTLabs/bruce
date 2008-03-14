@@ -12,20 +12,21 @@ Features:
 - simple point-by-point text display with styling and progressive expose
 - audio playback on any page, including blank ones
 - interactive Python interpreter with history
-- Python code and execution page
+- page of Python code with execution output
 - code display with scrolling
-- unicode escaped chars in ascii file
+- unicode escaped chars in ascii file (or any other source file encoding)
 - html page display with scrolling
-- image display with optional title and/or caption
-- configuration may be changed inside a presentation, affecting subsequent pages
-- resource location (images, video, sound from zip files etc.)
+- image display with optional zoom to fit, title and/or caption
+- video playback with optional zoom to fit, title
+- configuration may be changed inside a presentation, including per-page
+- sensible resource location (images, video, sound from zip files etc.)
+- custom Pages via modules found in resource path
 - timer and page count display for practicing
 - logo display in the corner of every page
 - may specify which screen to open on in multihead
-- may switch to/from fullscreen
+- runs fullscreen at native resolution (with sensible scaling of pages)
+- may switch to/from fullscreen quickly
 - HTML output of pages including notes
-- video playback
-- custom Pages via modules found in resource path
 
 
 Installation

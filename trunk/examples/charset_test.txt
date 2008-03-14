@@ -1,0 +1,13 @@
+--- config
+    charset=utf-8
+
+--- image kitten.jpg
+    title=UTF8 Euro â‚¬
+
+--- image kitten.jpg
+    charset=ascii
+    title=escaped \u20AC
+
+--- image kitten.jpg
+    charset=latin1
+    title=latin1 pound £

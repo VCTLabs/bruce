@@ -1,4 +1,6 @@
 
+2.0
+
 - allow command-line to change the size of the window
 
 

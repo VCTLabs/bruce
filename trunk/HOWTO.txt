@@ -2,20 +2,18 @@
 How to write presenations using Bruce the Presentation Tool
 ===========================================================
 
-Configuration
--------------
+Bruce presentations are written as plain-text files. See the
+examples folder for some samples. A simple presentation could
+consist of::
 
-Config options::
+    --- text first page
+    --- text second page
+    second line on second page
+    --- text third page
+    *bold text line on third page
+    --- image fourth_page.png
 
-**bgcolor**
-  Background color for all pages (default is black).
-
-**charset=<charset>**
-  Page content, **including flags** is encoded using the charset
-  (default is ASCII).
-
-**logo=<logo image>**
-  A logo to display in the bottom-right of every page. 
+and so on.
 
 
 Command file syntax
@@ -24,13 +22,19 @@ Command file syntax
 Commands start with a triple-hyphen and space, ``--- ``::
 
     --- <page type>
-      [page flags, one per line]
+        [page config, one per line]
 
     [page content]
 
-The arguments are preceeded by four spaces or a tab.
+Pages consist of a start marker "--- <some name>" followed by lines of
+content. If the start marker line has content itself, like
+``--- image kitten.jpg`` then that content is considered the first line
+of the page's content. This is convenient for page types that
+only have one line of content like images and code.
 
-Every page may include the following flags::
+Configuration overrides may immediately follow the page directive and
+are indented using either four spaces or a tab character. Every page
+may include the following configuration options::
 
 **nofooter**
   Don't display a footer image
@@ -41,11 +45,6 @@ Every page may include the following flags::
 Lines in the input starting with '#' are always left out of displayed
 content, but they are retained for the notes HTML output.
 
-Pages consist of a start marker "--- <some name>" followed by lines of
-content. If the start marker line has content itself, like
-``--- image kitten.jpg`` then that content is considered the first line
-of the page's content. This is convenient for page types that
-only have one line of content like images and code.
 
 Page Types
 ----------
@@ -67,10 +66,11 @@ Page Types
     . - line is hidden. Each 'next' event will display another hidden line.
     . \ no more special characters will be parsed on this line
 
-    Flags include:
+    Configuration includes:
 
     **valign=<vertical alignment>** - align the whole body of text
     either center, top or bottom (default center)
+
     **halign=<horizontal alignment>** - align the whole body of text
     either center, left or right (default center)
 
@@ -86,6 +86,9 @@ Page Types
        --- text
            valign=top
            halign=left
+           bgcolor=255,255,255
+           text.color=0,0,0
+           title.color=0,0,0
        =|Page Heading
        .First bullet point
        ..Nested point
@@ -177,6 +180,18 @@ Page Types
     Lines in config section set options for subsequent pages.
 
     Can specify colours as 0-255 values "R,G,B" or "R,G,B,A"
+
+    Global configuration options::
+
+    **bgcolor**
+      Background color for all pages (default is black).
+
+    **charset=<charset>**
+      Page content, **including flags** is encoded using the charset
+      (default is ASCII).
+
+    **logo=<logo image>**
+      A logo to display in the bottom-right of every page. 
 
 **--- blank**
     Nothing is displayed.
