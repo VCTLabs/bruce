@@ -9,12 +9,11 @@ from bruce import config
 from bruce import page
 from bruce import resource
 
-class CodePage(page.ScrollableLayoutPage):
+class CodePage(page.PageWithTitle, page.ScrollableLayoutPage):
     '''Displays some code from a file.
     '''
     config = (
         ('title', str, ''),
-        # only the following are configable
         ('title.font_name', str, 'Arial'),
         ('title.font_size', float, 64),
         ('title.color', tuple, (200, 255, 255, 255)),
@@ -40,6 +39,7 @@ class CodePage(page.ScrollableLayoutPage):
     label = None
     def on_enter(self, vw, vh):
         super(CodePage, self).on_enter(vw, vh)
+
         # format the code
         self.document = document.FormattedDocument(self.file_content)
         self.document.set_style(0, len(self.file_content), {
@@ -50,29 +50,40 @@ class CodePage(page.ScrollableLayoutPage):
 
         self.batch = graphics.Batch()
 
-        if self.title:
-            x = vw//2
-            l = self.label = text.Label(self.title,
-                font_name=self.cfg['title.font_name'],
-                font_size=self.cfg['title.font_size'],
-                color=self.cfg['title.color'],
-                halign='center', valign='bottom', batch=self.batch, x=x)
-            l.y = vh = vh - l.content_height
+        self.generate_title()
 
         # generate the document
         self.layout = layout.IncrementalTextLayout(self.document,
             vw, vh, multiline=True, batch=self.batch)
-        self.layout.y = vh
         self.layout.valign = 'top'
+
+        # position all the elements
+        self.on_resize(vw, vh)
+
+    def on_resize(self, vw, vh):
+        self.viewport_width, self.viewport_height = vw, vh
+
+        # position the title and adjust the available viewport height
+        if self.title_label:
+            self.title_label.x = vw//2
+            self.title_label.y = vh = vh - self.title_label.content_height
+
+        # position the code layout
+        self.layout.begin_update()
+        self.layout.x = 2
+        self.layout.width = vw - 4
+        self.layout.height = vh
+        self.layout.y = vh
+        self.layout.end_update()
 
     def on_leave(self):
         self.document = None
-        self.label = None
+        self.title_label = None
         self.layout = None
         self.batch = None
 
     def draw(self):
         self.batch.draw()
 
-config.add_section('code', dict((k, v) for k, t, v in CodePage.config[1:]))
+config.add_section('code', dict((k, v) for k, t, v in CodePage.config))
 

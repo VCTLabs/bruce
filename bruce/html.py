@@ -12,7 +12,6 @@ class HTMLTextPage(page.ScrollableLayoutPage):
     '''
     config = (
         ('isfile', bool, False),
-        # only the following is configurable
         ('color', tuple, (255, 255, 255, 255)),
     )
     name = 'html'
@@ -48,4 +47,5 @@ class HTMLTextPage(page.ScrollableLayoutPage):
         self.batch.draw()
 
 
-config.add_section('html', dict((k, v) for k, t, v in HTMLTextPage.config[1:]))
+config.add_section('html', dict((k, v) for k, t, v in HTMLTextPage.config))
+

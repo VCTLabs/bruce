@@ -119,7 +119,7 @@ sample.html
     zoom
 
 --- image kitten.jpg
-    caption=zoomed kitten caption
+    caption=zoomed kitten \u20AC
     zoom
 
 --- image kitten.jpg

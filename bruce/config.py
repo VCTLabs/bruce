@@ -13,17 +13,27 @@ class _Section(object):
         k = '%s.%s'%(self.name, label)
         if k in self.config:
             return self.config[k]
-        return self.config[label]
+        if label in self.config:
+            return self.config[label]
+        if k in self.config.defaults:
+            return self.config.defaults[k]
+        return self.config.defaults[label]
+    def __setitem__(self, label, value):
+        if self.name == 'config':
+            self.config[label] = value
+        else:
+            self.config['%s.%s'%(self.name, label)] = value
     def update(self, d):
         for k in d:
-            self.config['%s.%s'%(self.name, k)] = d[k]
+            if self.name == 'config':
+                self.config[k] = d[k]
+            else:
+                self.config['%s.%s'%(self.name, k)] = d[k]
 
 class _Config(dict):
     '''Store a set of defaults (defined here and in various page
     types and then per-presentation overrides.
     '''
-    # XXX support custom fonts via pyglet.resource.add_font(filename)
-
     defaults = dict(
         bgcolor = (0, 0, 0, 255),
         charset = 'ascii',
@@ -31,26 +41,33 @@ class _Config(dict):
     )
 
     def set(self, key, val):
+        # XXX update to use type not old value
         if key in self:
             old = self[key]
-            if isinstance(old, int):
-                val = int(val)
-            elif isinstance(old, float):
-                val = float(val)
-            elif isinstance(old, tuple):
-                # a color
-                val = tuple([int(x.strip())
-                        for x in val.strip('()').split(',')])
-                if len(val) < 4:
-                    val += (255,)
-            elif isinstance(old, basestring) or old is None:
-                pass
-            else:
-                raise ValueError("don't understand old value type %r"%(old))
+        elif key in self.defaults:
+            old = self.defaults[key]
+        else:
+            self[key] = val
+            return
+
+        if isinstance(old, int):
+            val = int(val)
+        elif isinstance(old, float):
+            val = float(val)
+        elif isinstance(old, tuple):
+            # a color
+            val = tuple([int(x.strip())
+                    for x in val.strip('()').split(',')])
+            if len(val) < 4:
+                val += (255,)
+        elif isinstance(old, basestring) or old is None:
+            pass
+        else:
+            raise ValueError("don't understand old value type %r"%(old))
         self[key] = val
 
     def __contains__(self, key):
-        return super(_Config, self).__contains__(key) or key in self.defaults
+        return super(_Config, self).__contains__(key) # (lookup done in Section now) or key in self.defaults
 
     def __getitem__(self, key):
         if super(_Config, self).__contains__(key):

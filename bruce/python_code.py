@@ -16,12 +16,11 @@ from bruce import page
 
 # XXX add option to minimize on launch and restore when process quits
 
-class PythonCodePage(page.ScrollableLayoutPage):
+class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
     '''Runs an editor for a Python script which is executable.
     '''
     config = (
         ('title', str, 'BruceEdit(tm) Python Source Editor'),
-        # only the following are configurable
         ('title.font_name', str, 'Arial'),
         ('title.font_size', float, 24),
         ('title.color', tuple, (200, 255, 255, 255)),
@@ -59,15 +58,12 @@ class PythonCodePage(page.ScrollableLayoutPage):
 
         self.batch = graphics.Batch()
 
-        self.label = text.Label(self.title,
-            font_name=self.cfg['title.font_name'],
-            font_size=self.cfg['title.font_size'],
-            color=self.cfg['title.color'],
-            halign='center', valign='top', batch=self.batch, x=vw//2, y=vh)
+        self.generate_title()
 
         # generate the document
         self.layout = layout.IncrementalTextLayout(self.document,
             vw, vh, multiline=True, batch=self.batch)
+        self.layout.valign = 'top'
 
         self.caret = caret.Caret(self.layout, color=self.cfg['caret.color'])
         self.caret.on_activate()
@@ -77,9 +73,10 @@ class PythonCodePage(page.ScrollableLayoutPage):
     def on_resize(self, vw, vh):
         self.viewport_width, self.viewport_height = vw, vh
 
-        self.label.y = vh
-        self.label.x = vw //2
-        vh = vh - self.label.content_height
+        if self.title_label:
+            self.title_label.y = vh
+            self.title_label.x = vw //2
+            vh = vh - self.title_label.content_height
 
         self.layout.begin_update()
         self.layout.x = 2
@@ -93,7 +90,7 @@ class PythonCodePage(page.ScrollableLayoutPage):
     def on_leave(self):
         self.content = self.document.text
         self.document = None
-        self.label = None
+        self.title_label = None
         self.layout = None
         self.batch = None
         self.caret = None
@@ -239,4 +236,5 @@ class PythonCodePage(page.ScrollableLayoutPage):
         self.batch.draw()
 
 
-config.add_section('pyscript', dict((k, v) for k, t, v in PythonCodePage.config[1:]))
+config.add_section('pyscript', dict((k, v) for k, t, v in PythonCodePage.config))
+

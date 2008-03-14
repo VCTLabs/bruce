@@ -42,8 +42,8 @@ class FadeOut(Effect):
 
 class TextPage(page.Page):
     config = (
-        ('valign', str, 'center'),
-        ('halign', str, 'center'),
+        ('valign', str, 'center'), #, 'center bottom top'.split()),
+        ('halign', str, 'center'), #, 'center left right'.split()),
         ('text.font_name', str, 'Arial'),
         ('text.font_size', float, 64),
         ('text.color', tuple, (255, 255, 255, 255)),
@@ -59,9 +59,6 @@ class TextPage(page.Page):
     def __init__(self, *args, **kw):
         super(TextPage, self).__init__(*args, **kw)
         self.effects = {}
-        # XXX move this to config
-        assert self.valign in 'center bottom top'.split()
-        assert self.halign in 'center left right'.split()
 
     def on_enter(self, vw, vh):
         super(TextPage, self).on_enter(vw, vh)

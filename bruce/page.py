@@ -19,12 +19,12 @@ class Page(pyglet.event.EventDispatcher):
     nofooter = False
 
     default_config = (
-        ('nofooter', bool,  False),
-        #('auto',     float, None),
-        ('sound',    str,   None),
-        ('logo',     str,   None),
-        ('charset',  str,   'ascii'),
-        ('bgcolor',  tuple, (0, 0, 0, 255)),
+        ('nofooter', bool,      False),
+        #('auto',     float,    None),
+        ('sound',    unicode,   None),
+        ('logo',     unicode,   None),
+        ('charset',  str,       'ascii'),
+        ('bgcolor',  tuple,     (0, 0, 0, 255)),
     )
     config = ()
 
@@ -33,18 +33,20 @@ class Page(pyglet.event.EventDispatcher):
         '''
         self.source = '\n'.join(source)
 
+        self.cfg = config.get_section(self.name)
+
         for name, type, default in self.default_config + self.config:
             if name in kw:
                 if type is tuple:
                     val = tuple(int(v.strip()) for v in kw[name].split(','))
                     if len(val) < 4:
                         val += (255,)
-                    kw[name] = val
+                    self.cfg[name] = val
+                elif issubclass(type, unicode):
+                    val = decode_content(self, kw[name])
+                    self.cfg[name] = type(val)
                 else:
-                    kw[name] = type(kw[name])
-
-        self.cfg = config.get_section(self.name)
-        self.cfg.update(kw)
+                    self.cfg[name] = type(kw[name])
 
         for name, type, default in self.default_config + self.config:
             if name in kw:
@@ -156,4 +158,15 @@ class ScrollableLayoutPage(Page):
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         #self.layout.view_x += dx
         self.layout.view_y -= dy
+
+
+class PageWithTitle(object):
+    title_label = None
+    def generate_title(self):
+        if self.cfg['title']:
+            self.title_label = pyglet.text.Label(self.cfg['title'],
+                font_name=self.cfg['title.font_name'],
+                font_size=self.cfg['title.font_size'],
+                color=self.cfg['title.color'],
+                halign='center', valign='bottom', batch=self.batch)
 
