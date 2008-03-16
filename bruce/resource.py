@@ -6,10 +6,12 @@ from bruce import config
 loader = pyglet.resource.Loader(path=[])
 
 class Resource(page.Page):
+    name = 'resource'
 
-    @classmethod
-    def as_page(cls, content, **kw):
-        for line in content.splitlines():
+    def __init__(self, content, **kw):
+        super(Resource, self).__init__(content, **kw)
+
+        for line in self.content.splitlines():
             line = line.strip()
             if not os.path.isabs(line):
                 line = os.path.join(config.get('directory'), line)
