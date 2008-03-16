@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess
 import errno
+from cgi import escape as html_quote
 
 if not subprocess.mswindows:
     import select
@@ -36,14 +37,12 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
         super(PythonCodePage, self).__init__(content, **kw)
         self._python = None
 
-    @classmethod
-    def as_html(cls, content, **flags):
+    def as_html(self):
         '''Invoked to generate the HTML version of the presentation.
         '''
-        if not content:
+        if not self.content:
             return 'python script'
-        content = decode_content(cls, content)
-        return '<pre>%s</pre>'%html_quote(content)
+        return '<pre>%s</pre>'%html_quote(self.content)
 
     def on_enter(self, vw, vh):
         super(PythonCodePage, self).on_enter(vw, vh)

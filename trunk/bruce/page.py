@@ -76,18 +76,12 @@ class Page(pyglet.event.EventDispatcher):
         scale = min(sx, sy)
         return base * scale
 
-    @classmethod
-    def as_page(cls, content, **kw):
-        return cls(content, **kw)
-
-    @classmethod
-    def as_html(cls, content, **kw):
+    def as_html(self):
         '''Invoked to generate the HTML version of the presentation.
         '''
-        if not content:
+        if not self.content:
             return ''
-        content = decode_content(cls, content)
-        return '<pre>%s</pre>'%html_quote(content)
+        return '<pre>%s</pre>'%html_quote(self.content)
 
     def draw(self):
         '''Draw self - assume orthographic projection.

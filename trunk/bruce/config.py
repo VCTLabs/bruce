@@ -87,7 +87,7 @@ class _Config(dict):
         return c
 
     flags = tuple([(k, str, defaults[k]) for k in defaults])
-    def as_page(self, content, **kw):
+    def __call__(self, content, **kw):
         for k in kw:
             if k in self.defaults:
                 # exact match on the key
@@ -97,16 +97,10 @@ class _Config(dict):
                 for d in self.defaults:
                     if '.' in d and d.split('.', 1)[1] == k:
                         self.set(d, kw[k])
-        return None
+        return self
 
-    def as_html(self, content, **kw):
-        # apply the config since we will need to know the correct charset
-        # (etc?)
-        self.as_page(content, **kw)
+    def as_html(self):
         return ''
-        #l = ['<b>config section</b>']
-        #l.extend('%s=%s'%i for i in kw.items())
-        #return '<br>'.join(l)
 
 # singleton
 config = _Config()

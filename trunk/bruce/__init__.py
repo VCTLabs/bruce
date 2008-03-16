@@ -3,6 +3,7 @@ __version__ = '2.0beta2'
 import os
 import sys
 import time
+from cgi import escape as html_quote
 
 import pyglet
 
@@ -97,7 +98,7 @@ def notes(filename, out_file='', columns=2):
         print >>o, '<div class="content">%s</div>'%page.encode('ascii',
                 'xmlcharrefreplace')
         if note:
-            note = '\n'.join(note)
+            note = '<br>\n'.join(html_quote(n) for n in note)
             print >>o, '<div class="note">%s</div>'%note.encode('ascii',
                 'xmlcharrefreplace')
         print >>o, '</div></td>'
