@@ -5,7 +5,7 @@ from bruce import config
 
 loader = pyglet.resource.Loader(path=[])
 
-class Resource(page.Page):
+class Resource(page.NoContent):
     name = 'resource'
 
     def __init__(self, content, **kw):
@@ -21,4 +21,3 @@ class Resource(page.Page):
                 loader.path.append(line)
         loader.reindex()
         return None
-

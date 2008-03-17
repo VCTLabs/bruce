@@ -37,12 +37,12 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
         super(PythonCodePage, self).__init__(content, **kw)
         self._python = None
 
-    def as_html(self):
-        '''Invoked to generate the HTML version of the presentation.
-        '''
-        if not self.content:
+    @classmethod
+    def as_html(cls, content, **kw):
+        inst = cls(content, **kw)
+        if not inst.content:
             return 'python script'
-        return '<pre>%s</pre>'%html_quote(self.content)
+        return '<pre>%s</pre>'%html_quote(inst.content)
 
     def on_enter(self, vw, vh):
         super(PythonCodePage, self).on_enter(vw, vh)
