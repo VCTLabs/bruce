@@ -1,6 +1,6 @@
-===========================================================
-How to write presenations using Bruce the Presentation Tool
-===========================================================
+============================================================
+How to write presentations using Bruce the Presentation Tool
+============================================================
 
 Bruce presentations are written as plain-text files. See the
 examples folder for some samples. A simple presentation could
