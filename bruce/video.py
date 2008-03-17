@@ -102,8 +102,8 @@ class VideoPage(page.Page):
         # determine whether we're scaling
         if self.cfg['zoom'] or w > vw or h > vh:
             self.scale = min(vw / float(w), vh / float(h))
-	    w *= self.scale
-	    h *= self.scale
+        w *= self.scale
+        h *= self.scale
 
         self.video_x, self.video_y = vw//2 - w//2, yoffset + (vh//2 - h//2)
 
