@@ -19,7 +19,7 @@ and so on.
 Command file syntax
 -------------------
 
-Commands start with a triple-hyphen and space, ``--- ``::
+Commands start with a triple-hyphen and space, "--- " and then a page type::
 
     --- <page type>
         [page config, one per line]
@@ -34,12 +34,14 @@ only have one line of content like images and code.
 
 Configuration overrides may immediately follow the page directive and
 are indented using either four spaces or a tab character. Every page
-may include the following configuration options::
+may include the following configuration options:
 
 **nofooter**
+
   Don't display a footer image
 
 **sound=<sound file>**
+
   Sound is played when the page is displayed.
 
 Lines in the input starting with '#' are always left out of displayed
@@ -49,7 +51,7 @@ content, but they are retained for the notes HTML output.
 Page Types
 ----------
 
-**--- text** - a normal text page
+**--- text**
     Each line in the text page is displayed on screen.
 
     Lines can start with one or more special characters. These include:
@@ -81,7 +83,7 @@ Page Types
        *a bold thing*
        -<<*a smaller bold thing not displayed immediately*
 
-    For a truly Powerp*int experience, try:
+    For a truly Powerp*int experience, try::
 
        --- text
            valign=top
@@ -173,7 +175,7 @@ Page Types
     Add a directory to the pyglet resources search path - used to find
     images, html and plugins you reference.
 
-	By default the directory that the presentation script resides in is
+    By default the directory that the presentation script resides in is
     the only entry on the path.
 
 **--- config**
@@ -181,16 +183,19 @@ Page Types
 
     Can specify colours as 0-255 values "R,G,B" or "R,G,B,A"
 
-    Global configuration options::
+    Global configuration options:
 
     **bgcolor**
+
       Background color for all pages (default is black).
 
     **charset=<charset>**
+
       Page content, **including flags** is encoded using the charset
       (default is ASCII).
 
     **logo=<logo image>**
+
       A logo to display in the bottom-right of every page. 
 
 **--- blank**
@@ -244,10 +249,10 @@ The basic class is the Page class::
             '''Invoked when the page is put up on the screen.
             '''
 
-		def on_resize(self, viewport_width, viewport_height):
-			'''Invoked when the viewport changes size (most likely switching
-		 	between fullscreen and windowed).
-			'''
+        def on_resize(self, viewport_width, viewport_height):
+            '''Invoked when the viewport changes size (most likely switching
+             between fullscreen and windowed).
+            '''
 
         def on_next(self):
             '''Invoked on the "next" event (cursor right or left mouse
