@@ -37,14 +37,16 @@ class ImagePage(page.PageWithTitle, page.Page):
     )
     name = 'image'
 
-    def as_html(self):
-        path = os.path.join(config.get('directory'), self.content)
+    @classmethod
+    def as_html(cls, content, **kw):
+        inst = cls(content, **kw)
+        path = os.path.join(config.get('directory'), inst.content)
         l = []
-        if self.cfg['title']:
-            l.append('<b>%s</b>'%self.cfg['title'])
+        if inst.cfg['title']:
+            l.append('<b>%s</b>'%inst.cfg['title'])
         l.append('<img height="100" src="%s">'%path)
-        if self.cfg['caption']:
-            l.append(self.cfg['caption'])
+        if inst.cfg['caption']:
+            l.append(inst.cfg['caption'])
         return '<br>'.join(l)
 
     caption_label = None

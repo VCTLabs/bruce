@@ -73,13 +73,11 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
         assert self.auto is False, 'not implemented yet'
 
     @classmethod
-    def as_html(cls, content, **flags):
-        '''Invoked to generate the HTML version of the presentation.
-        '''
-        if not content:
+    def as_html(cls, content, **kw):
+        inst = cls(content, **kw)
+        if not inst.content:
             return 'python interpreter'
-        content = decode_content(cls, content)
-        return '<pre>%s</pre>'%html_quote(content)
+        return '<pre>%s</pre>'%html_quote(inst.content)
 
     def on_enter(self, vw, vh):
         super(PythonInterpreterPage, self).on_enter(vw, vh)

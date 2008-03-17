@@ -69,6 +69,10 @@ class Page(pyglet.event.EventDispatcher):
 
         self.content = decode_content(self, content)
 
+    @classmethod
+    def as_page(cls, content, **kw):
+        return cls(content, **kw)
+
     def font_size(self, name):
         base = self.cfg[name]
         sx = self.viewport_width / 1024.
@@ -76,12 +80,14 @@ class Page(pyglet.event.EventDispatcher):
         scale = min(sx, sy)
         return base * scale
 
-    def as_html(self):
+    @classmethod
+    def as_html(cls, content, **kw):
         '''Invoked to generate the HTML version of the presentation.
         '''
-        if not self.content:
+        inst = cls(content, **kw)
+        if not inst.content:
             return ''
-        return '<pre>%s</pre>'%html_quote(self.content)
+        return '<pre>%s</pre>'%html_quote(inst.content)
 
     def draw(self):
         '''Draw self - assume orthographic projection.
@@ -131,6 +137,12 @@ class Page(pyglet.event.EventDispatcher):
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')
 
+
+class NoContent(Page):
+
+    @classmethod
+    def as_page(cls, content, **kw):
+        return None
 
 
 class ScrollableLayoutPage(Page):

@@ -24,13 +24,15 @@ class VideoPage(page.Page):
     )
     name = 'video'
 
-    def as_html(self):
+    @classmethod
+    def as_html(cls, content, **kw):
+        inst = cls(content, **kw)
         l = []
-        if self.cfg['title']:
-            l.append('<b>%s</b>'%self.cfg['title'])
-        l.append('Video: %s'%self.content)
-        if self.cfg['caption']:
-            l.append(self.cfg['caption'])
+        if inst.cfg['title']:
+            l.append('<b>%s</b>'%inst.cfg['title'])
+        l.append('Video: %s'%inst.content)
+        if inst.cfg['caption']:
+            l.append(inst.cfg['caption'])
         return '<br>'.join(l)
 
     title_label = caption_label = None

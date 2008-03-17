@@ -99,8 +99,13 @@ class _Config(dict):
                         self.set(d, kw[k])
         return self
 
-    def as_html(self):
+    @classmethod
+    def as_html(cls, content, **kw):
         return ''
+
+    @classmethod
+    def as_page(cls, content, **kw):
+        return None
 
 # singleton
 config = _Config()

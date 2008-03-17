@@ -27,9 +27,9 @@ def parse(text, html=False):
                 try:
                     content = '\n'.join(content).strip()
                     if html:
-                        obj = (klass(content, **flags).as_html(), notes)
+                        obj = (klass.as_html(content, **flags), notes)
                     else:
-                        obj = klass(content, **flags)
+                        obj = klass.as_page(content, **flags)
                 except ValueError, error:
                     raise ParseError(N, str(error))
                 klass = None
@@ -87,9 +87,9 @@ def parse(text, html=False):
         try:
             content = '\n'.join(content)
             if html:
-                obj = (klass(content, **flags).as_html(), notes)
+                obj = (klass.as_html(content, **flags), notes)
             else:
-                obj = klass(content, **flags)
+                obj = klass.as_page(content, **flags)
         except ValueError, error:
             raise ParseError(N, str(error))
         if obj:
