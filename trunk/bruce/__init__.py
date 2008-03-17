@@ -167,8 +167,8 @@ if __name__ == '__main__':
     width, height = map(int, options.window_size.split('x'))
     width = min(width, screen.width)
     height = min(height, screen.height)
-        run(args[0], fullscreen=options.fullscreen,
-            show_timer=options.timer, show_count=options.page_count,
-            start_page=int(options.start_page)-1, show_source=options.source,
-            screen=int(options.screen)-1, width=width, height=height)
+    run(args[0], fullscreen=options.fullscreen,
+        show_timer=options.timer, show_count=options.page_count,
+        start_page=int(options.start_page)-1, show_source=options.source,
+        screen=int(options.screen)-1, width=width, height=height)
 
