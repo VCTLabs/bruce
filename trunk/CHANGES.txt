@@ -1,8 +1,10 @@
 
-2.0
+2.0beta3 - 2008-03-17
 
 - allow command-line to change the size of the window
 - repaired HTML output
+- implemented video zoom
+- complete flag/config unification; configs may be unicode
 
 
 2.0beta2 - 2008-03-11
