@@ -163,8 +163,8 @@ if __name__ == '__main__':
     else:
         display = pyglet.window.get_platform().get_default_display()
     screen = int(options.screen)-1
-        screen = display.get_screens()[screen]
-        width, height = map(int, options.window_size.split('x'))
+    screen = display.get_screens()[screen]
+    width, height = map(int, options.window_size.split('x'))
     width = min(width, screen.width)
     height = min(height, screen.height)
         run(args[0], fullscreen=options.fullscreen,
