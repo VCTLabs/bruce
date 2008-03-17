@@ -1,0 +1,65 @@
+#summary Missing Bruce features
+
+Bugs:
+
+  # image border when zoomed up is still dodgy (check image placement - might not be pixel-aligned)
+
+Transitions:
+
+  # Need to be able to ask the next page to prepare for rendering. This will be done automatically when the current page is idle.
+  # Pages should be able to indicate when they are idle.
+
+And then:
+
+Wipe, slide, rotate can be done with projections:
+
+  # transform
+  # render current
+  # transform
+  # render next
+
+Fade may be done using a copy of the color buffer:
+
+  # copy current as old
+  # render next
+  # render old with alpha
+
+More advanced transitions using textures:
+
+  # render current to texture
+  # render next to texture
+  # animate
+
+
+Page transition ideas:
+
+  * fade between
+  * fade via black
+  * flip around over middle v/h
+  * rotate "cube" v/h
+  * slide (out or in or both)
+  * peel from side / corner
+  * progressive blur in / out (via shader)
+  * typographic:  http://www.youtube.com/watch?v=ejweI0EQpX8  http://www.youtube.com/watch?v=QX7N58df0j0  http://www.youtube.com/watch?v=QhAdFoEge1c
+
+
+Wishlist:
+
+  * auto typing in py interpreter
+  * fancier backgrounds
+  * control over HTML style
+  * logo alignment, blend etc.
+  * page-to-page transitions
+  * progressive text display animations
+  * shell session
+  * timer feedback replay
+  * source view in a pyglet window with fullscreen option
+  * scaling of video
+  * highlight (rectangle and spotlight)
+
+
+Text animation:
+
+  * progressive type of letters or words
+  * fade in speed
+  * zoom letters in
