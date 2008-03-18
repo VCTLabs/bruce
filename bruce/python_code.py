@@ -31,7 +31,7 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
         ('code.color', tuple, (200, 200, 200, 255)),
         ('caret.color', tuple, (200, 200, 200)),
     )
-    name = 'pyscript'
+    name = 'pycode'
 
     def __init__(self, content, **kw):
         super(PythonCodePage, self).__init__(content, **kw)
@@ -235,5 +235,5 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
         self.batch.draw()
 
 
-config.add_section('pyscript', dict((k, v) for k, t, v in PythonCodePage.config))
+config.add_section('pycode', dict((k, v) for k, t, v in PythonCodePage.config))
 
