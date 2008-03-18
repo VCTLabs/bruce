@@ -105,6 +105,9 @@ class _Config(dict):
 
     @classmethod
     def as_page(cls, content, **kw):
+        for k in kw:
+            if k in cls.defaults:
+                config.set(k, kw[k])
         return None
 
 # singleton
