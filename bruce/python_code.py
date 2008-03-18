@@ -112,7 +112,7 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
             args = [sys.executable, '/tmp/bruce-temp-script.py']
             self._python = subprocess.Popen(args, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-            self.label.text = 'Running... output below'
+            self.title_label.text = 'Running... output below'
             self.document.text = '> %s\n'%' '.join(args)
             self.caret.on_deactivate()
             self.stdin = []
@@ -127,7 +127,7 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
             # check for termination
             p.poll()
             if p.returncode is not None:
-                self.label.text = 'Subprocess terminated - hit escape'
+                self.title_label.text = 'Subprocess terminated - hit escape'
 
             if subprocess.mswindows:
                 # XXX need ms windows select stuff :(
@@ -196,7 +196,7 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
             'color': self.cfg['code.color'],
         })
         self.caret.on_activate()
-        self.label.text = '%s (python returned %s)'%(self.title,
+        self.title_label.text = '%s (python returned %s)'%(self.title,
             self._python.returncode)
         self._python = None
 
