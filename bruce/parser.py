@@ -24,6 +24,7 @@ def parse(text, html=False):
             first = all[-1]
             all[:] = all[:-1]
             if klass is not None:
+                flags['end_line'] = n-1
                 try:
                     content = '\n'.join(content).strip()
                     if html:
@@ -37,7 +38,7 @@ def parse(text, html=False):
                     pages.append(obj)
             N = n
             all = [first]
-            flags = dict(source=all)
+            flags = dict(source=all, start_line=n)
             content = []
             notes = []
             flags_section = True
@@ -84,6 +85,7 @@ def parse(text, html=False):
             content.append(line)
 
     if klass is not None:
+        flags['end_line'] = n-1
         try:
             content = '\n'.join(content)
             if html:

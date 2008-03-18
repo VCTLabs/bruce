@@ -9,6 +9,7 @@ import pyglet
 
 from bruce import parser
 from bruce import presentation
+from bruce import progress
 from bruce import resource
 from bruce import config
 
@@ -22,20 +23,35 @@ def _window(width, height, fullscreen, screen):
     else:
         return pyglet.window.Window(width=width, height=height, screen=screen)
 
-def _run(win, content, **kw):
-    p = presentation.Presentation(win, parser.parse(content), **kw)
-    win.push_handlers(p)
-    pyglet.app.run()
-
-def run(filename, fullscreen=False, screen=0, width=1024, height=768, **kw):
+def run(filename, fullscreen=False, screen=0, width=1024, height=768,
+        progress_screen=None, show_source=False, **kw):
     directory = os.path.abspath(os.path.dirname(filename))
     config.set('directory', directory)
     resource.loader.path.append(directory)
     resource.loader.reindex()
-    _run(_window(width, height, fullscreen, screen), file(filename).read(), **kw)
 
-def runstring(content, fullscreen=False, screen=0, width=1024, height=768, **kw):
-    _run(_window(width, height, fullscreen, screen), content, **kw)
+    w = _window(width, height, fullscreen, screen)
+    content = file(filename).read()
+    pres = presentation.Presentation(w, parser.parse(content), **kw)
+    w.push_handlers(pres)
+
+    if progress_screen is not None:
+        pw = min(1280, progress_screen.width)
+        ph = min(480, progress_screen.height)
+        pw = pyglet.window.Window(pw, ph, screen=progress_screen)
+        # XXX this cheats and should use the correct charset
+        prog = progress.Progress(pw, pres, content.decode('utf8'))
+        pw.push_handlers(prog)
+        pres.push_handlers(prog)
+        prog.push_handlers(pres)
+
+    if show_source:
+        pres.push_handlers(display_source.DisplaySource())
+
+    # now that we're all set up, load up the first page
+    pres.start_presentation()
+
+    pyglet.app.run()
 
 def notes(filename, out_file='', columns=2):
     directory = os.path.abspath(os.path.dirname(filename))
@@ -124,10 +140,10 @@ if __name__ == '__main__':
                       help="display page numbers")
     p.add_option("-s", "--startpage", dest="start_page",
                       default="1",
-                      help="start at page N (default 1)")
+                      help="start at page N (1+, default 1)")
     p.add_option("-S", "--screen", dest="screen",
                       default="1",
-                      help="display on screen (default 1)")
+                      help="display on screen (1+, default 1)")
     p.add_option("-n", "--notes", dest="notes",
                       action="store_true", default=False,
                       help="generate HTML notes (do not run presentation)")
@@ -140,19 +156,15 @@ if __name__ == '__main__':
     p.add_option("-v", "--version", dest="version",
                       action="store_true", default=False,
                       help="display version and quit")
-    p.add_option("-d", "--display-source", dest="source",
+    p.add_option("-d", "--progress-screen", dest="progress_screen",
+                      default=None,
+                      help="display progress in screen (1+, default none)")
+    p.add_option("-D", "--display-source", dest="source",
                       action="store_true", default=False,
-                      help="display page source in terminal")
+                      help="display source in terminal")
     p.add_option("-w", "--window-size", dest="window_size",
                       default="1024x768",
                       help="size of the window when not fullscreen")
-
-    '''
-    Disabled because it's not pretty
-    p.add_option("-z", "--zoom", dest="zoom",
-                      default="0",
-                      help="zoom display to fill fullscreen")
-    '''
 
     (options, args) = p.parse_args()
 
@@ -164,11 +176,16 @@ if __name__ == '__main__':
         display = pyglet.window.get_platform().get_default_display()
     screen = int(options.screen)-1
     screen = display.get_screens()[screen]
+    progress_screen = None
+    if options.progress_screen:
+        progress_screen = int(options.progress_screen)-1
+        progress_screen = display.get_screens()[progress_screen]
     width, height = map(int, options.window_size.split('x'))
     width = min(width, screen.width)
     height = min(height, screen.height)
     run(args[0], fullscreen=options.fullscreen,
         show_timer=options.timer, show_count=options.page_count,
-        start_page=int(options.start_page)-1, show_source=options.source,
+        start_page=int(options.start_page)-1, progress_screen=progress_screen,
+        show_source=options.source,
         screen=int(options.screen)-1, width=width, height=height)
 

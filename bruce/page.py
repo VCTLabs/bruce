@@ -28,10 +28,11 @@ class Page(pyglet.event.EventDispatcher):
     )
     config = ()
 
-    def __init__(self, content, source=[], **kw):
+    def __init__(self, content, start_line, end_line, source, **kw):
         '''Initialise the page given the content and config.
         '''
         self.source = '\n'.join(source)
+        self.start_line, self.end_line = start_line, end_line
 
         self.cfg = config.get_section(self.name)
 
@@ -162,7 +163,6 @@ class ScrollableLayoutPage(Page):
         self.layout.y = vh
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        #self.layout.view_x += dx
         self.layout.view_y -= dy
 
 
