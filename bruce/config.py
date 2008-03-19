@@ -36,8 +36,12 @@ class _Config(dict):
     '''
     defaults = dict(
         bgcolor = (0, 0, 0, 255),
-        charset = 'ascii',
         logo = None,
+    )
+
+    types = dict(
+        bgcolor = tuple,
+        logo = unicode,
     )
 
     def set(self, key, val):
@@ -50,20 +54,15 @@ class _Config(dict):
             self[key] = val
             return
 
-        if isinstance(old, int):
-            val = int(val)
-        elif isinstance(old, float):
-            val = float(val)
-        elif isinstance(old, tuple):
+        t = self.types[key]
+        if t is tuple:
             # a color
             val = tuple([int(x.strip())
                     for x in val.strip('()').split(',')])
             if len(val) < 4:
                 val += (255,)
-        elif isinstance(old, basestring) or old is None:
-            pass
         else:
-            raise ValueError("don't understand old value type %r"%(old))
+            val = t(val)
         self[key] = val
 
     def __contains__(self, key):
@@ -78,8 +77,9 @@ class _Config(dict):
         return _Section(self, name)
 
     def add_section(self, name, options):
-        for k in options:
-            self.defaults['%s.%s'%(name, k)] = options[k]
+        for k, t, v in options:
+            self.types['%s.%s'%(name, k)] = t
+            self.defaults['%s.%s'%(name, k)] = v
 
     def copy(self):
         c = _Config()

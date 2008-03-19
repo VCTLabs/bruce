@@ -1,0 +1,7 @@
+--- py
+    title=number 1
+    sysver
+--- config
+    py.code.font_name=Bitstream Vera Sans Mono
+--- py
+    title=number 2

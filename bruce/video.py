@@ -15,10 +15,10 @@ class VideoPage(page.Page):
         ('title', unicode, ''),
         ('caption', unicode, ''),
         ('zoom', bool, False),
-        ('text.font_name', unicode, 'Arial'),
+        ('text.font_name', str, 'Arial'),
         ('text.font_size', float, 64),
         ('text.color', tuple, (255, 255, 255, 255)),
-        ('title.font_name', unicode, 'Arial'),
+        ('title.font_name', str, 'Arial'),
         ('title.font_size', float, 64),
         ('title.color', tuple, (200, 255, 255, 255)),
     )
@@ -128,5 +128,5 @@ class VideoPage(page.Page):
             if self.scale:
                 gl.glPopMatrix()
 
-config.add_section('video', dict((k, v) for k, t, v in VideoPage.config))
+config.add_section('video', VideoPage.config)
 

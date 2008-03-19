@@ -227,5 +227,5 @@ def thread_queue_to_write(pipe, queue):
         except IOError: # subprocess terminated
             pass
 
-config.add_section('pycode', dict((k, v) for k, t, v in PythonCodePage.config))
+config.add_section('pycode', PythonCodePage.config)
 

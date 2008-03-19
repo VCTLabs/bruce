@@ -85,5 +85,5 @@ class CodePage(page.PageWithTitle, page.ScrollableLayoutPage):
     def draw(self):
         self.batch.draw()
 
-config.add_section('code', dict((k, v) for k, t, v in CodePage.config))
+config.add_section('code', CodePage.config)
 
