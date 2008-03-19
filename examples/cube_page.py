@@ -115,7 +115,5 @@ class Page(page.Page):
 
         glPopAttrib()
 
-config.add_section('cube', {
-    'color': (255, 255, 255, 255),
-})
+config.add_section('cube', (('color', tuple, (255, 255, 255, 255)),))
 
