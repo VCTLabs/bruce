@@ -1,11 +1,12 @@
 import sys
 import os
 import subprocess
+import tempfile
+import threading
+import time
+import Queue
 import errno
 from cgi import escape as html_quote
-
-if not subprocess.mswindows:
-    import select
 
 import pyglet
 from pyglet import graphics
@@ -16,6 +17,10 @@ from bruce import config
 from bruce import page
 
 # XXX add option to minimize on launch and restore when process quits
+
+# XXX: When should subprocess, thread and tempfile cleanup happen? 
+# Upon leaving the slide? 
+# Upon finishing the talk?
 
 class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
     '''Runs an editor for a Python script which is executable.
@@ -98,23 +103,39 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
             return self.on_text('\t')
         elif symbol == pyglet.window.key.SPACE:
             pass
+        elif self._python and symbol == pyglet.window.key.ENTER:
+            return self.on_text('\n')
         elif symbol == pyglet.window.key.ESCAPE:
             if self._python is not None:
                 self._subprocess_finished()
             else:
                 return pyglet.event.EVENT_UNHANDLED
-        elif symbol == pyglet.window.key.F4:
+        elif symbol == pyglet.window.key.F4 and not self._python:
             self._source = self.document.text
-            f = open('/tmp/bruce-temp-script.py', 'w')
+            temp_fd, temp_name = tempfile.mkstemp(prefix='bruce-temp', 
+                suffix='.py')
+            f = os.fdopen(temp_fd, 'w')
             f.write(self._source)
             f.close()
-            args = [sys.executable, '/tmp/bruce-temp-script.py']
+            args = [sys.executable, '-u', temp_name]
             self._python = subprocess.Popen(args, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             self.title_label.text = 'Running... output below'
             self.document.text = '> %s\n'%' '.join(args)
             self.caret.on_deactivate()
             self.stdin = []
+
+            self._stdout_queue = Queue.Queue()
+            t = threading.Thread(target=thread_read_to_queue, 
+                    args = (self._python.stdout, self._stdout_queue))
+            t.setDaemon(True)
+            t.start()
+
+            self._stdin_queue = Queue.Queue()
+            t = threading.Thread(target=thread_queue_to_write, 
+                    args = (self._python.stdin, self._stdin_queue))
+            t.setDaemon(True)
+            t.start()
         else:
             return pyglet.event.EVENT_UNHANDLED
         return pyglet.event.EVENT_HANDLED
@@ -124,62 +145,21 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
             p = self._python
 
             # check for termination
-            p.poll()
-            if p.returncode is not None:
-                self.title_label.text = 'Subprocess terminated - hit escape'
+            returncode = p.poll()
+            if returncode is not None:
+                self.title_label.text = '(returned %s) - hit escape' % (
+                    returncode)
 
-            if subprocess.mswindows:
-                # XXX need ms windows select stuff :(
-                return
-
-            # set up the reading
-            read_set = [p.stdout, p.stderr]
             stdout = []
-            stderr = []
+            # XXX: implement stderr capture
+            stderr = [] 
 
-            # figure whether we're writing anything
-            input = ''.join(self.stdin)
-            write_set = []
-            if input:
-                p.stdin.flush()
-                write_set.append(p.stdin)
-
-            # now see what select has for us
-            input_offset = 0
-            while read_set or write_set:
+            while True:
                 try:
-                    rlist, wlist, xlist = select.select(read_set, write_set,
-                        [], 0)
-                except select.error, e:
-                    if e[0] == errno.EINTR:
-                        continue
-                    else:
-                        raise
-
-                if not rlist or wlist:
+                    temp_char = self._stdout_queue.get_nowait()
+                    stdout.append(temp_char)
+                except Queue.Empty:
                     break
-
-                if p.stdin in wlist:
-                    # When select has indicated that the file is writable,
-                    # we can write up to PIPE_BUF bytes without risk
-                    # blocking.  POSIX defines PIPE_BUF >= 512
-                    bytes_written = p._write_no_intr(p.stdin.fileno(),
-                            buffer(input, input_offset, 512))
-                    input_offset += bytes_written
-                    if input_offset >= len(input):
-                        write_set.remove(p.stdin)
-
-                if p.stdout in rlist:
-                    data = p._read_no_intr(p.stdout.fileno(), 1024)
-                    if data == "":
-                        read_set.remove(p.stdout)
-                    stdout.append(data)
-
-                if p.stderr in rlist:
-                    data = p._read_no_intr(p.stderr.fileno(), 1024)
-                    if data == "":
-                        read_set.remove(p.stderr)
-                    stderr.append(data)
 
             # All data exchanged.  Translate lists into strings.
             if stdout:
@@ -201,7 +181,8 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
 
     def on_text(self, symbol):
         if self._python is not None:
-            self.stdin.append(symbol)
+            self._write(symbol)
+            self._stdin_queue.put(symbol)
             return pyglet.event.EVENT_HANDLED
         return self.caret.on_text(symbol)
 
@@ -233,6 +214,18 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
     def draw(self):
         self.batch.draw()
 
+def thread_read_to_queue(pipe, queue):
+    while True:
+        char = pipe.read(1)
+        queue.put(char)
+
+def thread_queue_to_write(pipe, queue):
+    while True:
+        char = queue.get()
+        try:
+            pipe.write(char)
+        except IOError: # subprocess terminated
+            pass
 
 config.add_section('pycode', dict((k, v) for k, t, v in PythonCodePage.config))
 
