@@ -110,9 +110,8 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
         self.viewport_width, self.viewport_height = vw, vh
 
         if self.title_label:
-            self.title_label.y = vh
             self.title_label.x = vw //2
-            vh -= self.title_label.content_height
+            self.title_label.y = vh = vh - self.title_label.content_height
 
         self.layout.begin_update()
         self.layout.height = vh
