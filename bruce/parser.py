@@ -7,12 +7,19 @@ class ParseError(Exception):
 def parse(text, html=False):
     from bruce.presentation import Presentation
 
+    # everything is UTF-8, suckers
+    text = text.decode('utf8')
+
     klass = None
     pages = []
     notes = []
     all = []
     flags_section = False
+    pos = 0
+
     for n, line in enumerate(text.splitlines()):
+
+        pos += len(line) + 1
         if klass is None and not line.startswith('--- '):
             continue
 
@@ -24,7 +31,7 @@ def parse(text, html=False):
             first = all[-1]
             all[:] = all[:-1]
             if klass is not None:
-                flags['end_line'] = n-1
+                flags['end_pos'] = pos - len(line) - 1
                 try:
                     content = '\n'.join(content).strip()
                     if html:
@@ -32,13 +39,14 @@ def parse(text, html=False):
                     else:
                         obj = klass.as_page(content, **flags)
                 except ValueError, error:
-                    raise ParseError(N, str(error))
+                    raise
+                    raise ParseError(N, repr(error))
                 klass = None
                 if obj:
                     pages.append(obj)
             N = n
             all = [first]
-            flags = dict(source=all, start_line=n)
+            flags = dict(source=all, start_pos=pos - len(line) - 1)
             content = []
             notes = []
             flags_section = True
@@ -52,13 +60,13 @@ def parse(text, html=False):
                 continue
 
             if not name.startswith('plugin:'):
-                raise ParseError(N, '%s not a registered page type'%name)
+                raise ParseError(n, '%s not a registered page type'%name)
 
             name = name[7:] + '.py'
             try:
                 f = loader.file(name)
             except pyglet.resource.ResourceNotFoundException:
-                raise ParseError(N, '%s not a plugin page type'%name)
+                raise ParseError(n, '%s not a plugin page type'%name)
 
             try:
                 source = f.read()
@@ -70,22 +78,22 @@ def parse(text, html=False):
             exec source in d
 
             if 'Page' not in d:
-                raise ParseError(N, '%s not a plugin page type'%name)
+                raise ParseError(n, '%s not a plugin page type'%name)
 
             klass = d['Page']
 
         elif flags_section and (line.startswith('  ') or line.startswith('\t')):
             if '=' in line:
                 name, value = line.split('=', 1)
-                flags[name.strip()] = value.strip()
+                flags[str(name.strip())] = value.strip()
             else:
-                flags[line.strip()] = True
+                flags[str(line.strip())] = True
         else:
             flags_section = False
             content.append(line)
 
     if klass is not None:
-        flags['end_line'] = n-1
+        flags['end_pos'] = pos
         try:
             content = '\n'.join(content)
             if html:
@@ -93,7 +101,7 @@ def parse(text, html=False):
             else:
                 obj = klass.as_page(content, **flags)
         except ValueError, error:
-            raise ParseError(N, str(error))
+            raise ParseError(N, error)
         if obj:
             pages.append(obj)
 

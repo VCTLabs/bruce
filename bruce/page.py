@@ -6,15 +6,6 @@ import pyglet
 
 from bruce import config
 
-def decode_content(page, content):
-    charset = page.cfg['charset']
-    if charset.lower() == 'ascii':
-        # convert escaped unicode into unicode
-        if '\u' in content or '\U' in content:
-            return content.decode('unicode_escape')
-        return content
-    return content.decode(charset)
-
 class Page(pyglet.event.EventDispatcher):
     nofooter = False
 
@@ -23,16 +14,15 @@ class Page(pyglet.event.EventDispatcher):
         #('auto',     float,    None),
         ('sound',    unicode,   None),
         ('logo',     unicode,   None),
-        ('charset',  str,       'ascii'),
         ('bgcolor',  tuple,     (0, 0, 0, 255)),
     )
     config = ()
 
-    def __init__(self, content, start_line, end_line, source, **kw):
+    def __init__(self, content, start_pos, end_pos, source, **kw):
         '''Initialise the page given the content and config.
         '''
         self.source = '\n'.join(source)
-        self.start_line, self.end_line = start_line, end_line
+        self.start_pos, self.end_pos = start_pos, end_pos
 
         self.cfg = config.get_section(self.name)
 
@@ -43,9 +33,6 @@ class Page(pyglet.event.EventDispatcher):
                     if len(val) < 4:
                         val += (255,)
                     self.cfg[name] = val
-                elif issubclass(type, unicode):
-                    val = decode_content(self, kw[name])
-                    self.cfg[name] = type(val)
                 else:
                     self.cfg[name] = type(kw[name])
 
@@ -68,7 +55,7 @@ class Page(pyglet.event.EventDispatcher):
                 self.sound = resource.loader.media(self.sound,
                     streaming=False)
 
-        self.content = decode_content(self, content)
+        self.content = content
 
     @classmethod
     def as_page(cls, content, **kw):

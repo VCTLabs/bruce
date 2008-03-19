@@ -30,7 +30,7 @@ class CodePage(page.PageWithTitle, page.ScrollableLayoutPage):
         # load the file content
         f = resource.loader.file(self.content.strip())
         try:
-            self.file_content = f.read().decode(self.cfg['charset'])
+            self.file_content = f.read().decode('utf8')
         finally:
             f.close()
 

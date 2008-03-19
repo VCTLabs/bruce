@@ -159,12 +159,9 @@ class Presentation(pyglet.event.EventDispatcher):
                 except TypeError:
                     self._raise_dispatch_exception(event_type, args, handler)
 
-    _closing = False
     def on_close(self):
-        if self._closing: return False
-        self._closing = True
-        self.window.close()
-        self.dispatch_event('on_close')
+        pyglet.app.exit()
+        return pyglet.event.EVENT_HANDLED
 
     def on_key_press(self, pressed, modifiers):
         # move forward on space

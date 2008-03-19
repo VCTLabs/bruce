@@ -28,10 +28,9 @@ class Progress(pyglet.event.EventDispatcher):
 
         vw, vh = window.width, window.height
         self.layout = pyglet.text.layout.IncrementalTextLayout(
-            self.document, vw//2, vh, multiline=True, batch=self.batch)
+            self.document, vw, vh, multiline=True, batch=self.batch)
         self.layout.valign = 'top'
         self.layout.y = vh
-        self.layout.x = vw//2
 
         self.start_time = None
         y = 0
@@ -51,10 +50,10 @@ class Progress(pyglet.event.EventDispatcher):
 
         pyglet.clock.schedule(self.update)
 
-    hilite_start = hilite_end = None
+    start_pos = end_pos = None
     def on_page_changed(self, page, page_num):
-        if self.hilite_start is not None:
-            self.document.set_style(self.hilite_start, self.hilite_end, {
+        if self.start_pos is not None:
+            self.document.set_style(self.start_pos, self.end_pos, {
                 'color': (255, 255, 255, 255),
             })
 
@@ -65,12 +64,19 @@ class Progress(pyglet.event.EventDispatcher):
         self.window.set_caption('Presentation: Slide %d'%(self.page_num+1,))
 
         # scroll to ensure the top of the page's source is visible
-        y = self.layout.get_position_from_line(page.start_line)
-        self.layout.view_y = -y
+        self.start_pos = page.start_pos #self.layout.get_position_from_line(page.start_line)
+        self.end_pos = page.end_pos #self.layout.get_position_from_line(page.end_line)
+        start_line = self.layout.get_line_from_position(self.start_pos)
+        if start_line:
+            self.layout.view_y = self.layout.lines[start_line-1].y
+        else:
+            self.layout.view_y = 0
 
-        self.hilite_start = len('\n'.join(self.source_lines[:page.start_line])) +1
-        self.hilite_end = len('\n'.join(self.source_lines[:page.end_line]))
-        self.document.set_style(self.hilite_start, self.hilite_end, {
+        print '*'*75
+        print start_line
+        print `self.source[self.start_pos:self.end_pos]`
+
+        self.document.set_style(self.start_pos, self.end_pos, {
             'color': (255, 0, 0, 255),
         })
 
@@ -129,16 +135,12 @@ class Progress(pyglet.event.EventDispatcher):
         # XXX pass to presentation if done over that
         self.layout.view_y -= dy
 
-    _closing = False
     def on_close(self):
-        if self._closing: return False
-        self._closing = True
-        self.window.close()
-        self.dispatch_event('on_close')
+        pyglet.app.exit()
+        return pyglet.event.EVENT_HANDLED
 
 Progress.register_event_type('on_key_press')
 Progress.register_event_type('on_text_motion')
 Progress.register_event_type('on_mouse_press')
 Progress.register_event_type('on_mouse_release')
-Progress.register_event_type('on_close')
 

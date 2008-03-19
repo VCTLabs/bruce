@@ -4,6 +4,7 @@
 - refactoring based on new event: presentation dispatching on_page_changed
 - refactoring of presentation intialisation
 - removed crappy zoom option
+- input source file charset is fixed to UTF8
 
 
 2.0beta3 - 2008-03-17
