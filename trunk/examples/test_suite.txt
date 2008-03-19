@@ -1,6 +1,5 @@
 # header stuff
 --- config
-    charset=utf-8
     title.color=200, 255, 200
     logo=pyglet.png
 
@@ -72,11 +71,9 @@ normal
 Euro symbol UTF-8: €
 
 --- text
-    charset=ascii
 Euro symbol escaped: \u20AC
 
 --- text
-    charset=utf-8
 first line
 -second line hidden
 -third line hidden
