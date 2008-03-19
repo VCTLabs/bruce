@@ -57,14 +57,25 @@ class ImagePage(page.PageWithTitle, page.Page):
 
         # load the image
         path = self.content.strip()
-        if os.path.exists(path):
-            im = pyglet.image.load(path)
+        if path.lower().endswith('.gif'):
+            if os.path.exists(path):
+                im = pyglet.image.load_animation(path)
+            else:
+                im = resource.loader.animation(path)
+            self.image_width = im.get_max_width()
+            self.image_height = im.get_max_height()
+            for frame in im.frames:
+                frame.image.anchor_x = self.image_width//2
+                frame.image.anchor_y = self.image_height//2
         else:
-            im = resource.loader.image(path)
-        self.image_width = im.width
-        self.image_height = im.height
-        im.anchor_x = im.width//2
-        im.anchor_y = im.height//2
+            if os.path.exists(path):
+                im = pyglet.image.load(path)
+            else:
+                im = resource.loader.image(path)
+            self.image_width = im.width
+            self.image_height = im.height
+            im.anchor_x = im.width//2
+            im.anchor_y = im.height//2
         self.image = sprite.Sprite(im, 0, 0, group=ClampTextureImageGroup(),
             batch=self.batch)
 
