@@ -170,9 +170,12 @@ class Presentation(pyglet.event.EventDispatcher):
 
         # switch fullscreen/windowed on ctrl-F
         if pressed == key.F and modifiers & key.MOD_CTRL:
+            if not self.window.fullscreen:
+                self.window._restore_size = (
+                    self.window.width, self.window.height)
             self.window.set_fullscreen(not self.window.fullscreen)
             if not self.window.fullscreen:
-                self.window.set_size(1024, 768)
+                self.window.set_size(*self.window._restore_size)
 
     def on_text_motion(self, motion):
         if motion == key.MOTION_LEFT: self.__previous()

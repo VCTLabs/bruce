@@ -6,6 +6,8 @@
 - removed crappy zoom option
 - input source file charset is fixed to UTF8
 - handle animated GIF display in image page (thanks Alex Holkner)
+- restore window to same size on switch back from fullscreen (thanks Alex
+  Holkner)
 
 
 2.0beta3 - 2008-03-17

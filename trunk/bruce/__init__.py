@@ -19,6 +19,7 @@ def _window(width, height, fullscreen, screen):
     if fullscreen:
         win = pyglet.window.Window(fullscreen=fullscreen, screen=screen)
         # XXX on_resize to transform to fit width / height from above
+        win._restore_size = (width, height)
         return win
     else:
         return pyglet.window.Window(width=width, height=height, screen=screen)
