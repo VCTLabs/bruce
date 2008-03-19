@@ -91,6 +91,9 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
         self.caret.position = len(self.document.text)
 
     def on_leave(self):
+        if self._python is not None:
+            self._subprocess_finished()
+
         self.content = self.document.text
         self.document = None
         self.title_label = None
@@ -112,24 +115,30 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
                 return pyglet.event.EVENT_UNHANDLED
         elif symbol == pyglet.window.key.F4 and not self._python:
             self._source = self.document.text
-            temp_fd, temp_name = tempfile.mkstemp(prefix='bruce-temp', 
+            temp_fd, temp_name = tempfile.mkstemp(prefix='bruce-temp-', 
                 suffix='.py')
             f = os.fdopen(temp_fd, 'w')
             f.write(self._source)
             f.close()
             args = [sys.executable, '-u', temp_name]
-            self._python = subprocess.Popen(args, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+
+            temp_fd, temp_name = tempfile.mkstemp(prefix='bruce-temp-', 
+                suffix='.py')
+            stdout_file = os.fdopen(temp_fd, 'w')
+            self._stdout_file_name = temp_name
+
+            temp_fd, temp_name = tempfile.mkstemp(prefix='bruce-temp-', 
+                suffix='.py')
+            stderr_file = os.fdopen(temp_fd, 'w')
+            self._stderr_file_name = temp_name
+
+            self._python = subprocess.Popen(args, stdout=stdout_file,
+                stderr=stderr_file, stdin=subprocess.PIPE)
             self.title_label.text = 'Running... output below'
             self.document.text = '> %s\n'%' '.join(args)
             self.caret.on_deactivate()
-            self.stdin = []
-
-            self._stdout_queue = Queue.Queue()
-            t = threading.Thread(target=thread_read_to_queue, 
-                    args = (self._python.stdout, self._stdout_queue))
-            t.setDaemon(True)
-            t.start()
+            self._stdout_file = open(self._stdout_file_name, 'r')
+            self._stderr_file = open(self._stderr_file_name, 'r')
 
             self._stdin_queue = Queue.Queue()
             t = threading.Thread(target=thread_queue_to_write, 
@@ -150,16 +159,12 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
                 self.title_label.text = '(returned %s) - hit escape' % (
                     returncode)
 
-            stdout = []
-            # XXX: implement stderr capture
-            stderr = [] 
+            def get_chars_from_file(open_file):
+                data = open_file.read()
+                return list(data)
 
-            while True:
-                try:
-                    temp_char = self._stdout_queue.get_nowait()
-                    stdout.append(temp_char)
-                except Queue.Empty:
-                    break
+            stdout = get_chars_from_file(self._stdout_file)
+            stderr = get_chars_from_file(self._stderr_file)
 
             # All data exchanged.  Translate lists into strings.
             if stdout:
@@ -213,11 +218,6 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
 
     def draw(self):
         self.batch.draw()
-
-def thread_read_to_queue(pipe, queue):
-    while True:
-        char = pipe.read(1)
-        queue.put(char)
 
 def thread_queue_to_write(pipe, queue):
     while True:

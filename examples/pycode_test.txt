@@ -1,3 +1,6 @@
+--- pycode
+print 'Capturing stdout'
+raise StandardError('and stderr, too!')
 
 --- pycode
 # We can interact with the subprocess's stdin/stdout
