@@ -47,5 +47,5 @@ class HTMLTextPage(page.ScrollableLayoutPage):
         self.batch.draw()
 
 
-config.add_section('html', dict((k, v) for k, t, v in HTMLTextPage.config))
+config.add_section('html', HTMLTextPage.config)
 

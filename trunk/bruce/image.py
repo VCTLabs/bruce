@@ -120,5 +120,5 @@ class ImagePage(page.PageWithTitle, page.Page):
     def draw(self):
         self.batch.draw()
 
-config.add_section('image', dict((k, v) for k, t, v in ImagePage.config))
+config.add_section('image', ImagePage.config)
 

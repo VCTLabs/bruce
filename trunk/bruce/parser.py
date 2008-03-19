@@ -32,15 +32,11 @@ def parse(text, html=False):
             all[:] = all[:-1]
             if klass is not None:
                 flags['end_pos'] = pos - len(line) - 1
-                try:
-                    content = '\n'.join(content).strip()
-                    if html:
-                        obj = (klass.as_html(content, **flags), notes)
-                    else:
-                        obj = klass.as_page(content, **flags)
-                except ValueError, error:
-                    raise
-                    raise ParseError(N, repr(error))
+                content = '\n'.join(content).strip()
+                if html:
+                    obj = (klass.as_html(content, **flags), notes)
+                else:
+                    obj = klass.as_page(content, **flags)
                 klass = None
                 if obj:
                     pages.append(obj)
@@ -94,14 +90,11 @@ def parse(text, html=False):
 
     if klass is not None:
         flags['end_pos'] = pos
-        try:
-            content = '\n'.join(content)
-            if html:
-                obj = (klass.as_html(content, **flags), notes)
-            else:
-                obj = klass.as_page(content, **flags)
-        except ValueError, error:
-            raise ParseError(N, error)
+        content = '\n'.join(content)
+        if html:
+            obj = (klass.as_html(content, **flags), notes)
+        else:
+            obj = klass.as_page(content, **flags)
         if obj:
             pages.append(obj)
 

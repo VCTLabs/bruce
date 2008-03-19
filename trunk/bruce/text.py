@@ -169,5 +169,5 @@ class TextPage(page.Page):
     def draw(self):
         self.batch.draw()
 
-config.add_section('text', dict((k, v) for k, t, v in TextPage.config))
+config.add_section('text', TextPage.config)
 

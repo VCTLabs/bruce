@@ -222,5 +222,5 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
     def draw(self):
         self.batch.draw()
 
-config.add_section('py', dict((k, v) for k, t, v in PythonInterpreterPage.config))
+config.add_section('py', PythonInterpreterPage.config)
 
