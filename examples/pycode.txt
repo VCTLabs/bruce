@@ -1,0 +1,24 @@
+
+--- pycode
+# We can interact with the subprocess's stdin/stdout
+print 'Printing something before input.'
+print 'from sub: ' + raw_input('pyg>')
+print 'Printing something after input.'
+
+--- pycode
+import pyglet
+
+window = pyglet.window.Window()
+label = pyglet.text.Label('Hello, world', 
+                          font_name='Times New Roman', 
+                          font_size=36,
+                          x=window.width//2, y=window.height//2,
+                          halign='center', valign='center')
+
+@window.event
+def on_draw():
+    window.clear()
+    label.draw()
+
+pyglet.app.run()
+
