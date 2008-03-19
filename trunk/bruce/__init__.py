@@ -36,10 +36,13 @@ def run(filename, fullscreen=False, screen=0, width=1024, height=768,
     w.push_handlers(pres)
 
     if progress_screen is not None:
-        pw = min(640, progress_screen.width)
+        pw = min(1280, progress_screen.width)
         ph = min(480, progress_screen.height)
-        pw = pyglet.window.Window(pw, ph, screen=progress_screen)
-        # XXX this cheats and should use the correct charset
+        if fullscreen:
+            pw = pyglet.window.Window(fullscreen=fullscreen,
+                screen=progress_screen)
+        else:
+            pw = pyglet.window.Window(pw, ph, screen=progress_screen)
         prog = progress.Progress(pw, pres, content.decode('utf8'))
         pw.push_handlers(prog)
         pres.push_handlers(prog)
