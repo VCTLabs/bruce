@@ -18,7 +18,7 @@ class HTMLTextPage(page.ScrollableLayoutPage):
     def __init__(self, content, **kw):
         super(HTMLTextPage, self).__init__(content, **kw)
 
-        if self.isfile:
+        if self.cfg['isfile']:
             # content is a filename
             f = resource.loader.file(self.content)
             try:

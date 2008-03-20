@@ -37,11 +37,13 @@ class _Config(dict):
     defaults = dict(
         bgcolor = (0, 0, 0, 255),
         logo = None,
+        sound = None,
     )
 
     types = dict(
         bgcolor = tuple,
         logo = unicode,
+        sound = unicode,
     )
 
     def set(self, key, val):

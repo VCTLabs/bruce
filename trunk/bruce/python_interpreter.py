@@ -58,7 +58,7 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
 
         self.auto_content = content
 
-        if self.sysver:
+        if self.cfg['sysver']:
             self.content = sys.version + '\n' + self.prompt
         else:
             self.content = self.prompt
@@ -70,7 +70,7 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
         self.history = ['']
         self.history_pos = 0
 
-        assert self.auto is False, 'not implemented yet'
+        assert self.cfg['auto'] is False, 'not implemented yet'
 
     @classmethod
     def as_html(cls, content, **kw):

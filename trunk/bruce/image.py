@@ -116,7 +116,7 @@ class ImagePage(page.PageWithTitle, page.Page):
 
         # determine whether we're scaling
         w, h = self.image_width, self.image_height
-        if self.zoom or w > vw or h > vh:
+        if self.cfg['zoom'] or w > vw or h > vh:
             self.image.scale = min(vw / float(w), vh / float(h))
 
         # and center the image

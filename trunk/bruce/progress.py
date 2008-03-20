@@ -37,10 +37,13 @@ class Progress(pyglet.event.EventDispatcher):
 
         vw, vh = window.width, window.height
         self.layout = pyglet.text.layout.IncrementalTextLayout(
-            self.document, vw//2, vh, multiline=True, batch=self.batch)
+            self.document, vw//2 - 4, vh, multiline=True, batch=self.batch)
         self.layout.valign = 'top'
-        self.layout.x = vw//2
+        self.layout.x = 2 + vw//2
         self.layout.y = vh
+
+        self.caret = pyglet.text.caret.Caret(self.layout)
+        self.caret.on_activate()
 
         self.start_time = None
         y = 0
@@ -77,11 +80,12 @@ class Progress(pyglet.event.EventDispatcher):
         # scroll to ensure the top of the page's source is visible
         self.start_pos = page.start_pos
         self.end_pos = page.end_pos
-        start_line = self.layout.get_line_from_position(self.start_pos)
-        if start_line:
-            self.layout.view_y = self.layout.lines[start_line-1].y
-        else:
-            self.layout.view_y = 0
+        #start_line = self.layout.get_line_from_position(self.start_pos)
+        #if start_line:
+            #self.layout.view_y = self.layout.lines[start_line-1].y
+        #else:
+            #self.layout.view_y = 0
+        self.caret.position = page.start_pos
 
         # colour the currently-active section of the source
         self.document.set_style(self.start_pos, self.end_pos, {
@@ -133,15 +137,18 @@ class Progress(pyglet.event.EventDispatcher):
                 except TypeError:
                     self._raise_dispatch_exception(event_type, args, handler)
 
-
-    # pass these back to the presentation if it's listening
-    def on_key_press(self, pressed, modifiers):
-        if self.dispatch_event('on_key_press', pressed, modifiers):
-            return pyglet.event.EVENT_HANDLED
-        return pressed != pyglet.window.key.ESCAPE
+    # XXX pass these to the presentation?
+    def on_text(self, symbol):
+        return self.caret.on_text(symbol)
 
     def on_text_motion(self, motion):
-        return self.dispatch_event('on_text_motion', motion)
+        return self.caret.on_text_motion(motion)
+
+    def on_text_motion_select(self, motion):
+        return self.caret.on_text_motion_select(motion)
+
+    def on_mouse_drag(self, x, y, dx, dy, button, modifiers):
+        return self.caret.on_mouse_drag(x, y, dx, dy, button, modifiers)
 
     def on_mouse_press(self, x, y, button, modifiers):
         return self.dispatch_event('on_mouse_press', x, y, button,
@@ -150,16 +157,6 @@ class Progress(pyglet.event.EventDispatcher):
     def on_mouse_release(self, x, y, button, modifiers):
         return self.dispatch_event('on_mouse_release', x, y, button,
             modifiers)
-
-    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        # XXX pass to presentation if done over that
-        self.layout.view_x -= scroll_x
-        # XXX scale
-        self.layout.view_y += scroll_y * 16
-
-    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        # XXX pass to presentation if done over that
-        self.layout.view_y -= dy
 
     def on_close(self):
         pyglet.app.exit()

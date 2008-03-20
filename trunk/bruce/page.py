@@ -1,4 +1,5 @@
 import os
+import re
 
 from cgi import escape as html_quote
 
@@ -6,17 +7,22 @@ import pyglet
 
 from bruce import config
 
+def decode_content(content):
+    if not content: return content
+    def sub(s):
+        return str(s.group(0)).decode('unicode_escape')
+    return re.sub(r'\\[Uu][0-9a-fA-F]{4}', sub, content)
+
 class Page(pyglet.event.EventDispatcher):
     nofooter = False
 
     default_config = (
         ('nofooter', bool,      False),
         #('auto',     float,    None),
-        ('sound',    unicode,   None),
-        ('logo',     unicode,   None),
-        ('bgcolor',  tuple,     (0, 0, 0, 255)),
+        ('bgcolor', tuple, (0, 0, 0, 255)),
     )
     config = ()
+    sound = None
 
     def __init__(self, content, start_pos, end_pos, source, **kw):
         '''Initialise the page given the content and config.
@@ -27,35 +33,31 @@ class Page(pyglet.event.EventDispatcher):
         self.cfg = config.get_section(self.name)
 
         for name, type, default in self.default_config + self.config:
-            if name in kw:
-                if type is tuple:
-                    val = tuple(int(v.strip()) for v in kw[name].split(','))
-                    if len(val) < 4:
-                        val += (255,)
-                    self.cfg[name] = val
-                else:
-                    self.cfg[name] = type(kw[name])
-
-        for name, type, default in self.default_config + self.config:
-            if name in kw:
-                setattr(self, name, kw[name])
-                del kw[name]
+            if name not in kw: continue
+            if type is tuple:
+                val = tuple(int(v.strip()) for v in kw[name].split(','))
+                if len(val) < 4:
+                    val += (255,)
+                self.cfg[name] = val
+            elif issubclass(type, basestring):
+                self.cfg[name] = type(decode_content(kw[name]))
             else:
-                setattr(self, name, default)
+                self.cfg[name] = type(kw[name])
+            del kw[name]
 
         if kw:
             raise ValueError('unknown flags %r'%(kw,))
 
-        if self.sound:
-            if os.path.exists(self.sound):
-                self.sound = pyglet.media.load(self.sound, streaming=False)
+        sound = self.cfg['sound']
+        if sound:
+            if os.path.exists(sound):
+                self.sound = pyglet.media.load(sound, streaming=False)
             else:
                 # avoid circular import problem
                 from bruce import resource
-                self.sound = resource.loader.media(self.sound,
-                    streaming=False)
+                self.sound = resource.loader.media(sound, streaming=False)
 
-        self.content = content
+        self.content = decode_content(content)
 
     @classmethod
     def as_page(cls, content, **kw):
