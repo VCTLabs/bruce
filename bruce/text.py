@@ -125,7 +125,7 @@ class TextPage(page.Page):
 
         content = '\n'.join(content)
         self.document = document.FormattedDocument(content)
-        self.document.set_style(0, len(content), {'align': self.halign})
+        self.document.set_style(0, len(content), {'align': self.cfg['halign']})
         for s, e, attrs in styles:
             self.document.set_style(s, e, attrs)
 
@@ -133,10 +133,10 @@ class TextPage(page.Page):
         self.batch = graphics.Batch()
         self.layout = layout.IncrementalTextLayout(self.document,
             vw, vh, multiline=True, batch=self.batch)
-        self.layout.valign = self.valign
-        if self.valign == 'center':
+        self.layout.valign = self.cfg['valign']
+        if self.cfg['valign'] == 'center':
             self.layout.y = vh//2
-        elif self.valign == 'bottom':
+        elif self.cfg['valign'] == 'bottom':
             self.layout.y = 0
         else:
             self.layout.y = vh
