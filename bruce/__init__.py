@@ -174,22 +174,25 @@ if __name__ == '__main__':
 
     if options.version:
         print __version__
+    elif not args:
+        print 'Error: argument required'
+        print p.get_usage()
     elif options.notes:
         notes(args[0], options.out_file, int(options.columns))
     else:
         display = pyglet.window.get_platform().get_default_display()
-    screen = int(options.screen)-1
-    screen = display.get_screens()[screen]
-    progress_screen = None
-    if options.progress_screen:
-        progress_screen = int(options.progress_screen)-1
-        progress_screen = display.get_screens()[progress_screen]
-    width, height = map(int, options.window_size.split('x'))
-    width = min(width, screen.width)
-    height = min(height, screen.height)
-    run(args[0], fullscreen=options.fullscreen,
-        show_timer=options.timer, show_count=options.page_count,
-        start_page=int(options.start_page)-1, progress_screen=progress_screen,
-        show_source=options.source,
-        screen=int(options.screen)-1, width=width, height=height)
+        screen = int(options.screen)-1
+        screen = display.get_screens()[screen]
+        progress_screen = None
+        if options.progress_screen:
+            progress_screen = int(options.progress_screen)-1
+            progress_screen = display.get_screens()[progress_screen]
+        width, height = map(int, options.window_size.split('x'))
+        width = min(width, screen.width)
+        height = min(height, screen.height)
+        run(args[0], fullscreen=options.fullscreen,
+            show_timer=options.timer, show_count=options.page_count,
+            start_page=int(options.start_page)-1,
+            progress_screen=progress_screen, show_source=options.source,
+            screen=int(options.screen)-1, width=width, height=height)
 
