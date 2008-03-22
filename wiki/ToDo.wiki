@@ -1,10 +1,18 @@
 #summary Missing Bruce features
 
-Bugs:
+=Interface=
 
-  # image border when zoomed up is still dodgy (check image placement - might not be pixel-aligned)
+Many variables:
 
-Transitions:
+1. fullscreen or not
+2. main window showing current page
+3. other window with scaled current page
+4. other window showing source progressively
+5. other window showing next page
+6. source edit window
+
+
+=Transitions=
 
   # Need to be able to ask the next page to prepare for rendering. This will be done automatically when the current page is idle.
   # Pages should be able to indicate when they are idle.
@@ -43,7 +51,7 @@ Page transition ideas:
   * typographic:  http://www.youtube.com/watch?v=ejweI0EQpX8  http://www.youtube.com/watch?v=syf8olcM0z4 http://www.youtube.com/watch?v=QX7N58df0j0  http://www.youtube.com/watch?v=QhAdFoEge1c
 
 
-Wishlist:
+=Wishlist=
 
   * auto typing in py interpreter
   * fancier backgrounds
@@ -58,7 +66,7 @@ Wishlist:
   * highlight (rectangle and spotlight)
 
 
-Text animation:
+=Text animation=
 
   * progressive type of letters or words
   * fade in speed
