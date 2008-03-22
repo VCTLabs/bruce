@@ -182,8 +182,8 @@ class Presentation(pyglet.event.EventDispatcher):
         elif motion == key.MOTION_RIGHT: self.__next()
         elif motion == key.MOTION_NEXT_PAGE: self.__move(5)
         elif motion == key.MOTION_PREVIOUS_PAGE: self.__move(-5)
-        elif motion == key.MOTION_BEGINNING_OF_FILE: self.__move(self.num_pages)
-        elif motion == key.MOTION_END_OF_FILE: self.__move(-self.num_pages)
+        elif motion == key.MOTION_BEGINNING_OF_FILE: self.__move(-self.num_pages)
+        elif motion == key.MOTION_END_OF_FILE: self.__move(self.num_pages)
         else: return pyglet.event.EVENT_UNHANDLED
         return pyglet.event.EVENT_HANDLED
 
