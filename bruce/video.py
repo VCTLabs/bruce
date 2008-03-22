@@ -57,8 +57,8 @@ class VideoPage(page.Page):
             self.video_height /= video_format.sample_aspect
 
         # if we have a title then generate it
-        if self.title:
-            self.title_label = text.Label(self.title,
+        if self.cfg['title']:
+            self.title_label = text.Label(self.cfg['title'],
                 font_name=self.cfg['title.font_name'],
                 font_size=self.cfg['title.font_size'],
                 color=self.cfg['title.color'],
