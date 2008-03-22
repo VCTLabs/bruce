@@ -180,7 +180,7 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
             'color': self.cfg['code.color'],
         })
         self.caret.on_activate()
-        self.title_label.text = '%s (python returned %s)'%(self.title,
+        self.title_label.text = '%s (python returned %s)'%(self.cfg['title'],
             self._python.returncode)
         self._python = None
 

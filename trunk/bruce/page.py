@@ -20,6 +20,7 @@ class Page(pyglet.event.EventDispatcher):
         ('nofooter', bool,      False),
         #('auto',     float,    None),
         ('bgcolor', tuple, (0, 0, 0, 255)),
+        ('sound', unicode, None),
     )
     config = ()
     sound = None
