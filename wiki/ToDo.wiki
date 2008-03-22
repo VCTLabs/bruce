@@ -40,7 +40,7 @@ Page transition ideas:
   * slide (out or in or both)
   * peel from side / corner
   * progressive blur in / out (via shader)
-  * typographic:  http://www.youtube.com/watch?v=ejweI0EQpX8  http://www.youtube.com/watch?v=QX7N58df0j0  http://www.youtube.com/watch?v=QhAdFoEge1c
+  * typographic:  http://www.youtube.com/watch?v=ejweI0EQpX8  http://www.youtube.com/watch?v=syf8olcM0z4 http://www.youtube.com/watch?v=QX7N58df0j0  http://www.youtube.com/watch?v=QhAdFoEge1c
 
 
 Wishlist:
