@@ -6,5 +6,7 @@ this is a text page
     title=zoomed
 --- video tada.avi
     zoom
+--- video tada.avi
+    loop
 --- text
 this is a text page
