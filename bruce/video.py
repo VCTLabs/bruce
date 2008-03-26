@@ -15,6 +15,7 @@ class VideoPage(page.Page):
         ('title', unicode, ''),
         ('caption', unicode, ''),
         ('zoom', bool, False),
+        ('loop', bool, False),
         ('text.font_name', str, 'Arial'),
         ('text.font_size', float, 64),
         ('text.color', tuple, (255, 255, 255, 255)),
@@ -65,8 +66,8 @@ class VideoPage(page.Page):
                 halign='center', valign='bottom', batch=self.batch)
 
         # if we have a captio then generate it
-        if self.caption:
-            self.caption_label = text.Label(self.caption,
+        if self.cfg['caption']:
+            self.caption_label = text.Label(self.cfg['caption'],
                 font_name=self.cfg['text.font_name'],
                 font_size=self.cfg['text.font_size'],
                 color=self.cfg['text.color'],
@@ -78,10 +79,13 @@ class VideoPage(page.Page):
         # create the player
         self.player = media.Player()
         self.player.queue(source)
-        self.player.eos_action = self.player.EOS_PAUSE
+        if self.cfg['loop']:
+            self.player.eos_action = self.player.EOS_LOOP
+        else:
+            self.player.eos_action = self.player.EOS_PAUSE
         self.player.play()
 
-    scale = 0
+    scale = 1
     def on_resize(self, vw, vh):
         self.viewport_width, self.viewport_height = vw, vh
 
