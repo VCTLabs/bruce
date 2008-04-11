@@ -129,6 +129,7 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
         self.batch = None
         self.caret = None
 
+    doing_more = False
     def on_key_press(self, symbol, modifiers):
         if symbol == pyglet.window.key.TAB:
             return self.caret.on_text('\t')
@@ -141,13 +142,18 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
                 line = 'print "help() not supported, sorry!"'
             self.current_input.append(line)
             self.history_pos = len(self.history)
-            self.history[self.history_pos-1] = line.strip()
-            self.history.append('')
+            if line.strip():
+                self.history[self.history_pos-1] = line.strip()
+                self.history.append('')
             more = self.interpreter.execute('\n'.join(self.current_input))
+            if self.doing_more and not line.strip():
+                self.doing_more = False
+            more = more or self.doing_more
             if not more:
                 self.current_input = []
                 self._write(self.prompt)
             else:
+                self.doing_more = True
                 self._write(self.prompt_more)
             self.start_of_line = len(self.document.text)
             self.caret.position = len(self.document.text)
