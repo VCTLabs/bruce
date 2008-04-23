@@ -5,8 +5,6 @@ class ParseError(Exception):
         super(ParseError, self).__init__('line %d: %s'%(number, error))
 
 def parse(text, html=False):
-    from bruce.presentation import Presentation
-
     # everything is UTF-8, suckers
     text = text.decode('utf8')
 

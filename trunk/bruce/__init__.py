@@ -8,6 +8,7 @@ from cgi import escape as html_quote
 import pyglet
 
 from bruce import parser
+from bruce import rst_parser
 from bruce import presentation
 from bruce import progress
 from bruce import resource
@@ -33,7 +34,10 @@ def run(filename, fullscreen=False, screen=0, width=1024, height=768,
 
     w = _window(width, height, fullscreen, screen)
     content = file(filename).read()
-    pres = presentation.Presentation(w, parser.parse(content), **kw)
+    if filename.endswith('.rst'):
+        pres = presentation.Presentation(w, rst_parser.parse(content), **kw)
+    else:
+        pres = presentation.Presentation(w, parser.parse(content), **kw)
     w.push_handlers(pres)
 
     if progress_screen is not None:
