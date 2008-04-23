@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import sys
 import os
 import code
+from cgi import escape as html_quote
 
 import pyglet
 from pyglet import graphics
@@ -36,7 +37,7 @@ class PythonInterpreterPage(page.PageWithTitle, page.ScrollableLayoutPage):
     '''Runs an interactive Python interpreter.
     '''
     config = (
-        ('title', str, ''),
+        ('title', unicode, ''),
         ('sysver', bool, False),
         ('auto', bool, False),
         ('title.font_name', str, 'Arial'),
