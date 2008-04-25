@@ -1,12 +1,14 @@
 import pyglet
-
-from bruce import page
+from pyglet.text.formats.structured import ImageElement
 
 import docutils.parsers.rst
 import docutils.utils
 import docutils.nodes
 import docutils.frontend
+from docutils.transforms import references
 import docutils.writers.html4css1
+
+from bruce import page
 
 bullets = u'\u25cf\u25cb\u25a1'*3 # (just in case)
 def bullet_generator(bullet):
@@ -20,26 +22,36 @@ def number_generator(node):
         yield '%s%d%s'%(node['prefix'], i, node['suffix'])
         i += 1
 
+
 class RstTextPage(page.Page):
     name = 'rst-text'
 
     def __init__(self, *args, **kw):
         self.styles = kw.pop('styles')
+        self.images = kw.pop('images')
         super(RstTextPage, self).__init__(*args, **kw)
 
     def on_enter(self, vw, vh):
         super(RstTextPage, self).on_enter(vw, vh)
 
+        self.batch = pyglet.graphics.Batch()
         self.document = pyglet.text.document.FormattedDocument(self.content)
         for s, e, style in self.styles:
             self.document.set_style(s, e, style)
 
+        for pos, im in self.images:
+            im = pyglet.image.load(im)
+            self.document.insert_element(pos, ImageElement(im))
+
         # render the text lines to our batch
-        self.batch = pyglet.graphics.Batch()
         self.layout = pyglet.text.layout.IncrementalTextLayout(self.document,
             vw, vh, multiline=True, batch=self.batch)
+        self.layout.begin_update()
         self.layout.valign = 'top'
         self.layout.y = vh
+        self.layout.end_update()
+
+        self.layout._update()
 
     def on_leave(self):
         self.document = None
@@ -67,37 +79,47 @@ class Translator(docutils.nodes.GenericNodeVisitor):
     def visit_section(self, node):
         #print 'SECTION:', node
         self._content = ''
+        self._content_length = 0
         self._styles = []
+        self._images = []
         self._styles_stack = []
         self._list_stack = []
         self._start = node.line
         self._cur = 0
-        self._start_style(font_size=24, font_name='Arial',
-            color=(255, 255, 255, 255))
+        self._start_style(font_size=24, font_name='Arial')
+
+    def add_text(self, text):
+        self._content += text
+        self._content_length += len(text)
 
     def depart_section(self, node):
         self.styled_depart(node)
-
-        # source tracking
         self._styles.reverse()
-        page = RstTextPage(self._content, 0, 0, '', styles=self._styles)
-        self.pages.append(page)
+        # XXX source stuff here isn't complete (need original text)
+        self._page = RstTextPage(self._content, self._start, self._cur, '',
+            images=self._images, styles=self._styles, bgcolor='255,255,255,255')
+        self.pages.append(self._page)
 
     def _start_style(self, **style):
-        self._styles_stack.append((len(self._content), style))
+        self._styles_stack.append((self._content_length, style))
 
     def styled_depart(self, node):
         start, style = self._styles_stack.pop()
-        #print (start, len(self._content), style)
-        self._styles.append((start, len(self._content), style))
+        #print (start, self._content_length, style)
+        self._styles.append((start, self._content_length, style))
         self._cur = node.line
 
-    def nop_depart(self, node):
+    def nop(self, node):
         self._cur = node.line
+
+    def prune(self, node):
+        raise docutils.nodes.SkipNode
 
     def visit_title(self, node):
         self._start_style(font_size=36, bold=True)
-    depart_title = styled_depart
+    def depart_title(self, node):
+        self.add_text('\n')
+        self.styled_depart(node)
 
     def visit_emphasis(self, node):
         self._start_style(italic=True)
@@ -107,38 +129,47 @@ class Translator(docutils.nodes.GenericNodeVisitor):
         self._start_style(bold=True)
     depart_strong = styled_depart
 
+    def visit_image(self, node):
+        self._images.append((self._content_length, node['uri']))
+        self._content_length += 1
+    depart_image = nop
+
     _paragraph_suppress_newline = False
     def visit_paragraph(self, node):
+        # XXX argh, need to start a new paragraph if preceding element wasn't a para thing
+        pass
+    def depart_paragraph(self, node):
         if not self._paragraph_suppress_newline:
-            self._content += '\n'
+            self.add_text('\n')
         self._paragraph_suppress_newline = False
-    depart_paragraph = nop_depart
+    #depart_paragraph = nop
 
     def visit_bullet_list(self, node):
-        self._content += '\n'
+        self.add_text('\n')
         self._list_stack.append(bullet_generator(bullets[0]))
     def depart_bullet_list(self, node):
         self._list_stack.pop()
 
     def visit_enumerated_list(self, node):
-        self._content += '\n'
         self._list_stack.append(number_generator(node))
     def depart_enumerated_list(self, node):
-        self._list_stack.pop()
+        self.add_text('\n')
 
     def visit_list_item(self, node):
-        self._content += '\n' + self._list_stack[-1].next()
+        self.add_text(self._list_stack[-1].next())
         self._paragraph_suppress_newline = True
-    depart_list_item = nop_depart
+    def depart_list_item(self, node):
+        self.add_text('\n')
 
     def visit_literal_block(self, node):
-        self._content += '\n'
         self._start_style(font_name='Courier New')
-    depart_literal_block = styled_depart
+    def depart_literal_block(self, node):
+        self.styled_depart(node)
+        self.add_text('\n')
 
-    def visit_decoration(self, node):
-        pass
-    depart_decoration = nop_depart
+    # don't care about the definitions
+    visit_substitution_definition = prune
+    depart_substitution_definition = nop
 
     def visit_footer(self, node):
         # XXX save off and attach to the presentation
@@ -157,7 +188,7 @@ class Translator(docutils.nodes.GenericNodeVisitor):
         # XXX do something with the footer
 
     def visit_Text(self, node):
-        self._content += node.astext()
+        self.add_text(node.astext())
     def depart_Text(self, node):
         pass
 
@@ -174,6 +205,8 @@ def parse(text, html=False):
     settings.rfc_references = False
     document = docutils.utils.new_document('bruce-doc', settings)
     parser.parse(text, document)
+
+    references.Substitutions(document).apply()
 
     t = Translator(document)
     document.walkabout(t)
