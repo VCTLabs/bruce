@@ -10,6 +10,8 @@
   Holkner)
 - fix home/end movement (thanks Thomas Pani)
 - allow looping of video (and fixed un-zoomed positioning) (thanks fdev31)
+- initial ReStructuredText mode (pyglet -m bruce <presentation>.rst)
+- fix video scaling (issue 10)
 
 
 2.0beta3 - 2008-03-17
