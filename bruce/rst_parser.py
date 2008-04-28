@@ -77,95 +77,122 @@ class Translator(docutils.nodes.GenericNodeVisitor):
         pass
 
     def visit_section(self, node):
-        #print 'SECTION:', node
-        self._content = ''
-        self._content_length = 0
-        self._styles = []
-        self._images = []
-        self._styles_stack = []
-        self._list_stack = []
-        self._start = node.line
-        self._cur = 0
-        self._start_style(font_size=24, font_name='Arial')
+        print 'SECTION:', node
+        self.text_content = ''
+        # this is the eventual content position that we keep track of because we're
+        # not inserting the image elements into the content as we go.
+        self.document_length = 0
+        self.document_styles = []
+        self.document_images = []
+        self.style_stack = []
+        self.list_stack = []
+        self.section_start_line = node.line
+        self.section_end_line = 0
+        self._first_para = True
+        self.start_style(font_size=24, font_name='Arial')
 
     def add_text(self, text):
-        self._content += text
-        self._content_length += len(text)
+        self.text_content += text
+        self.document_length += len(text)
+
+    def break_para(self):
+        '''Break the previous paragraphish.
+        '''
+        if self._first_para:
+            self._first_para = False
+            return
+        self.add_text('\n')
 
     def depart_section(self, node):
         self.styled_depart(node)
-        self._styles.reverse()
+        self.document_styles.reverse()
         # XXX source stuff here isn't complete (need original text)
-        self._page = RstTextPage(self._content, self._start, self._cur, '',
-            images=self._images, styles=self._styles, bgcolor='255,255,255,255')
+        self._page = RstTextPage(self.text_content, self.section_start_line,
+            self.section_end_line, '', images=self.document_images, styles=self.document_styles,
+            bgcolor='255,255,255,255')
         self.pages.append(self._page)
 
-    def _start_style(self, **style):
-        self._styles_stack.append((self._content_length, style))
+    def start_style(self, **style):
+        # use the length of the actual text for styling because the images haven't
+        # been inserted into the document yet
+        self.style_stack.append((len(self.text_content), style))
+
+    def pop_style(self):
+        start, style = self.style_stack.pop()
+        self.document_styles.append((start, len(self.text_content), style))
 
     def styled_depart(self, node):
-        start, style = self._styles_stack.pop()
-        #print (start, self._content_length, style)
-        self._styles.append((start, self._content_length, style))
-        self._cur = node.line
+        self.pop_style()
+        self.section_end_line = node.line
 
     def nop(self, node):
-        self._cur = node.line
+        self.section_end_line = node.line
 
     def prune(self, node):
         raise docutils.nodes.SkipNode
 
     def visit_title(self, node):
-        self._start_style(font_size=36, bold=True)
+        self.break_para()
+        self.start_style(font_size=36, bold=True)
     def depart_title(self, node):
-        self.add_text('\n')
         self.styled_depart(node)
 
     def visit_emphasis(self, node):
-        self._start_style(italic=True)
+        self.start_style(italic=True)
     depart_emphasis = styled_depart
 
     def visit_strong(self, node):
-        self._start_style(bold=True)
+        self.start_style(bold=True)
     depart_strong = styled_depart
 
     def visit_image(self, node):
-        self._images.append((self._content_length, node['uri']))
-        self._content_length += 1
+        # if the parent is structural - document, section, etc then we need
+        # to break the previous paragraphish
+        if isinstance(node.parent, docutils.nodes.Structural):
+            self.break_para()
+        self.document_images.append((self.document_length, node['uri']))
+        self.document_length += 1
     depart_image = nop
 
     _paragraph_suppress_newline = False
     def visit_paragraph(self, node):
-        # XXX argh, need to start a new paragraph if preceding element wasn't a para thing
-        pass
-    def depart_paragraph(self, node):
         if not self._paragraph_suppress_newline:
-            self.add_text('\n')
+            self.break_para()
         self._paragraph_suppress_newline = False
-    #depart_paragraph = nop
+    depart_paragraph = nop
 
     def visit_bullet_list(self, node):
-        self.add_text('\n')
-        self._list_stack.append(bullet_generator(bullets[0]))
+        self.break_para()
+        if self.list_stack:
+            depth = self.list_stack[-1][0] + 20
+        else:
+            depth = 20
+        self.start_style(margin_left=depth)
+        self.list_stack.append((depth, bullet_generator(bullets[0])))
     def depart_bullet_list(self, node):
-        self._list_stack.pop()
+        self.styled_depart(node)
+        self.list_stack.pop()
 
     def visit_enumerated_list(self, node):
-        self._list_stack.append(number_generator(node))
+        self.list_stack.append((0, number_generator(node)))
+        self.break_para()
     def depart_enumerated_list(self, node):
-        self.add_text('\n')
+        pass
 
     def visit_list_item(self, node):
-        self.add_text(self._list_stack[-1].next())
+        self.break_para()
+        #self.start_style(margin_left=-80)
+        self.add_text(self.list_stack[-1][1].next())
+        #self.pop_style()
         self._paragraph_suppress_newline = True
     def depart_list_item(self, node):
-        self.add_text('\n')
+        pass
 
     def visit_literal_block(self, node):
-        self._start_style(font_name='Courier New')
+        self.break_para()
+        self.start_style(font_name='Courier New')
     def depart_literal_block(self, node):
         self.styled_depart(node)
-        self.add_text('\n')
 
     # don't care about the definitions
     visit_substitution_definition = prune
@@ -174,17 +201,17 @@ class Translator(docutils.nodes.GenericNodeVisitor):
     def visit_footer(self, node):
         # XXX save off and attach to the presentation
         #print 'FOOTER:', node
-        self._content = ''
-        self._styles = []
-        self._styles_stack = []
-        self._list_stack = []
-        self._start = node.line
-        self._cur = 0
-        self._start_style(font_size=24, font_name='Arial',
+        self.text_content = ''
+        self.document_styles = []
+        self.style_stack = []
+        self.list_stack = []
+        self.section_start_line = node.line
+        self.section_end_line = 0
+        self.start_style(font_size=24, font_name='Arial',
             color=(255, 255, 255, 255))
     def depart_footer(self, node):
         self.styled_depart(node)
-        self._styles.reverse()
+        self.document_styles.reverse()
         # XXX do something with the footer
 
     def visit_Text(self, node):

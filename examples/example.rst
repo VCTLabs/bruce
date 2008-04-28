@@ -1,9 +1,13 @@
 Page 1
 ------
 
-Some *italic* **bold** text
+Some *italic* |biohazard| **bold** text
 
-.. footer:: hello
+.. |biohazard| image:: examples/biohazard.png
+.. image:: examples/pyglet.png
+
+Some more |biohazard| **bold** text.
+
 
 Page 2
 ------
