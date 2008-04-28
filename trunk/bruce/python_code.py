@@ -160,8 +160,14 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
                     returncode)
 
             def get_chars_from_file(open_file):
-                data = open_file.read()
-                return list(data)
+                #return list(open_file.read())
+                # the following is a patch submitted in issue 13
+                d = open_file.readline()
+                data = []
+                while d:
+                    data.append(d)
+                    d = open_file.readline()
+                return list(''.join(data))
 
             stdout = get_chars_from_file(self._stdout_file)
             stderr = get_chars_from_file(self._stderr_file)

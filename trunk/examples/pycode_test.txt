@@ -7,6 +7,8 @@ raise StandardError('and stderr, too!')
 print 'Printing something before input.'
 print 'from sub: ' + raw_input('pyg>')
 print 'Printing something after input.'
+print 'second sub: ' + raw_input('pyg>')
+print 'Printing something after input.'
 
 --- pycode
 import pyglet

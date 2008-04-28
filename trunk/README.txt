@@ -27,6 +27,8 @@ Features:
 - runs fullscreen at native resolution (with sensible scaling of pages)
 - may switch to/from fullscreen quickly
 - HTML output of pages including notes
+- may display ReStructuredText files as presentations with one page
+  per section
 
 
 Installation
