@@ -221,6 +221,7 @@ class PythonCodePage(page.PageWithTitle, page.ScrollableLayoutPage):
             self.layout.valign = 'bottom'
             self.layout.y = 0
             self.layout.view_y = 0
+        self.caret.position = len(self.document.text)
 
     def draw(self):
         self.batch.draw()

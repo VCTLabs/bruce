@@ -13,6 +13,8 @@
 - initial ReStructuredText mode (pyglet -m bruce <presentation>.rst)
 - fix video scaling (issue 10)
 - stop videos on leaving video page (issue 11)
+- prevent raw_input from blocking on OS X (issue 13)
+- scroll pycode output display correctly (issue 14)
 
 
 2.0beta3 - 2008-03-17

@@ -4,6 +4,7 @@ raise StandardError('and stderr, too!')
 
 --- pycode
 # We can interact with the subprocess's stdin/stdout
+print '*\n'*50
 print 'Printing something before input.'
 print 'from sub: ' + raw_input('pyg>')
 print 'Printing something after input.'
