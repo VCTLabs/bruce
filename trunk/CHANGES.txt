@@ -12,6 +12,7 @@
 - allow looping of video (and fixed un-zoomed positioning) (thanks fdev31)
 - initial ReStructuredText mode (pyglet -m bruce <presentation>.rst)
 - fix video scaling (issue 10)
+- stop videos on leaving video page (issue 11)
 
 
 2.0beta3 - 2008-03-17

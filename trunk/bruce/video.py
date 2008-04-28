@@ -112,6 +112,8 @@ class VideoPage(page.Page):
         self.video_x, self.video_y = vw//2 - w//2, yoffset + (vh//2 - h//2)
 
     def on_leave(self):
+        self.player.pause()
+        self.player = None
         self.image = None
         self.batch = None
         self.title_label = None
