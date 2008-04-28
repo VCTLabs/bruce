@@ -122,15 +122,10 @@ class VideoPage(page.Page):
 
         # Video
         if self.player.source and self.player.source.video_format:
-            if self.scale:
-                gl.glPushMatrix()
-                gl.glScalef(self.scale, self.scale, 1)
             self.player.texture.blit(self.video_x,
                                      self.video_y,
-                                     width=self.video_width,
-                                     height=self.video_height)
-            if self.scale:
-                gl.glPopMatrix()
+                                     width=self.video_width*self.scale,
+                                     height=self.video_height*self.scale)
 
 config.add_section('video', VideoPage.config)
 
