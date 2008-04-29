@@ -1,6 +1,9 @@
 Page 1
 ------
 
+Line of para.
+Second line of para.
+
 Some *italic* |biohazard| **bold** text
 
 .. |biohazard| image:: examples/biohazard.png
@@ -8,6 +11,14 @@ Some *italic* |biohazard| **bold** text
 
 Some more |biohazard| **bold** text.
 
+.. config::
+     text.font_name=Arial
+
+sdf 
+
+..   literal.font_name=Bitstream Vera Sans Mono
+
+..   literal_block.font_name=Bitstream Vera Sans Mono
 
 Page 2
 ------

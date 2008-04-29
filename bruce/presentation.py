@@ -27,7 +27,7 @@ class Presentation(pyglet.event.EventDispatcher):
         if show_timer:
             self.timer_label = pyglet.text.Label('--:--',
                 font_name='Courier New', font_size=24,
-                color=(128, 128, 128, 150),
+                color=(128, 128, 128, 128),
                 halign='right', valign='bottom', batch=self.batch,
                 x=self.window.width, y=0)
             y = self.timer_label.content_height
@@ -37,7 +37,7 @@ class Presentation(pyglet.event.EventDispatcher):
             self.count_label = pyglet.text.Label(
                 '%d/%d'%(self.page_num+1, len(pages)),
                 font_name='Courier New', font_size=24,
-                color=(128, 128, 128, 150),
+                color=(128, 128, 128, 128),
                 halign='right', valign='bottom', batch=self.batch,
                 x=self.window.width, y=y)
 
