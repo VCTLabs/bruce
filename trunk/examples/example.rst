@@ -12,13 +12,7 @@ Some *italic* |biohazard| **bold** text
 Some more |biohazard| **bold** text.
 
 .. config::
-     text.font_name=Arial
-
-sdf 
-
-..   literal.font_name=Bitstream Vera Sans Mono
-
-..   literal_block.font_name=Bitstream Vera Sans Mono
+   default.font_name=Times New Roman
 
 Page 2
 ------
@@ -32,6 +26,11 @@ Page 2
 
 Page 3
 ------
+
+i.   foo
+ii.  bar
+iii. fleb
+iv.  baz
 
 Example::
 
