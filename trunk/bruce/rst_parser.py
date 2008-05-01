@@ -65,6 +65,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         text = node.astext()
         if self.in_literal:
             text = text.replace('\n', u'\u2028')
+        else:
+            # collapse newlines to reintegrate para
+            text = text.replace('\n', ' ')
         self.add_text(text)
 
     def visit_unknown(self, node):
@@ -76,16 +79,15 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     # Structural elements
 
     def visit_title(self, node):
+        self.break_para()
         self.push_style(node, self.stylesheet['title'])
-
-    def depart_title(self, node):
-        self.add_text('\n')
 
     def visit_section(self, node):
         self.push_style(node, self.stylesheet['default'])
         self.in_literal = False
         self.document = pyglet.text.document.FormattedDocument()
         self.len_text = 0
+        self.first_paragraph = True
         self.next_style = dict(self.current_style)
 
     def depart_section(self, node):
@@ -95,8 +97,21 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     # Body elements
 
-    def depart_paragraph(self, node):
+    def break_para(self):
+        '''Break the previous paragraphish.
+        '''
+        if self.first_paragraph:
+            self.first_paragraph = False
+            return
         self.add_text('\n')
+
+    paragraph_suppress_newline = False
+    def visit_paragraph(self, node):
+        if not self.paragraph_suppress_newline:
+            self.break_para()
+            if self.in_item:
+                self.add_text('\t')
+        self.paragraph_suppress_newline = False
 
     def visit_literal_block(self, node):
         self.push_style(node, self.stylesheet['literal_block'])
@@ -104,25 +119,28 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def depart_literal_block(self, node):
         self.in_literal = False
-        self.add_text('\n')
+        self.break_para()
 
     def visit_image(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
-        #if isinstance(node.parent, nodes.Structural):
-        #    self.add_text('\n')
+        if isinstance(node.parent, nodes.Structural):
+            self.break_para()
         image = pyglet.image.load(node['uri'])
         self.add_element(structured.ImageElement(image))
 
     def visit_bullet_list(self, node):
+        self.break_para()
         l = structured.UnorderedListBuilder(bullet_generator.next())
-        l.begin(self, {})
+        style = {}
+        l.begin(self, style)
+        self.push_style(node, style)
         self.list_stack.append(l)
     def depart_bullet_list(self, node):
         self.list_stack.pop()
-        self.add_text('\n')
 
     def visit_enumerated_list(self, node):
+        self.break_para()
         # XXX node.prefix
         format = {
             'arabic': '1',
@@ -130,16 +148,22 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             'upperroman': 'I',
         }[node['enumtype']] + node['suffix']
         l = structured.OrderedListBuilder(1, format)
-        l.begin(self, {})
+        style = {}
+        l.begin(self, style)
+        self.push_style(node, style)
         self.list_stack.append(l)
     def depart_enumerated_list(self, node):
         self.list_stack.pop()
-        self.add_text('\n')
 
+    in_item = False
     def visit_list_item(self, node):
+        self.break_para()
         self.list_stack[-1].item(self, {})
+        self.paragraph_suppress_newline = True
+        self.in_item = True
     def depart_list_item(self, node):
-        pass
+        self.in_item = False
+    
 
     # Inline elements
     def visit_emphasis(self, node):
