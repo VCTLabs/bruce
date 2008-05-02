@@ -1,6 +1,7 @@
 import docutils.parsers.rst
 from docutils.core import publish_doctree
 from docutils import nodes
+from docutils.transforms import references
 
 from bruce import page
 
@@ -41,6 +42,15 @@ default_stylesheet = dict(
     ),
 )
 
+boolean_true = set('yes true on'.split())
+
+config_types = dict(
+    font_size = int,
+    margin_left = int, margin_right = int, margin_top = int, margin_bottom = int,
+    bold = lambda v: v.lower() in boolean_true, italic = lambda v: v.lower() in boolean_true,
+    font_name = str, # XXX remove
+)
+
 class Section(object):
     def __init__(self, level):
         self.level = level
@@ -55,11 +65,26 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def decode_structured(self, text, location):
         self.location = location
+
+        #parser = docutils.parsers.rst.Parser()
+        #settings = docutils.frontend.OptionParser().get_default_values()
+        #settings.tab_width = 8
+        #settings.pep_references = False
+        #settings.rfc_references = False
+        #document = docutils.utils.new_document('bruce-doc', settings)
+        #parser.parse(text, document)
+
         if isinstance(location, pyglet.resource.FileLocation):
             doctree = publish_doctree(text, source_path=location.path)
         else:
             doctree = publish_doctree(text)
         doctree.walkabout(DocutilsVisitor(doctree, self))
+
+    def visit_unknown(self, node):
+        pass
+
+    def depart_unknown(self, node):
+        pass
 
     def visit_Text(self, node):
         text = node.astext()
@@ -70,16 +95,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             text = text.replace('\n', ' ')
         self.add_text(text)
 
-    def visit_unknown(self, node):
-        pass
-
-    def depart_unknown(self, node):
-        pass
 
     # Structural elements
 
     def visit_title(self, node):
-        self.break_para()
+        self.break_paragraph()
         self.push_style(node, self.stylesheet['title'])
 
     def visit_section(self, node):
@@ -95,9 +115,15 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             bgcolor='255,255,255,255')
         self.pages.append(p)
 
+    def prune(self, node):
+        raise docutils.nodes.SkipNode
+
+    def visit_substitution_definition(self, node):
+        self.prune(node)
+
     # Body elements
 
-    def break_para(self):
+    def break_paragraph(self):
         '''Break the previous paragraphish.
         '''
         if self.first_paragraph:
@@ -108,29 +134,28 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     paragraph_suppress_newline = False
     def visit_paragraph(self, node):
         if not self.paragraph_suppress_newline:
-            self.break_para()
+            self.break_paragraph()
             if self.in_item:
                 self.add_text('\t')
         self.paragraph_suppress_newline = False
 
     def visit_literal_block(self, node):
+        self.break_paragraph()
         self.push_style(node, self.stylesheet['literal_block'])
         self.in_literal = True
 
     def depart_literal_block(self, node):
         self.in_literal = False
-        self.break_para()
 
     def visit_image(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
-        if isinstance(node.parent, nodes.Structural):
-            self.break_para()
+        if not isinstance(node.parent, nodes.TextElement):
+            self.break_paragraph()
         image = pyglet.image.load(node['uri'])
         self.add_element(structured.ImageElement(image))
 
     def visit_bullet_list(self, node):
-        self.break_para()
         l = structured.UnorderedListBuilder(bullet_generator.next())
         style = {}
         l.begin(self, style)
@@ -140,7 +165,6 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.list_stack.pop()
 
     def visit_enumerated_list(self, node):
-        self.break_para()
         # XXX node.prefix
         format = {
             'arabic': '1',
@@ -157,15 +181,17 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     in_item = False
     def visit_list_item(self, node):
-        self.break_para()
+        self.break_paragraph()
         self.list_stack[-1].item(self, {})
         self.paragraph_suppress_newline = True
+        # indicate that new paragraphs need to be indented
         self.in_item = True
     def depart_list_item(self, node):
         self.in_item = False
     
 
     # Inline elements
+
     def visit_emphasis(self, node):
         self.push_style(node, self.stylesheet['emphasis'])
 
@@ -181,15 +207,15 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def visit_subscript(self, node):
         self.push_style(node, self.stylesheet['subscript'])
 
-    # Config
+
+    # config element
+
     def visit_config(self, node):
         for line in node.get_config().splitlines():
             key,value = line.strip().split('=')
             group, key = key.split('.')
-            if key == 'font_name': value=str(value)
+            value = config_types[key](value)
             self.stylesheet[group][key] = value
-    def depart_config(self, node):
-        pass
 
 class config(nodes.Special, nodes.Invisible, nodes.Element):
     def get_config(self):
