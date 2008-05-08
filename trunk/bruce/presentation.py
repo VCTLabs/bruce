@@ -65,32 +65,10 @@ class Presentation(pyglet.event.EventDispatcher):
         self.window.set_fullscreen(fullscreen)
         return pyglet.event.EVENT_HANDLED
 
-    __logo_spec = None
-    __logo = None
     def on_draw(self):
-        # set the clear color which is specified in 0-255 (and glClearColor
-        # takes 0-1)
-        pyglet.gl.glPushAttrib(pyglet.gl.GL_COLOR_BUFFER_BIT)
-        clear_color = [v/255. for v in self.page.cfg['bgcolor']]
-        pyglet.gl.glClearColor(*clear_color)
-
-        self.window.clear()
-        logo = self.page.cfg['logo']
-        if logo != self.__logo_spec:
-            valign = 'bottom'
-            halign = 'right'
-            if ';' in logo:
-                fname, args = logo.split(';', 1)
-            else:
-                fname = logo
-            self.__logo = pyglet.sprite.Sprite(resource.loader.image(fname))
-            self.__logo.x = self.window.width - self.__logo.width
-            self.__logo.y = 0
-
-        if self.__logo and self.page.nofooter != True:
-            self.__logo.draw()
-
+        self.page.decorate()
         self.page.draw()
+
         if self.start_time is not None:
             t = time.time() - self.start_time
             self.timer_label.text = '%02d:%02d'%(t//60, t%60)
@@ -98,8 +76,6 @@ class Presentation(pyglet.event.EventDispatcher):
             self.count_label.text = '%d/%d'%(self.page_num+1, len(self.pages))
         if self.batch is not None:
             self.batch.draw()
-
-        pyglet.gl.glPopAttrib()
 
     def __move(self, dir):
         # start the timer if we're displaying one
@@ -129,8 +105,8 @@ class Presentation(pyglet.event.EventDispatcher):
         # play the next page's sound (if any)
         # force skip of the rest of the current sound (if any)
         self.player.next()
-        if self.page.sound:
-            self.player.queue(self.page.sound)
+        if self.page.cfg['sound']:
+            self.player.queue(self.page.cfg['sound'])
             self.player.play()
 
         # let anyone listening know that the page has changed

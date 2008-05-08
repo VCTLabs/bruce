@@ -1,7 +1,11 @@
 # header stuff
 --- config
-    title.color=200, 255, 200
-    logo=pyglet.png
+    title.color=0, 50, 50
+
+--- decoration
+    bgcolor=235,235,235,255
+#image:pyglet.png;align=right;valign=bottom
+quad:C100,100,100,255;V0,0;V0,100;C0,0,0,255;Vw,100;Vw,0
 
 # content
 --- text
@@ -20,6 +24,9 @@ valign=top
 <<smaller font
 <<<smaller smaller font
 <<<<<<<<really small font
+
+--- decoration
+    bgcolor=235,235,235,255
 
 --- text
     valign=bottom
@@ -53,10 +60,8 @@ normal
 --- text
     valign=top
     halign=left
-    nofooter
     text.color=0,0,0
     title.color=0,0,0
-    bgcolor=255,255,255
 |=Powerpoint style
 
 .This is so totally
