@@ -26,8 +26,8 @@ Page 2
 2. item 2
 3. item 3
 
-Page 3
-------
+Page
+----
 
 i.   foo
 ii.  bar
@@ -40,3 +40,7 @@ Example::
   def foo():
     return 'foo'
 
+Page
+----
+
+More stuff

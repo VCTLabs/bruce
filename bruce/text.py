@@ -46,13 +46,13 @@ class TextPage(page.Page):
         ('halign', str, 'center'), #, 'center left right'.split()),
         ('text.font_name', str, 'Arial'),
         ('text.font_size', float, 64),
-        ('text.color', tuple, (255, 255, 255, 255)),
+        ('text.color', tuple, (0, 0, 0, 255)),
         ('title.font_name', str, 'Arial'),
         ('title.font_size', float, 64),
-        ('title.color', tuple, (255, 255, 100, 255)),
+        ('title.color', tuple, (55, 55, 0, 255)),
         ('code.font_name', str, 'Courier New'),
         ('code.font_size', float, 64),
-        ('code.color', tuple, (200, 200, 200, 255)),
+        ('code.color', tuple, (0, 0, 0, 255)),
     )
     name = 'text'
 

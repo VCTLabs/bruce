@@ -17,13 +17,11 @@ class Page(pyglet.event.EventDispatcher):
     nofooter = False
 
     default_config = (
-        ('nofooter', bool,      False),
-        #('auto',     float,    None),
-        ('bgcolor', tuple, (0, 0, 0, 255)),
-        ('sound', unicode, None),
+        ('no_decoration', bool,     False),
+        ('decoration',    None,     config.Decoration('')),
+        ('sound',         unicode,  ''),
     )
     config = ()
-    sound = None
 
     def __init__(self, content, start_pos, end_pos, source, **kw):
         '''Initialise the page given the content and config.
@@ -80,6 +78,11 @@ class Page(pyglet.event.EventDispatcher):
             return ''
         return '<pre>%s</pre>'%html_quote(inst.content)
 
+    def decorate(self):
+        '''Draw decorations for this page using the current config.
+        '''
+        self.cfg['decoration'].draw()
+
     def draw(self):
         '''Draw self - assume orthographic projection.
         '''
@@ -96,6 +99,7 @@ class Page(pyglet.event.EventDispatcher):
         dimensions.
         '''
         self.viewport_width, self.viewport_height = viewport_width, viewport_height
+        self.cfg['decoration'].on_enter(viewport_width, viewport_height)
 
     def on_resize(self, viewport_width, viewport_height):
         '''Invoked when the viewport has changed dimensions.
@@ -104,7 +108,9 @@ class Page(pyglet.event.EventDispatcher):
         will be able to handle this better.
         '''
         self.on_leave()
+        self.cfg['decoration'].on_leave()
         self.on_enter(viewport_width, viewport_height)
+        self.cfg['decoration'].on_enter(viewport_width, viewport_height)
 
     def on_next(self):
         '''Invoked on the "next" event (cursor right or left mouse
@@ -123,7 +129,7 @@ class Page(pyglet.event.EventDispatcher):
     def on_leave(self):
         '''Invoked when the page is removed from the screen.
         '''
-        pass
+        self.cfg['decoration'].on_leave()
 
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')

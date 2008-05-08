@@ -1,3 +1,28 @@
+'''
+
+Ideas
+
+Presentation has decorations layer in background.
+
+Pages may specify no decoration.
+
+Pages may specify no title. Though pages with no title are pretty ugly thanks to
+the now-unnecessary title. Perhaps ReST just isn't suited to that kind of presentation?
+
+Or perhaps I can have page directives which are structural like Sections?
+
+Pages may specify arguments to layout: halign and valign
+
+
+Layout.valign/halign are actually *anchors*.
+
+
+'''
+
+
+
+
+
 import docutils.parsers.rst
 from docutils.core import publish_doctree
 from docutils import nodes
@@ -39,6 +64,10 @@ default_stylesheet = dict(
         font_size=28,
         bold=True,
         align='center'
+    ),
+    layout = dict(
+        valign='top',
+        halign='left'
     ),
 )
 
@@ -119,6 +148,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         raise docutils.nodes.SkipNode
 
     def visit_substitution_definition(self, node):
+        self.prune(node)
+
+    def visit_system_message(self, node):
         self.prune(node)
 
     # Body elements
