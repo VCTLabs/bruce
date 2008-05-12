@@ -6,6 +6,7 @@ from cgi import escape as html_quote
 import pyglet
 
 from bruce import config
+from bruce import decoration
 
 def decode_content(content):
     if not content: return content
@@ -18,7 +19,7 @@ class Page(pyglet.event.EventDispatcher):
 
     default_config = (
         ('no_decoration', bool,     False),
-        ('decoration',    None,     config.Decoration('')),
+        ('decoration',    None,     decoration.Decoration('')),
         ('sound',         unicode,  ''),
     )
     config = ()

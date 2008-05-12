@@ -1,95 +1,6 @@
 import os
 
-
-import pyglet
-from pyglet.gl import *
-
-class Decoration(dict):
-    '''
-    Decoratio content consists of lines of drawing commands:
-
-    image:filename;halign=right;valign=bottom
-    quad:Crrr,ggg,bbb;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
-
-    Quad vertex color carries over if it's not specified for each vertex,
-    allowing either solid color or blending.
-
-    Vertexes may be expressions (which will be eval()'ed). The expressions have
-    the variables "w" and "h" available which are the width and height of the
-    presentation viewport.
-
-    '''
-    def __init__(self, content, **kw):
-        self['bgcolor'] = (255, 255, 255, 255)
-        self.content = content
-        self.update(kw)
-
-    def on_enter(self, viewport_width, viewport_height):
-        self.viewport_width, self.viewport_height = viewport_width, viewport_height
-
-        self.decorations = []
-        self.batch = pyglet.graphics.Batch()
-
-        # vars for the eval
-        glob = {}
-        loc = dict(w=viewport_width, h=viewport_height)
-
-        from bruce import resource
-
-        # parse content
-        for line in self.content.splitlines():
-            if line.startswith('image:'):
-                image = line.split(':')[1]
-                if ';' in image:
-                    fname, args = image.split(';', 1)
-                else:
-                    fname = image
-                s = pyglet.sprite.Sprite(resource.loader.image(fname), batch=self.batch)
-                # XXX use args to align
-                s.x = viewport_width - s.width
-                s.y = 0
-                self.decorations.append(s)
-            elif line.startswith('quad:'):
-                quad = line.split(':')[1]
-                cur_color = None
-                c = []
-                v = []
-                for entry in quad.split(';'):
-                    if entry[0] == 'C':
-                        cur_color = map(int, entry[1:].split(','))
-                    elif entry[0] == 'V':
-                        if cur_color is None:
-                            raise ValueError('invalid quad spec %r: needs color first'%quad)
-                        c.extend(cur_color)
-                        v.extend([eval(e, glob, loc) for e in entry[1:].split(',')])
-                q = self.batch.add(4, GL_QUADS, None, ('v2i', v), ('c4b', c))
-                self.decorations.append(q)
-
-    def on_leave(self):
-        for decoration in self.decorations:
-            decoration.delete()
-        self.batch = None
-
-    __logo = None
-    def draw(self):
-        # set the clear color which is specified in 0-255 (and glClearColor
-        # takes 0-1)
-        glPushAttrib(GL_COLOR_BUFFER_BIT)
-        clear_color = [int(v)/255. for v in self['bgcolor'].split(',')]
-        glClearColor(*clear_color)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glPopAttrib()
-
-        self.batch.draw()
-
-    @classmethod
-    def as_html(cls, content, **kw):
-        return ''
-
-    @classmethod
-    def as_page(cls, content, **kw):
-        config['decoration'] = cls(content, **kw)
-        return None
+from bruce import decoration
 
 class _Section(object):
     '''Each page created will grab a _Section for itself which also
@@ -124,7 +35,7 @@ class _Config(dict):
     types and then per-presentation overrides.
     '''
     types = dict(decoration=None, sound=unicode)
-    defaults = dict(decoration=Decoration(''), sound='')
+    defaults = dict(decoration=decoration.Decoration(''), sound='')
 
     def set(self, key, val):
         # XXX update to use type not old value
@@ -202,5 +113,5 @@ add_section = config.add_section
 get_section = config.get_section
 path = os.path.abspath(os.path.join(os.getcwd(), __file__))
 
-__all__ = 'get set add_section get_section path config Decoration'.split()
+__all__ = 'get set add_section get_section path config'.split()
 
