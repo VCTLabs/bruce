@@ -99,6 +99,7 @@ def parse(text, html=False):
     return pages
 
 from bruce import config
+from bruce import decoration
 from bruce.text import TextPage
 from bruce.code import CodePage
 from bruce.resource import Resource, loader
@@ -108,7 +109,7 @@ from bruce.html import HTMLTextPage
 from bruce.blank import BlankPage
 from bruce.python_interpreter import PythonInterpreterPage
 from bruce.python_code import PythonCodePage
-_classes = dict(config=config.config, decoration=config.Decoration,
+_classes = dict(config=config.config, decoration=decoration.Decoration,
     text=TextPage, html=HTMLTextPage,
     image=ImagePage, resource=Resource, video=VideoPage, blank=BlankPage,
     code=CodePage, py=PythonInterpreterPage, pycode=PythonCodePage)

@@ -29,6 +29,7 @@ from docutils import nodes
 from docutils.transforms import references
 
 from bruce import page
+from bruce.decoration import Decoration
 
 import pyglet
 from pyglet.text.formats import structured
@@ -69,6 +70,7 @@ default_stylesheet = dict(
         valign='top',
         halign='left'
     ),
+    decoration = Decoration(''),
 )
 
 boolean_true = set('yes true on'.split())
@@ -78,6 +80,7 @@ config_types = dict(
     margin_left = int, margin_right = int, margin_top = int, margin_bottom = int,
     bold = lambda v: v.lower() in boolean_true, italic = lambda v: v.lower() in boolean_true,
     font_name = str, # XXX remove
+    bgcolor = str, # lambda v: map(int, v.split(',')),
 )
 
 class Section(object):
@@ -91,6 +94,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             stylesheet = dict(default_stylesheet)
         self.stylesheet = stylesheet
         self.pages = []
+        self.document = None
 
     def decode_structured(self, text, location):
         self.location = location
@@ -116,6 +120,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         pass
 
     def visit_Text(self, node):
+        if self.document is None:
+            print 'WARNING: text outside Section', node
+            return
         text = node.astext()
         if self.in_literal:
             text = text.replace('\n', u'\u2028')
@@ -141,7 +148,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def depart_section(self, node):
         p = RstTextPage('', 0, 0, '', document=self.document,
-            bgcolor='255,255,255,255')
+            decoration=self.stylesheet['decoration'])
         self.pages.append(p)
 
     def prune(self, node):
@@ -249,6 +256,17 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             value = config_types[key](value)
             self.stylesheet[group][key] = value
 
+    def visit_decoration(self, node):
+        content = []
+        args = {}
+        for line in node.get_decoration().splitlines():
+            if ':' in line:
+                content.append(line)
+            else:
+                key, value = line.strip().split('=')
+                args[str(key)] = config_types[key](value)
+        self.stylesheet['decoration'] = Decoration('\n'.join(content), **args)
+
 class config(nodes.Special, nodes.Invisible, nodes.Element):
     def get_config(self):
         return self.rawsource
@@ -259,6 +277,17 @@ def config_directive(name, arguments, options, content, lineno,
 config_directive.arguments = (0, 0, 0)
 config_directive.content = True
 docutils.parsers.rst.directives.register_directive('config', config_directive)
+
+class decoration(nodes.Special, nodes.Invisible, nodes.Element):
+    def get_decoration(self):
+        return self.rawsource
+
+def decoration_directive(name, arguments, options, content, lineno,
+                          content_offset, block_text, state, state_machine):
+    return [ decoration('\n'.join(content)) ]
+decoration_directive.arguments = (0, 0, 0)
+decoration_directive.content = True
+docutils.parsers.rst.directives.register_directive('decoration', decoration_directive)
 
 
 class DocutilsVisitor(nodes.NodeVisitor):
@@ -285,22 +314,14 @@ class RstTextPage(page.Page):
     name = 'rst-text'
     def __init__(self, *args, **kw):
         self.document = kw.pop('document')
-        self.decorations = []
+        self.decoration = kw.pop('decoration')
         super(RstTextPage, self).__init__(*args, **kw)
 
     def on_enter(self, vw, vh):
         super(RstTextPage, self).on_enter(vw, vh)
 
         self.batch = pyglet.graphics.Batch()
-
-        self.decorations.append(self.batch.add(4, pyglet.gl.GL_QUADS, None,
-            ('v2i', (0, vh-50, vw, vh-50, vw, vh, 0, vh)),
-            ('c3B', (200, 200, 100)*4),
-        ))
-        self.decorations.append(self.batch.add(4, pyglet.gl.GL_QUADS, None,
-            ('v2i', (0, 0, vw, 0, vw, 50, 0, 50)),
-            ('c3B', (200, 200, 100)*4),
-        ))
+        self.decoration.on_enter(vw, vh)
 
         # render the text lines to our batch
         self.layout = pyglet.text.layout.IncrementalTextLayout(self.document,
@@ -311,14 +332,13 @@ class RstTextPage(page.Page):
         self.layout.end_update()
 
     def on_leave(self):
-        for decoration in self.decorations:
-            decoration.delete()
-        self.decorations = []
+        self.decoration.on_leave()
         self.layout.delete()
         self.layout = None
         self.batch = None
 
     def draw(self):
+        self.decoration.draw()
         self.batch.draw()
 
 def parse(text, html=False):
