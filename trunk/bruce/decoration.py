@@ -3,6 +3,31 @@ import os
 import pyglet
 from pyglet.gl import *
 
+class QuadGroup(pyglet.graphics.Group):
+    def __init__(self, blend_src=GL_SRC_ALPHA, blend_dest=GL_ONE_MINUS_SRC_ALPHA,
+            parent=None):
+        super(QuadGroup, self).__init__(parent)
+        self.blend_src = blend_src
+        self.blend_dest = blend_dest
+
+    def set_state(self):
+        glPushAttrib(GL_ENABLE_BIT)
+        glEnable(GL_BLEND)
+        glDisable(GL_TEXTURE_2D)
+        glBlendFunc(self.blend_src, self.blend_dest)
+
+    def unset_state(self):
+        glPopAttrib()
+
+    def __eq__(self, other):
+        return (other.__class__ is self.__class__ and
+                self.parent is other.parent and
+                self.blend_src == other.blend_src and
+                self.blend_dest == other.blend_dest)
+
+    def __hash__(self):
+        return hash((id(self.parent), self.blend_src, self.blend_dest))
+
 class Decoration(dict):
     '''
     Decoratio content consists of lines of drawing commands:
@@ -19,7 +44,7 @@ class Decoration(dict):
 
     '''
     def __init__(self, content, **kw):
-        self['bgcolor'] = '255,255,255,255'
+        self['bgcolor'] = (255, 255, 255, 255)
         self.content = content
         self.update(kw)
 
@@ -30,7 +55,6 @@ class Decoration(dict):
         self.batch = pyglet.graphics.Batch()
 
         # vars for the eval
-        glob = {}
         loc = dict(w=viewport_width, h=viewport_height)
 
         from bruce import resource
@@ -60,9 +84,12 @@ class Decoration(dict):
                         if cur_color is None:
                             raise ValueError('invalid quad spec %r: needs color first'%quad)
                         c.extend(cur_color)
-                        v.extend([eval(e, glob, loc) for e in entry[1:].split(',')])
-                q = self.batch.add(4, GL_QUADS, None, ('v2i', v), ('c4b', c))
+                        v.extend([eval(e, {}, loc) for e in entry[1:].split(',')
+                            if '_' not in e])
+                q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
                 self.decorations.append(q)
+            elif line.startswith('bgcolor:'):
+                self['bgcolor'] = map(int, line.split(':')[1].split(','))
 
     def on_leave(self):
         for decoration in self.decorations:
@@ -74,8 +101,7 @@ class Decoration(dict):
         # set the clear color which is specified in 0-255 (and glClearColor
         # takes 0-1)
         glPushAttrib(GL_COLOR_BUFFER_BIT)
-        clear_color = [int(v)/255. for v in self['bgcolor'].split(',')]
-        glClearColor(*clear_color)
+        glClearColor(*self['bgcolor'])
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glPopAttrib()
 

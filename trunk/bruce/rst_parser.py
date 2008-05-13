@@ -80,7 +80,6 @@ config_types = dict(
     margin_left = int, margin_right = int, margin_top = int, margin_bottom = int,
     bold = lambda v: v.lower() in boolean_true, italic = lambda v: v.lower() in boolean_true,
     font_name = str, # XXX remove
-    bgcolor = str, # lambda v: map(int, v.split(',')),
 )
 
 class Section(object):

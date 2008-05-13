@@ -34,8 +34,8 @@ class _Config(dict):
     '''Store a set of defaults (defined here and in various page
     types and then per-presentation overrides.
     '''
-    types = dict(decoration=None, sound=unicode)
-    defaults = dict(decoration=decoration.Decoration(''), sound='')
+    types = dict(sound=unicode, decoration=None)
+    defaults = dict(sound='', decoration=decoration.Decoration(''))
 
     def set(self, key, val):
         # XXX update to use type not old value
@@ -79,7 +79,6 @@ class _Config(dict):
         c.update(self)
         return c
 
-    flags = tuple([(k, str, defaults[k]) for k in defaults])
     def __call__(self, content, **kw):
         for k in kw:
             if k in self.defaults:
