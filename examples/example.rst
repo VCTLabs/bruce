@@ -18,7 +18,7 @@ Some *italic* |biohazard| **bold** text
 
 Some more |biohazard| **bold** text.
 
-.. config::
+.. style::
    default.font_name=Times New Roman
    title.font_name=Bitstream Vera Sans
    title.bold=yes
@@ -33,8 +33,21 @@ Page 2
 2. item 2
 3. item 3
 
-Page
 ----
+
+.. style::
+   layout.valign=center
+   layout.halign=center
+
+page with no title
+
+More
+----
+
+.. style::
+   layout.valign=bottom
+   layout.halign=left
+
 
 i.   foo
 ii.  bar
