@@ -1,8 +1,9 @@
 
 .. decoration::
-    bgcolor=235,235,235,255
+    bgcolor:235,235,235,255
     image:pyglet-trans-64.png;align=right;valign=bottom
-    quad:C100,100,100,255;V0,0;V0,64;C0,0,0,255;Vw,64;Vw,0
+    quad:C255,210,200,255;V0,h;V0,h-48;Vw,h-48;Vw,h
+    quad:C255,210,200,255;V0,0;V0,64;C0,0,0,255;Vw,64;Vw,0
 
 Page 1
 ------
