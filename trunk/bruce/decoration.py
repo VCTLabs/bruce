@@ -52,12 +52,11 @@ class Decoration(dict):
         self.viewport_width, self.viewport_height = viewport_width, viewport_height
 
         self.decorations = []
+        self.images = []
         self.batch = pyglet.graphics.Batch()
 
         # vars for the eval
         loc = dict(w=viewport_width, h=viewport_height)
-
-        from bruce import resource
 
         # parse content
         for line in self.content.splitlines():
@@ -67,11 +66,12 @@ class Decoration(dict):
                     fname, args = image.split(';', 1)
                 else:
                     fname = image
-                s = pyglet.sprite.Sprite(resource.loader.image(fname), batch=self.batch)
+                image = pyglet.resource.image(fname)
+                s = pyglet.sprite.Sprite(image, batch=self.batch)
                 # XXX use args to align
                 s.x = viewport_width - s.width
                 s.y = 0
-                self.decorations.append(s)
+                self.images.append(s)
             elif line.startswith('quad:'):
                 quad = line.split(':')[1]
                 cur_color = None

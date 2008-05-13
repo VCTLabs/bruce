@@ -2,8 +2,6 @@ import time
 import pyglet
 from pyglet.window import key, mouse
 
-from bruce import resource
-
 class Presentation(pyglet.event.EventDispatcher):
 
     def __init__(self, window, pages, start_page=0, show_timer=False,
@@ -66,7 +64,6 @@ class Presentation(pyglet.event.EventDispatcher):
         return pyglet.event.EVENT_HANDLED
 
     def on_draw(self):
-        self.page.decorate()
         self.page.draw()
 
         if self.start_time is not None:
@@ -102,12 +99,14 @@ class Presentation(pyglet.event.EventDispatcher):
 
         self.window.set_caption("Presentation: Slide %d"%(self.page_num+1))
 
+        '''
         # play the next page's sound (if any)
         # force skip of the rest of the current sound (if any)
         self.player.next()
         if self.page.cfg['sound']:
             self.player.queue(self.page.cfg['sound'])
             self.player.play()
+        '''
 
         # let anyone listening know that the page has changed
         self.dispatch_event('on_page_changed', self.page, self.page_num)

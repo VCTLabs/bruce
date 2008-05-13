@@ -20,9 +20,6 @@ Layout.valign/halign are actually *anchors*.
 '''
 
 
-
-
-
 import docutils.parsers.rst
 from docutils.core import publish_doctree
 from docutils import nodes
@@ -75,11 +72,11 @@ default_stylesheet = dict(
 
 boolean_true = set('yes true on'.split())
 
-config_types = dict(
+style_types = dict(
     font_size = int,
     margin_left = int, margin_right = int, margin_top = int, margin_bottom = int,
     bold = lambda v: v.lower() in boolean_true, italic = lambda v: v.lower() in boolean_true,
-    font_name = str, # XXX remove
+    valign = str, halign = str, font_name = unicode,
 )
 
 class Section(object):
@@ -97,23 +94,18 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def decode_structured(self, text, location):
         self.location = location
-
-        #parser = docutils.parsers.rst.Parser()
-        #settings = docutils.frontend.OptionParser().get_default_values()
-        #settings.tab_width = 8
-        #settings.pep_references = False
-        #settings.rfc_references = False
-        #document = docutils.utils.new_document('bruce-doc', settings)
-        #parser.parse(text, document)
-
         if isinstance(location, pyglet.resource.FileLocation):
             doctree = publish_doctree(text, source_path=location.path)
         else:
             doctree = publish_doctree(text)
         doctree.walkabout(DocutilsVisitor(doctree, self))
 
-    def visit_unknown(self, node):
+    def visit_document(self, node):
+        # XXX maybe something here of interest?
         pass
+
+    #def visit_unknown(self, node):
+        #pass
 
     def depart_unknown(self, node):
         pass
@@ -146,9 +138,12 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.next_style = dict(self.current_style)
 
     def depart_section(self, node):
-        p = RstTextPage('', 0, 0, '', document=self.document,
-            decoration=self.stylesheet['decoration'])
+        p = TextPage(self.document, self.stylesheet)
         self.pages.append(p)
+
+    def visit_transition(self, node):
+        self.depart_section(node)
+        self.visit_section(node)
 
     def prune(self, node):
         raise docutils.nodes.SkipNode
@@ -246,13 +241,13 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.push_style(node, self.stylesheet['subscript'])
 
 
-    # config element
+    # style element
 
-    def visit_config(self, node):
-        for line in node.get_config().splitlines():
+    def visit_style(self, node):
+        for line in node.get_style().splitlines():
             key,value = line.strip().split('=')
             group, key = key.split('.')
-            value = config_types[key](value)
+            value = style_types[key](value)
             self.stylesheet[group][key] = value
 
     def visit_decoration(self, node):
@@ -263,19 +258,19 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
                 content.append(line)
             else:
                 key, value = line.strip().split('=')
-                args[str(key)] = config_types[key](value)
+                args[str(key)] = style_types[key](value)
         self.stylesheet['decoration'] = Decoration('\n'.join(content), **args)
 
-class config(nodes.Special, nodes.Invisible, nodes.Element):
-    def get_config(self):
+class style(nodes.Special, nodes.Invisible, nodes.Element):
+    def get_style(self):
         return self.rawsource
 
-def config_directive(name, arguments, options, content, lineno,
+def style_directive(name, arguments, options, content, lineno,
                           content_offset, block_text, state, state_machine):
-    return [ config('\n'.join(content)) ]
-config_directive.arguments = (0, 0, 0)
-config_directive.content = True
-docutils.parsers.rst.directives.register_directive('config', config_directive)
+    return [ style('\n'.join(content)) ]
+style_directive.arguments = (0, 0, 0)
+style_directive.content = True
+docutils.parsers.rst.directives.register_directive('style', style_directive)
 
 class decoration(nodes.Special, nodes.Invisible, nodes.Element):
     def get_decoration(self):
@@ -296,8 +291,8 @@ class DocutilsVisitor(nodes.NodeVisitor):
 
     def dispatch_visit(self, node):
         node_name = node.__class__.__name__
-        method = getattr(self.decoder, 'visit_%s' % node_name,
-                         self.decoder.visit_unknown)
+        method = getattr(self.decoder, 'visit_%s' % node_name)
+        #, self.decoder.visit_unknown)
         method(node)
 
     def dispatch_departure(self, node):
@@ -309,29 +304,36 @@ class DocutilsVisitor(nodes.NodeVisitor):
         method(node)
 
 
-class RstTextPage(page.Page):
+class TextPage(page.Page):
     name = 'rst-text'
-    def __init__(self, *args, **kw):
-        self.document = kw.pop('document')
-        self.decoration = kw.pop('decoration')
-        super(RstTextPage, self).__init__(*args, **kw)
+    def __init__(self, document, stylesheet):
+        self.document = document
+        self.stylesheet = stylesheet
+        self.decoration = stylesheet['decoration']
 
     def on_enter(self, vw, vh):
-        super(RstTextPage, self).on_enter(vw, vh)
+        super(TextPage, self).on_enter(vw, vh)
 
         self.batch = pyglet.graphics.Batch()
-        self.decoration.on_enter(vw, vh)
 
         # render the text lines to our batch
         self.layout = pyglet.text.layout.IncrementalTextLayout(self.document,
             vw, vh, multiline=True, batch=self.batch)
         self.layout.begin_update()
-        self.layout.valign = 'top'
-        self.layout.y = vh
+        print self.stylesheet['layout']
+        if self.stylesheet['layout']['valign'] == 'center':
+            self.layout.valign = 'center'
+            self.layout.y = vh//2
+        elif self.stylesheet['layout']['valign'] == 'top':
+            self.layout.valign = 'top'
+            self.layout.y = vh
+        else:
+            self.layout.valign = 'bottom'
+            self.layout.y = 0
         self.layout.end_update()
 
     def on_leave(self):
-        self.decoration.on_leave()
+        super(TextPage, self).on_leave()
         self.layout.delete()
         self.layout = None
         self.batch = None
