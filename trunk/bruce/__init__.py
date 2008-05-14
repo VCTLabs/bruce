@@ -1,4 +1,4 @@
-__version__ = '2.0beta3'
+__version__ = '3.0beta1'
 
 import os
 import sys

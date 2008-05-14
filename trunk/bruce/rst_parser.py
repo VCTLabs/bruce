@@ -102,6 +102,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.len_text = 0
         self.first_paragraph = True
         self.next_style = dict(self.current_style)
+        self.notes = []
 
     def finish_page(self):
         if self.len_text:
@@ -221,7 +222,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.in_item = True
     def depart_list_item(self, node):
         self.in_item = False
-    
+
+    def visit_note(self, node):
+        self.notes.append(node.children[0].astext().replace('\n', ' '))
+        self.prune()
+
 
     #
     # Inline elements
@@ -258,7 +263,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             self.stylesheet[group][key] = value
 
     def visit_decoration(self, node):
-        self.stylesheet['decoration'] = Decoration(node.get_decoration())
+        self.stylesheet['decoration'].content = node.get_decoration()
 
 class style(nodes.Special, nodes.Invisible, nodes.Element):
     def get_style(self):
