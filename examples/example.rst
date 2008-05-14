@@ -1,3 +1,17 @@
+.. style::
+   layout.valign=center
+   align=center
+   font_size=64
+
+**Welcome to Bruce!**
+
+.. style:: font_size=32
+
+Bruce the Presentation Tool version 3.0, that is
+
+
+Page 1
+------
 
 .. decoration::
     bgcolor:235,235,235,255
@@ -6,8 +20,9 @@
     quad:C255,210,200,255;V0,0;V0,64;C0,0,0,255;Vw,64;Vw,0
     viewport:0,64,w,h-(64+48)
 
-Page 1
-------
+.. style::
+   layout.valign=top
+   align=left
 
 Line of para.
 Second line of para.
