@@ -34,7 +34,7 @@ Features:
 Installation
 ============
 
-Bruce REQUIRES pyglet 1.1
+Bruce REQUIRES Python 2.5 and pyglet 1.1
 
 To install Bruce, run::
 

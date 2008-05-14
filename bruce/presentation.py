@@ -64,7 +64,7 @@ class Presentation(pyglet.event.EventDispatcher):
         return pyglet.event.EVENT_HANDLED
 
     def on_draw(self):
-        self.page.draw()
+        self.page.do_draw()
 
         if self.start_time is not None:
             t = time.time() - self.start_time
