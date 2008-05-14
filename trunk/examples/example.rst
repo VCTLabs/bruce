@@ -4,6 +4,7 @@
     image:pyglet-trans-64.png;align=right;valign=bottom
     quad:C255,210,200,255;V0,h;V0,h-48;Vw,h-48;Vw,h
     quad:C255,210,200,255;V0,0;V0,64;C0,0,0,255;Vw,64;Vw,0
+    viewport:0,64,w,h-(64+48)
 
 Page 1
 ------
@@ -20,8 +21,6 @@ Some more |biohazard| **bold** text.
 
 .. style::
    default.font_name=Times New Roman
-   title.font_name=Bitstream Vera Sans
-   title.bold=yes
 
 Page 2
 ------

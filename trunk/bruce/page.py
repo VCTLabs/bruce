@@ -2,6 +2,7 @@ import os
 import re
 
 import pyglet
+from pyglet.gl import glPushMatrix, glPopMatrix, glTranslatef
 
 class Page(pyglet.event.EventDispatcher):
     def draw(self):
@@ -19,8 +20,14 @@ class Page(pyglet.event.EventDispatcher):
         '''Invoked when the page is put up on the screen of the given
         dimensions.
         '''
-        self.viewport_width, self.viewport_height = viewport_width, viewport_height
         self.decoration.on_enter(viewport_width, viewport_height)
+        self.layout(*self.decoration.get_viewport())
+
+    def layout(self, viewport_x, viewport_y, viewport_width, viewport_height):
+        '''Invoked as part of on_enter handling, must be provided by an
+        implementation class.
+        '''
+        raise NotImplementedError('implement in subclass')
 
     def on_resize(self, viewport_width, viewport_height):
         '''Invoked when the viewport has changed dimensions.
@@ -49,6 +56,28 @@ class Page(pyglet.event.EventDispatcher):
         '''Invoked when the page is removed from the screen.
         '''
         self.decoration.on_leave()
+        self.cleanup()
+
+    def cleanup(self):
+        '''Invoked as part of on_leave handling, must be provided by an
+        implementation class.
+        '''
+        raise NotImplementedError('implement in subclass')
+
+    def do_draw(self):
+        '''Invoked to render the page when active.
+
+        Renders the decoration and then the implementation page's contents.
+        '''
+        self.decoration.draw()
+        self.draw()
+
+    def draw(self):
+        '''Invoked as part of do_draw, must be provided by an
+        implementation class.
+        '''
+        raise NotImplementedError('implement in subclass')
+
 
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')

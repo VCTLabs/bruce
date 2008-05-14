@@ -1,25 +1,3 @@
-'''
-
-Ideas
-
-Presentation has decorations layer in background.
-
-Pages may specify no decoration.
-
-Pages may specify no title. Though pages with no title are pretty ugly thanks to
-the now-unnecessary title. Perhaps ReST just isn't suited to that kind of presentation?
-
-Or perhaps I can have page directives which are structural like Sections?
-
-Pages may specify arguments to layout: halign and valign
-
-
-Layout.valign/halign are actually *anchors*.
-
-
-'''
-
-
 import docutils.parsers.rst
 from docutils.core import publish_doctree
 from docutils import nodes
@@ -59,14 +37,13 @@ default_stylesheet = dict(
         font_size=20,
         margin_left=20,
     ),
-    title = dict(
-        font_size=28,
-        bold=True,
-        align='center'
-    ),
+#    title = dict(
+#        font_size=28,
+#        bold=True,
+#        align='center'
+#    ),
     layout = dict(
         valign='top',
-        halign='left',
     ),
     decoration = Decoration(''),
 )
@@ -110,6 +87,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def depart_unknown(self, node):
         pass
 
+    def prune(self):
+        raise docutils.nodes.SkipNode
+
 
     #
     # Page construction
@@ -118,6 +98,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.push_style(node, self.stylesheet['default'])
         self.in_literal = False
         self.document = pyglet.text.document.FormattedDocument()
+        self.stylesheet['decoration'].title = None
         self.len_text = 0
         self.first_paragraph = True
         self.next_style = dict(self.current_style)
@@ -140,10 +121,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.finish_page()
 
     def visit_title(self, node):
-        # XXX handle this separately such that we can integrate the title and contents
-        # into the page decoration better.
-        self.break_paragraph()
-        self.push_style(node, self.stylesheet['title'])
+        # title is handled separately so it may be placed nicely
+        self.stylesheet['decoration'].title = node.children[0].astext().replace('\n', ' ')
+        self.prune()
 
     def visit_section(self, node):
         # finish off a prior non-section page
@@ -157,14 +137,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.finish_page()
         self.new_page(node)
 
-    def prune(self, node):
-        raise docutils.nodes.SkipNode
-
     def visit_substitution_definition(self, node):
-        self.prune(node)
+        self.prune()
 
     def visit_system_message(self, node):
-        self.prune(node)
+        self.prune()
 
 
     #
@@ -321,7 +298,7 @@ class DocutilsVisitor(nodes.NodeVisitor):
         self.decoder.pop_style(node)
 
         node_name = node.__class__.__name__
-        method = getattr(self.decoder, 'depart_%s' % node_name, 
+        method = getattr(self.decoder, 'depart_%s' % node_name,
                          self.decoder.depart_unknown)
         method(node)
 
@@ -333,35 +310,31 @@ class TextPage(page.Page):
         self.stylesheet = stylesheet
         self.decoration = stylesheet['decoration']
 
-    def on_enter(self, vw, vh):
-        super(TextPage, self).on_enter(vw, vh)
-
+    def layout(self, x, y, vw, vh):
         self.batch = pyglet.graphics.Batch()
 
         # render the text lines to our batch
-        self.layout = pyglet.text.layout.IncrementalTextLayout(self.document,
-            vw, vh, multiline=True, batch=self.batch)
+        l = self._layout = pyglet.text.layout.IncrementalTextLayout(
+            self.document, vw, vh, multiline=True, batch=self.batch)
 
         # do alignment
-        self.layout.begin_update()
-        self.layout.valign = self.stylesheet['layout']['valign']
-        if self.layout.valign == 'center': self.layout.y = vh//2
-        elif self.layout.valign == 'top': self.layout.y = vh
-        else: self.layout.y = 0
-        self.layout.halign = self.stylesheet['layout']['halign']
-        if self.layout.halign == 'center': self.layout.x = vw//2
-        elif self.layout.halign == 'right': self.layout.x = vw
-        else: self.layout.x = 0
-        self.layout.end_update()
+        l.begin_update()
+        l.valign = self.stylesheet['layout']['valign']
+        if l.valign == 'center': l.y = y + vh//2
+        elif l.valign == 'top': l.y = y + vh
+        else: l.y = y
+        #l.halign = self.stylesheet['layout']['halign']
+        #if l.halign == 'center': l.x = x + vw//2
+        #elif l.halign == 'right': l.x = x + vw
+        #else: l.x = x
+        l.end_update()
 
-    def on_leave(self):
-        super(TextPage, self).on_leave()
-        self.layout.delete()
-        self.layout = None
+    def cleanup(self):
+        self._layout.delete()
+        self._layout = None
         self.batch = None
 
     def draw(self):
-        self.decoration.draw()
         self.batch.draw()
 
 def parse(text, html=False):
