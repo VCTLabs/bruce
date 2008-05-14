@@ -42,16 +42,17 @@ default_stylesheet = dict(
     default = dict(
         font_name='Arial',
         font_size=20,
-        margin_bottom=12
+        margin_bottom=12,
+        align='left',
     ),
     emphasis = dict(
-        italic=True
+        italic=True,
     ),
     strong = dict(
-        bold=True
+        bold=True,
     ),
     literal = dict(
-        font_name='Courier New'
+        font_name='Courier New',
     ),
     literal_block = dict(
         font_name='Courier New',
@@ -65,10 +66,16 @@ default_stylesheet = dict(
     ),
     layout = dict(
         valign='top',
-        halign='left'
+        halign='left',
     ),
     decoration = Decoration(''),
 )
+
+def copy_stylesheet(d):
+    new = {}
+    for k in d:
+        new[k] = d[k].copy()
+    return new
 
 boolean_true = set('yes true on'.split())
 
@@ -76,7 +83,7 @@ style_types = dict(
     font_size = int,
     margin_left = int, margin_right = int, margin_top = int, margin_bottom = int,
     bold = lambda v: v.lower() in boolean_true, italic = lambda v: v.lower() in boolean_true,
-    valign = str, halign = str, font_name = unicode,
+    valign = str, align = str, font_name = unicode,
 )
 
 class Section(object):
@@ -100,36 +107,14 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             doctree = publish_doctree(text)
         doctree.walkabout(DocutilsVisitor(doctree, self))
 
-    def visit_document(self, node):
-        # XXX maybe something here of interest?
-        pass
-
-    #def visit_unknown(self, node):
-        #pass
-
     def depart_unknown(self, node):
         pass
 
-    def visit_Text(self, node):
-        if self.document is None:
-            print 'WARNING: text outside Section', node
-            return
-        text = node.astext()
-        if self.in_literal:
-            text = text.replace('\n', u'\u2028')
-        else:
-            # collapse newlines to reintegrate para
-            text = text.replace('\n', ' ')
-        self.add_text(text)
 
-
-    # Structural elements
-
-    def visit_title(self, node):
-        self.break_paragraph()
-        self.push_style(node, self.stylesheet['title'])
-
-    def visit_section(self, node):
+    #
+    # Page construction
+    #
+    def new_page(self, node):
         self.push_style(node, self.stylesheet['default'])
         self.in_literal = False
         self.document = pyglet.text.document.FormattedDocument()
@@ -137,13 +122,40 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.first_paragraph = True
         self.next_style = dict(self.current_style)
 
+    def finish_page(self):
+        if self.len_text:
+            p = TextPage(self.document, copy_stylesheet(self.stylesheet))
+            self.pages.append(p)
+        self.document = None
+        self.len_text = 0
+
+
+    #
+    # Structural elements
+    #
+    def visit_document(self, node):
+        self.new_page(node)
+
+    def depart_document(self, node):
+        self.finish_page()
+
+    def visit_title(self, node):
+        # XXX handle this separately such that we can integrate the title and contents
+        # into the page decoration better.
+        self.break_paragraph()
+        self.push_style(node, self.stylesheet['title'])
+
+    def visit_section(self, node):
+        # finish off a prior non-section page
+        self.finish_page()
+        self.new_page(node)
+
     def depart_section(self, node):
-        p = TextPage(self.document, self.stylesheet)
-        self.pages.append(p)
+        self.finish_page()
 
     def visit_transition(self, node):
-        self.depart_section(node)
-        self.visit_section(node)
+        self.finish_page()
+        self.new_page(node)
 
     def prune(self, node):
         raise docutils.nodes.SkipNode
@@ -154,7 +166,18 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def visit_system_message(self, node):
         self.prune(node)
 
+
+    #
     # Body elements
+    #
+    def visit_Text(self, node):
+        text = node.astext()
+        if self.in_literal:
+            text = text.replace('\n', u'\u2028')
+        else:
+            # collapse newlines to reintegrate para
+            text = text.replace('\n', ' ')
+        self.add_text(text)
 
     def break_paragraph(self):
         '''Break the previous paragraphish.
@@ -223,8 +246,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.in_item = False
     
 
+    #
     # Inline elements
-
+    #
     def visit_emphasis(self, node):
         self.push_style(node, self.stylesheet['emphasis'])
 
@@ -241,25 +265,23 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.push_style(node, self.stylesheet['subscript'])
 
 
+    #
     # style element
-
+    #
     def visit_style(self, node):
         for line in node.get_style().splitlines():
-            key,value = line.strip().split('=')
-            group, key = key.split('.')
-            value = style_types[key](value)
+            key, value = line.strip().split('=')
+            if '.' in key:
+                group, key = key.split('.')
+                value = style_types[key](value)
+            else:
+                group = 'default'
+                value = style_types[key](value)
+                self.push_style('style-element', {key: value})
             self.stylesheet[group][key] = value
 
     def visit_decoration(self, node):
-        content = []
-        args = {}
-        for line in node.get_decoration().splitlines():
-            if ':' in line:
-                content.append(line)
-            else:
-                key, value = line.strip().split('=')
-                args[str(key)] = style_types[key](value)
-        self.stylesheet['decoration'] = Decoration('\n'.join(content), **args)
+        self.stylesheet['decoration'] = Decoration(node.get_decoration())
 
 class style(nodes.Special, nodes.Invisible, nodes.Element):
     def get_style(self):
@@ -319,17 +341,17 @@ class TextPage(page.Page):
         # render the text lines to our batch
         self.layout = pyglet.text.layout.IncrementalTextLayout(self.document,
             vw, vh, multiline=True, batch=self.batch)
+
+        # do alignment
         self.layout.begin_update()
-        print self.stylesheet['layout']
-        if self.stylesheet['layout']['valign'] == 'center':
-            self.layout.valign = 'center'
-            self.layout.y = vh//2
-        elif self.stylesheet['layout']['valign'] == 'top':
-            self.layout.valign = 'top'
-            self.layout.y = vh
-        else:
-            self.layout.valign = 'bottom'
-            self.layout.y = 0
+        self.layout.valign = self.stylesheet['layout']['valign']
+        if self.layout.valign == 'center': self.layout.y = vh//2
+        elif self.layout.valign == 'top': self.layout.y = vh
+        else: self.layout.y = 0
+        self.layout.halign = self.stylesheet['layout']['halign']
+        if self.layout.halign == 'center': self.layout.x = vw//2
+        elif self.layout.halign == 'right': self.layout.x = vw
+        else: self.layout.x = 0
         self.layout.end_update()
 
     def on_leave(self):

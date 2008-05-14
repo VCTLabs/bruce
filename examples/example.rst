@@ -37,7 +37,7 @@ Page 2
 
 .. style::
    layout.valign=center
-   layout.halign=center
+   align=center
 
 page with no title
 
@@ -46,7 +46,7 @@ More
 
 .. style::
    layout.valign=bottom
-   layout.halign=left
+   align=left
 
 
 i.   foo
