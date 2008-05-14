@@ -28,7 +28,7 @@ class QuadGroup(pyglet.graphics.Group):
     def __hash__(self):
         return hash((id(self.parent), self.blend_src, self.blend_dest))
 
-class Decoration(dict):
+class Decoration(object):
     '''
     Decoratio content consists of lines of drawing commands:
 
@@ -43,10 +43,13 @@ class Decoration(dict):
     presentation viewport.
 
     '''
-    def __init__(self, content, **kw):
-        self['bgcolor'] = (255, 255, 255, 255)
+    bgcolor = (255, 255, 255, 255)
+
+    def __init__(self, content):
         self.content = content
-        self.update(kw)
+
+    def copy(self):
+        return Decoration(self.content)
 
     def on_enter(self, viewport_width, viewport_height):
         self.viewport_width, self.viewport_height = viewport_width, viewport_height
@@ -89,7 +92,7 @@ class Decoration(dict):
                 q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
                 self.decorations.append(q)
             elif line.startswith('bgcolor:'):
-                self['bgcolor'] = map(int, line.split(':')[1].split(','))
+                self.bgcolor = map(int, line.split(':')[1].split(','))
 
     def on_leave(self):
         for decoration in self.decorations:
@@ -101,7 +104,7 @@ class Decoration(dict):
         # set the clear color which is specified in 0-255 (and glClearColor
         # takes 0-1)
         glPushAttrib(GL_COLOR_BUFFER_BIT)
-        glClearColor(*self['bgcolor'])
+        glClearColor(*self.bgcolor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glPopAttrib()
 
