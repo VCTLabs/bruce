@@ -37,11 +37,6 @@ default_stylesheet = dict(
         font_size=20,
         margin_left=20,
     ),
-#    title = dict(
-#        font_size=28,
-#        bold=True,
-#        align='center'
-#    ),
     layout = dict(
         valign='top',
     ),
@@ -187,6 +182,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         if not isinstance(node.parent, nodes.TextElement):
             self.break_paragraph()
         image = pyglet.image.load(node['uri'])
+        # XXX handle dimensions
         self.add_element(structured.ImageElement(image))
 
     def visit_bullet_list(self, node):
@@ -262,9 +258,20 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
                 self.push_style('style-element', {key: value})
             self.stylesheet[group][key] = value
 
+    def visit_video(self, node):
+        # if the parent is structural - document, section, etc then we need
+        # to break the previous paragraphish
+        if not isinstance(node.parent, nodes.TextElement):
+            self.break_paragraph()
+        # XXX handle dimensions
+        self.add_element(VideoElement(node.get_video()))
+
     def visit_decoration(self, node):
         self.stylesheet['decoration'].content = node.get_decoration()
 
+#
+# Style directive
+#
 class style(nodes.Special, nodes.Invisible, nodes.Element):
     def get_style(self):
         return self.rawsource
@@ -276,6 +283,9 @@ style_directive.arguments = (0, 0, 0)
 style_directive.content = True
 docutils.parsers.rst.directives.register_directive('style', style_directive)
 
+#
+# Decoration directive
+#
 class decoration(nodes.Special, nodes.Invisible, nodes.Element):
     def get_decoration(self):
         return self.rawsource
@@ -286,6 +296,81 @@ def decoration_directive(name, arguments, options, content, lineno,
 decoration_directive.arguments = (0, 0, 0)
 decoration_directive.content = True
 docutils.parsers.rst.directives.register_directive('decoration', decoration_directive)
+
+
+#
+# Video directive
+#
+class video(nodes.Special, nodes.Invisible, nodes.Element):
+    def get_video(self):
+        return self.rawsource
+
+def video_directive(name, arguments, options, content, lineno,
+                          content_offset, block_text, state, state_machine):
+    return [ video('\n'.join(content)) ]
+video_directive.arguments = (0, 0, 0)
+video_directive.content = True
+docutils.parsers.rst.directives.register_directive('video', video_directive)
+
+class VideoElement(pyglet.text.document.InlineElement):
+    def __init__(self, video_filename, width=None, height=None, loop=False):
+        self.video_filename = video_filename
+
+        video = pyglet.media.load(self.video_filename)
+
+        self.loop = loop
+        assert video.video_format
+        video_format = video.video_format
+
+        # determine dimensions
+        self.video_width = video_format.width
+        self.video_height = video_format.height
+        if video_format.sample_aspect > 1:
+            self.video_width *= video_format.sample_aspect
+        elif video_format.sample_aspect < 1:
+            self.video_height /= video_format.sample_aspect
+
+        self.width = width is None and self.video_width or width
+        self.height = height is None and self.video_height or height
+
+        self.vertex_lists = {}
+
+        ascent = max(0, self.height)
+        descent = 0 #min(0, -anchor_y)
+        super(VideoElement, self).__init__(ascent, descent, self.width)
+
+    def place(self, layout, x, y):
+        self.video = pyglet.media.load(self.video_filename)
+        # create the player
+        self.player = pyglet.media.Player()
+        self.player.queue(self.video)
+        if self.loop:
+            self.player.eos_action = self.player.EOS_LOOP
+        else:
+            self.player.eos_action = self.player.EOS_PAUSE
+        self.player.play()
+
+        # set up rendering the player texture
+        texture = self.player.texture
+        group = pyglet.graphics.TextureGroup(texture, layout.top_group)
+        x1 = x
+        y1 = y + self.descent
+        x2 = x + self.width
+        y2 = y + self.height + self.descent
+        vertex_list = layout.batch.add(4, pyglet.gl.GL_QUADS, group,
+            ('v2i', (x1, y1, x2, y1, x2, y2, x1, y2)),
+            ('c3B', (255, 255, 255) * 4),
+            ('t3f', texture.tex_coords))
+        self.vertex_lists[layout] = vertex_list
+
+    vertex_list = None
+    def remove(self, layout):
+        self.player.next()
+        self.player = None
+        self.layout = None
+        if self.vertex_list:
+            self.vertex_list.delete()
+        self.vertex_list = None
 
 
 class DocutilsVisitor(nodes.NodeVisitor):
