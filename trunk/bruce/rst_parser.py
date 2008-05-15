@@ -291,6 +291,13 @@ class TextPage(page.Page):
         #else: l.x = x
         l.end_update()
 
+        # to support auto-resizing elements....
+        # if you give the element a ref to the layout and total size, then it
+        # can base its size off the difference.  you still need to do it in two
+        # passes, but can avoid laying out everything again... just invalidate
+        # the style of the element, which will push the rest of the content
+        # down when pyglet notices its size has increased
+
     def cleanup(self):
         self._layout.delete()
         self._layout = None
