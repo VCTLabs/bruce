@@ -1,7 +1,24 @@
 import os
 
+from docutils.parsers.rst import directives
+from docutils import nodes
+
 import pyglet
 from pyglet.gl import *
+
+#
+# Decoration directive
+#
+class decoration(nodes.Special, nodes.Invisible, nodes.Element):
+    def get_decoration(self):
+        return self.rawsource
+
+def decoration_directive(name, arguments, options, content, lineno,
+                          content_offset, block_text, state, state_machine):
+    return [ decoration('\n'.join(content)) ]
+decoration_directive.arguments = (0, 0, 0)
+decoration_directive.content = True
+directives.register_directive('decoration', decoration_directive)
 
 class QuadGroup(pyglet.graphics.Group):
     def __init__(self, blend_src=GL_SRC_ALPHA, blend_dest=GL_ONE_MINUS_SRC_ALPHA,
@@ -82,48 +99,14 @@ class Decoration(object):
 
         # vars for the eval
         loc = dict(w=viewport_width, h=viewport_height)
-
-        title = self.default_title_style
+        self.title_style = self.default_title_style
 
         # parse content
         for line in self.content.splitlines():
-            if line.startswith('image:'):
-                image = line.split(':')[1]
-                if ';' in image:
-                    fname, args = image.split(';', 1)
-                else:
-                    fname = image
-                image = pyglet.resource.image(fname)
-                s = pyglet.sprite.Sprite(image, batch=self.batch)
-                # XXX use args to align
-                s.x = viewport_width - s.width
-                s.y = 0
-                self.images.append(s)
-            elif line.startswith('quad:'):
-                quad = line.split(':')[1]
-                cur_color = None
-                c = []
-                v = []
-                for entry in quad.split(';'):
-                    if entry[0] == 'C':
-                        cur_color = map(int, entry[1:].split(','))
-                    elif entry[0] == 'V':
-                        if cur_color is None:
-                            raise ValueError('invalid quad spec %r: needs color first'%quad)
-                        c.extend(cur_color)
-                        v.extend([eval(e, {}, loc) for e in entry[1:].split(',')
-                            if '_' not in e])
-                q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
-                self.decorations.append(q)
-            elif line.startswith('bgcolor:'):
-                self.bgcolor = map(int, line.split(':')[1].split(','))
-            elif line.startswith('viewport:'):
-                viewport = line.split(':')[1]
-                self.limited_viewport = tuple(eval(e, {}, loc)
-                    for e in viewport.split(',') if '_' not in e)
-            elif line.startswith('title:'):
-                title = line.split(':')[1].split(';')
+            directive, rest = line.split(':', 2)
+            getattr(self, 'handle_%s'%directive.strip())(rest.strip())
 
+        # handle rendering the title if there is one
         if self.title is not None:
             pos, halign, valign, name, size, bold, italic, color = title
 
@@ -137,12 +120,69 @@ class Decoration(object):
                 x, y, halign=halign, valign=valign, batch=self.batch)
             self.decorations.append(l)
 
+    def handle_image(self, image):
+        halign='left'
+        valign='bottom'
+        if ';' in image:
+            fname, args = image.split(';', 1)
+            for arg in args.split(';'):
+                k, v = [e.strip() for e in arg.split('=')]
+                if k == 'halign': halign=v
+                elif k == 'valign': valign=v
+        else:
+            fname = image
+
+        image = pyglet.resource.image(fname)
+        s = pyglet.sprite.Sprite(image, x=0, y=0, batch=self.batch)
+        if halign == 'center':
+            image.anchor_x = s.width//2
+            s.x = self.viewport_width//2
+        elif halign == 'right':
+            image.anchor_x = s.width
+            s.x = self.viewport_width
+        else:
+            image.anchor_x = 0
+        if valign == 'center':
+            image.anchor_y = s.height//2
+            s.y = self.viewport_height//2
+        elif valign == 'top':
+            image.anchor_y = s.height
+            s.y = self.viewport_height
+        else:
+            image.anchor_y = 0
+        self.images.append(s)
+
+    def handle_quad(self, quad):
+        cur_color = None
+        c = []
+        v = []
+        for entry in [e.strip() for e in quad.split(';')]:
+            if entry[0] == 'C':
+                cur_color = map(int, entry[1:].split(','))
+            elif entry[0] == 'V':
+                if cur_color is None:
+                    raise ValueError('invalid quad spec %r: needs color first'%quad)
+                c.extend(cur_color)
+                v.extend([eval(e, {}, loc) for e in entry[1:].split(',')
+                    if '_' not in e])
+        q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
+        self.decorations.append(q)
+
+    def handle_bgcolor(self, color):
+        self.bgcolor = map(int, color.split(','))
+
+    def handle_viewport(self, viewport):
+        self.limited_viewport = tuple(eval(e, {}, loc)
+            for e in viewport.split(',') if '_' not in e)
+
+    def handle_title(self, title):
+        self.title_style = line.split(':')[1].split(';')
+
     def on_leave(self):
         for decoration in self.decorations:
             decoration.delete()
         self.batch = None
 
-    __logo = None
     def draw(self):
         # set the clear color which is specified in 0-255 (and glClearColor
         # takes 0-1)

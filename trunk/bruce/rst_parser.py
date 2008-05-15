@@ -7,7 +7,7 @@ import pyglet
 from pyglet.text.formats import structured
 
 from bruce import page
-from bruce.decoration import Decoration
+from bruce import decoration
 
 from bruce.style import *
 from bruce.video import VideoElement
@@ -220,6 +220,12 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
                 self.push_style('style-element', {key: value})
             self.stylesheet[group][key] = value
 
+    def visit_field_list(self, node):
+        pass
+
+    def visit_field(self, node):
+        print node
+
     def visit_video(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
@@ -230,20 +236,6 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def visit_decoration(self, node):
         self.stylesheet['decoration'].content = node.get_decoration()
-
-#
-# Decoration directive
-#
-class decoration(nodes.Special, nodes.Invisible, nodes.Element):
-    def get_decoration(self):
-        return self.rawsource
-
-def decoration_directive(name, arguments, options, content, lineno,
-                          content_offset, block_text, state, state_machine):
-    return [ decoration('\n'.join(content)) ]
-decoration_directive.arguments = (0, 0, 0)
-decoration_directive.content = True
-docutils.parsers.rst.directives.register_directive('decoration', decoration_directive)
 
 class DocutilsVisitor(nodes.NodeVisitor):
     def __init__(self, document, decoder):
@@ -266,7 +258,6 @@ class DocutilsVisitor(nodes.NodeVisitor):
 
 
 class TextPage(page.Page):
-    name = 'rst-text'
     def __init__(self, document, stylesheet):
         self.document = document
         self.stylesheet = stylesheet
@@ -285,10 +276,6 @@ class TextPage(page.Page):
         if l.valign == 'center': l.y = y + vh//2
         elif l.valign == 'top': l.y = y + vh
         else: l.y = y
-        #l.halign = self.stylesheet['layout']['halign']
-        #if l.halign == 'center': l.x = x + vw//2
-        #elif l.halign == 'right': l.x = x + vw
-        #else: l.x = x
         l.end_update()
 
         # to support auto-resizing elements....
