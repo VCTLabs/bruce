@@ -38,6 +38,10 @@ Some *italic* |biohazard| **bold** text
 
 Some more |biohazard| **bold** text.
 
+:foo: bar
+      more bar
+      even more bar
+
 .. style::
    :default.font_name: Times New Roman
 
@@ -65,7 +69,6 @@ More
 .. style::
    :layout.valign: bottom
    :align: left
-
 
 i.   foo
 ii.  bar
