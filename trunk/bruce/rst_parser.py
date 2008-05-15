@@ -3,11 +3,14 @@ from docutils.core import publish_doctree
 from docutils import nodes
 from docutils.transforms import references
 
+import pyglet
+from pyglet.text.formats import structured
+
 from bruce import page
 from bruce.decoration import Decoration
 
-import pyglet
-from pyglet.text.formats import structured
+from bruce.style import *
+from bruce.video import VideoElement
 
 def bullet_generator(bullets = u'\u25cf\u25cb\u25a1'):
     i = -1
@@ -15,48 +18,6 @@ def bullet_generator(bullets = u'\u25cf\u25cb\u25a1'):
         i = (i + 1)%3
         yield bullets[i]
 bullet_generator = bullet_generator()
-
-default_stylesheet = dict(
-    default = dict(
-        font_name='Arial',
-        font_size=20,
-        margin_bottom=12,
-        align='left',
-    ),
-    emphasis = dict(
-        italic=True,
-    ),
-    strong = dict(
-        bold=True,
-    ),
-    literal = dict(
-        font_name='Courier New',
-    ),
-    literal_block = dict(
-        font_name='Courier New',
-        font_size=20,
-        margin_left=20,
-    ),
-    layout = dict(
-        valign='top',
-    ),
-    decoration = Decoration(''),
-)
-
-def copy_stylesheet(d):
-    new = {}
-    for k in d:
-        new[k] = d[k].copy()
-    return new
-
-boolean_true = set('yes true on'.split())
-
-style_types = dict(
-    font_size = int,
-    margin_left = int, margin_right = int, margin_top = int, margin_bottom = int,
-    bold = lambda v: v.lower() in boolean_true, italic = lambda v: v.lower() in boolean_true,
-    valign = str, align = str, font_name = unicode,
-)
 
 class Section(object):
     def __init__(self, level):
@@ -170,7 +131,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def visit_literal_block(self, node):
         self.break_paragraph()
-        self.push_style(node, self.stylesheet['literal_block'])
+        # push both the literal (character style) and literal_block (block
+        # style)... the use of "dummy" will ensure both are popped off when
+        # we exit the block
+        self.push_style(node, self.stylesheet['literal'])
+        self.push_style('dummy', self.stylesheet['literal_block'])
         self.in_literal = True
 
     def depart_literal_block(self, node):
@@ -181,7 +146,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         # to break the previous paragraphish
         if not isinstance(node.parent, nodes.TextElement):
             self.break_paragraph()
-        image = pyglet.image.load(node['uri'])
+        image = pyglet.image.load(node['uri'].strip())
         # XXX handle dimensions
         self.add_element(structured.ImageElement(image))
 
@@ -247,14 +212,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     # style element
     #
     def visit_style(self, node):
-        for line in node.get_style().splitlines():
-            key, value = line.strip().split('=')
+        for key, value in node.attlist():
             if '.' in key:
                 group, key = key.split('.')
-                value = style_types[key](value)
             else:
                 group = 'default'
-                value = style_types[key](value)
                 self.push_style('style-element', {key: value})
             self.stylesheet[group][key] = value
 
@@ -270,20 +232,6 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.stylesheet['decoration'].content = node.get_decoration()
 
 #
-# Style directive
-#
-class style(nodes.Special, nodes.Invisible, nodes.Element):
-    def get_style(self):
-        return self.rawsource
-
-def style_directive(name, arguments, options, content, lineno,
-                          content_offset, block_text, state, state_machine):
-    return [ style('\n'.join(content)) ]
-style_directive.arguments = (0, 0, 0)
-style_directive.content = True
-docutils.parsers.rst.directives.register_directive('style', style_directive)
-
-#
 # Decoration directive
 #
 class decoration(nodes.Special, nodes.Invisible, nodes.Element):
@@ -296,82 +244,6 @@ def decoration_directive(name, arguments, options, content, lineno,
 decoration_directive.arguments = (0, 0, 0)
 decoration_directive.content = True
 docutils.parsers.rst.directives.register_directive('decoration', decoration_directive)
-
-
-#
-# Video directive
-#
-class video(nodes.Special, nodes.Invisible, nodes.Element):
-    def get_video(self):
-        return self.rawsource
-
-def video_directive(name, arguments, options, content, lineno,
-                          content_offset, block_text, state, state_machine):
-    return [ video('\n'.join(content)) ]
-video_directive.arguments = (0, 0, 0)
-video_directive.content = True
-docutils.parsers.rst.directives.register_directive('video', video_directive)
-
-class VideoElement(pyglet.text.document.InlineElement):
-    def __init__(self, video_filename, width=None, height=None, loop=False):
-        self.video_filename = video_filename
-
-        video = pyglet.media.load(self.video_filename)
-
-        self.loop = loop
-        assert video.video_format
-        video_format = video.video_format
-
-        # determine dimensions
-        self.video_width = video_format.width
-        self.video_height = video_format.height
-        if video_format.sample_aspect > 1:
-            self.video_width *= video_format.sample_aspect
-        elif video_format.sample_aspect < 1:
-            self.video_height /= video_format.sample_aspect
-
-        self.width = width is None and self.video_width or width
-        self.height = height is None and self.video_height or height
-
-        self.vertex_lists = {}
-
-        ascent = max(0, self.height)
-        descent = 0 #min(0, -anchor_y)
-        super(VideoElement, self).__init__(ascent, descent, self.width)
-
-    def place(self, layout, x, y):
-        self.video = pyglet.media.load(self.video_filename)
-        # create the player
-        self.player = pyglet.media.Player()
-        self.player.queue(self.video)
-        if self.loop:
-            self.player.eos_action = self.player.EOS_LOOP
-        else:
-            self.player.eos_action = self.player.EOS_PAUSE
-        self.player.play()
-
-        # set up rendering the player texture
-        texture = self.player.texture
-        group = pyglet.graphics.TextureGroup(texture, layout.top_group)
-        x1 = x
-        y1 = y + self.descent
-        x2 = x + self.width
-        y2 = y + self.height + self.descent
-        vertex_list = layout.batch.add(4, pyglet.gl.GL_QUADS, group,
-            ('v2i', (x1, y1, x2, y1, x2, y2, x1, y2)),
-            ('c3B', (255, 255, 255) * 4),
-            ('t3f', texture.tex_coords))
-        self.vertex_lists[layout] = vertex_list
-
-    vertex_list = None
-    def remove(self, layout):
-        self.player.next()
-        self.player = None
-        self.layout = None
-        if self.vertex_list:
-            self.vertex_list.delete()
-        self.vertex_list = None
-
 
 class DocutilsVisitor(nodes.NodeVisitor):
     def __init__(self, document, decoder):
