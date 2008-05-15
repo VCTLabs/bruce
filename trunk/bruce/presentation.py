@@ -74,6 +74,10 @@ class Presentation(pyglet.event.EventDispatcher):
         if self.batch is not None:
             self.batch.draw()
 
+    def on_resize(self, viewport_width, viewport_height):
+        # XXX set DPI scaled according to viewport change.
+        pass
+
     def __move(self, dir):
         # start the timer if we're displaying one
         if self.show_timer and self.start_time is None:
