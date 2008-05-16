@@ -152,8 +152,23 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         if not isinstance(node.parent, nodes.TextElement):
             self.break_paragraph()
         image = pyglet.image.load(node['uri'].strip())
-        # XXX handle dimensions
-        self.add_element(structured.ImageElement(image))
+
+        # XXX allow image to fill the available layout dimensions
+
+        # handle width and height, retaining aspect if only one is specified
+        kw = {}
+        if node.has_key('width'):
+            kw['width'] = int(node['width'])
+        if node.has_key('height'):
+            kw['height'] = int(node['height'])
+            if 'width' not in kw:
+                scale = kw['height'] / float(image.height)
+                kw['width'] = int(scale * image.width)
+        elif 'width' in kw:
+            scale = kw['width'] / float(image.width)
+            kw['height'] = int(scale * image.height)
+
+        self.add_element(structured.ImageElement(image, **kw))
 
     def visit_bullet_list(self, node):
         l = structured.UnorderedListBuilder(bullet_generator.next())
@@ -170,8 +185,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             'arabic': '1',
             'lowerroman': 'i',
             'upperroman': 'I',
+            'loweralpha': 'a',
+            'upperalpha': 'A',
         }[node['enumtype']] + node['suffix']
-        l = structured.OrderedListBuilder(1, format)
+        start = int(node.get('start', 1))
+        l = structured.OrderedListBuilder(start, format)
         style = {}
         l.begin(self, style)
         self.push_style(node, style)
