@@ -61,3 +61,8 @@ A blank decoration directive ".. decoration::" will result in
 the default decoration having a white background and the page title centered
 at the top of the page.
 
+**images**
+    A width and/or height may be specified to scale the image when displayed.
+    If only one is specified then the image's other dimension will be scaled
+    to ensure the image aspect ration is retained.
+

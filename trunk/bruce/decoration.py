@@ -125,6 +125,11 @@ class Decoration(object):
                 x, y, halign=halign, valign=valign, batch=self.batch)
             self.decorations.append(l)
 
+            if self.limited_viewport == (0, 0, viewport_width, viewport_height):
+                self.limited_viewport = (0, 0, viewport_width, viewport_height -
+                    l.content_height)
+
+
     def handle_image(self, image):
         halign='left'
         valign='bottom'
