@@ -6,6 +6,8 @@ from docutils import nodes
 import pyglet
 from pyglet.gl import *
 
+from bruce.color import parse_color
+
 #
 # Decoration directive
 #
@@ -51,13 +53,16 @@ class Decoration(object):
     '''
     Decoration content consists of lines of configuration or drawing commands::
 
-        bgcolor:rrr,ggg,bbb,aaa
+        bgcolor: <color spec>
         title:x,y;halign;valign;font_name;font_size;bold;italic;color
         image:filename;halign=right;valign=bottom
-        quad:Crrr,ggg,bbb,aaa;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
+        quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
 
     Quad vertex color carries over if it's not specified for each vertex,
     allowing either solid color or blending.
+
+    Colors are specified in HTML format with either three or four channels (if three
+    then the fourth, alpha channel is set to 255).
 
     Vertexes may be expressions (which will be eval()'ed). The expressions have
     the variables "w" and "h" available which are the width and height of the
@@ -72,7 +77,7 @@ class Decoration(object):
     '''
     bgcolor = (255, 255, 255, 255)
     default_title_style = ('w//2,h', 'center', 'top', 'Arial', '28', 'yes',
-        'no', '0,0,0,255')
+        'no', 'black')
 
     def __init__(self, content, title=None):
         self.content = content
@@ -98,7 +103,6 @@ class Decoration(object):
         self.batch = pyglet.graphics.Batch()
 
         # vars for the eval
-        loc = dict(w=viewport_width, h=viewport_height)
         self.title_style = self.default_title_style
 
         # parse content
@@ -108,14 +112,15 @@ class Decoration(object):
 
         # handle rendering the title if there is one
         if self.title is not None:
-            pos, halign, valign, name, size, bold, italic, color = title
+            pos, halign, valign, name, size, bold, italic, color = self.title_style
 
             # create the title positioning
+            loc = dict(w=self.viewport_width, h=self.viewport_height)
             x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
             size = int(size)
             bold = bold.lower() in YES_VALUES
             italic = italic.lower() in YES_VALUES
-            color = map(int, color.split(','))
+            color = parse_color(color)
             l = pyglet.text.Label(self.title, name, size, bold, italic, color,
                 x, y, halign=halign, valign=valign, batch=self.batch)
             self.decorations.append(l)
@@ -156,9 +161,10 @@ class Decoration(object):
         cur_color = None
         c = []
         v = []
+        loc = dict(w=self.viewport_width, h=self.viewport_height)
         for entry in [e.strip() for e in quad.split(';')]:
             if entry[0] == 'C':
-                cur_color = map(int, entry[1:].split(','))
+                cur_color = parse_color(entry[1:])
             elif entry[0] == 'V':
                 if cur_color is None:
                     raise ValueError('invalid quad spec %r: needs color first'%quad)
@@ -169,9 +175,10 @@ class Decoration(object):
         self.decorations.append(q)
 
     def handle_bgcolor(self, color):
-        self.bgcolor = map(int, color.split(','))
+        self.bgcolor = parse_color(color)
 
     def handle_viewport(self, viewport):
+        loc = dict(w=self.viewport_width, h=self.viewport_height)
         self.limited_viewport = tuple(eval(e, {}, loc)
             for e in viewport.split(',') if '_' not in e)
 

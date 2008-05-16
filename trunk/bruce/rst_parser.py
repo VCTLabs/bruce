@@ -1,3 +1,5 @@
+import os
+
 import docutils.parsers.rst
 from docutils.core import publish_doctree
 from docutils import nodes
@@ -7,7 +9,10 @@ import pyglet
 from pyglet.text.formats import structured
 
 from bruce import page
+
+# these imports simply cause directives to be registered
 from bruce import decoration
+from bruce import resource
 
 from bruce.style import *
 from bruce.video import VideoElement
@@ -236,6 +241,17 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def visit_decoration(self, node):
         self.stylesheet['decoration'].content = node.get_decoration()
+
+    def visit_resource(self, node):
+        resource_name = node.get_resource()
+        # XXX
+        #if not os.path.isabs(resource_name):
+            #resource_name = os.path.join(config.get('directory'), line)
+        if resource_name.lower().endswith('.ttf'):
+            pyglet.resource.add_font(resource_name)
+        else:
+            pyglet.resource.path.append(resource_name)
+        pyglet.resource.reindex()
 
 class DocutilsVisitor(nodes.NodeVisitor):
     def __init__(self, document, decoder):
