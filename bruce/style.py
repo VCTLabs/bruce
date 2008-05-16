@@ -1,13 +1,27 @@
+'''
+Ideas:
+
+:push:
+:pop:           -- manage style state on a separate stack to allow temporary changes
+
+:reset:         -- reset back to the Bruce default style
+'''
+
 from docutils import nodes
 from docutils.transforms import references
 from docutils.parsers.rst import directives
 
+from bruce.color import parse_color
+
 from bruce.decoration import Decoration
 
+# XXX validate the values here
 def is_boolean(value, boolean_true = set('yes true on'.split())):
     return value in boolean_true
 def stripped(argument):
     return argument and argument.strip() or ''
+def color(argument):
+    return parse_color(argument)
 def halignment(argument):
     return directives.choice(argument, ('left', 'center', 'right'))
 def valignment(argument):
@@ -30,6 +44,7 @@ style_directive.options = {
      'layout.valign': valignment,
 }
 for group in ('', 'default.','literal.','emphasis.','strong.'):
+    style_directive.options[group + 'color'] = color
     style_directive.options[group + 'font_size'] = directives.positive_int
     style_directive.options[group + 'font_name'] = stripped
     style_directive.options[group + 'bold'] = is_boolean
@@ -48,6 +63,7 @@ default_stylesheet = dict(
         font_size=20,
         margin_bottom=12,
         align='left',
+        color=(0,0,0,255),
     ),
     emphasis = dict(
         italic=True,

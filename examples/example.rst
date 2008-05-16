@@ -10,18 +10,14 @@
 
 Bruce the Presentation Tool version 3.0, that is
 
-----
-
-.. video:: examples/tada.avi
-
 Page 1
 ------
 
 .. decoration::
-   bgcolor:235,235,235,255
-   image:pyglet-trans-64.png;align=right;valign=bottom
-   quad:C255,210,200,255;V0,h;V0,h-48;Vw,h-48;Vw,h
-   quad:C255,210,200,255;V0,0;V0,64;C0,0,0,255;Vw,64;Vw,0
+   bgcolor: silver
+   image:pyglet-trans-64.png;halign=right;valign=bottom
+   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
+   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
    viewport:0,64,w,h-(64+48)
 
 .. style::
@@ -38,12 +34,12 @@ Some *italic* |biohazard| **bold** text
 
 Some more |biohazard| **bold** text.
 
-:foo: bar
-      more bar
-      even more bar
-
 .. style::
    :default.font_name: Times New Roman
+
+----
+
+.. video:: examples/tada.avi
 
 Page 2
 ------

@@ -9,9 +9,9 @@ folder *.rst files for some samples, the simplest being
 on a white background::
 
     .. style::
-       layout.valign=center
-       align=center
-       font_size=36
+       :layout.valign: center
+       :align: center
+       :font_size: 36
 
     Text displayed centered on the default white background.
 
@@ -35,7 +35,9 @@ More Detail
 -----------
 
 Pages in Bruce are defined as being the text contained in a section
-or between transitions (horizontal rules, "----").
+or between transitions (horizontal rules, "----"). It is important that a blank
+surrounds the transition line, otherwise ReST might try to interpret it as a 
+title (which will often mean resulting in a parsing error).
 
 Bruce supports a large amount of ReStructuredText:
 
