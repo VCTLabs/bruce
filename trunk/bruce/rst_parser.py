@@ -220,7 +220,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def visit_strong(self, node):
         self.push_style(node, self.stylesheet['strong'])
-        
+
     def visit_literal(self, node):
         self.push_style(node, self.stylesheet['literal'])
 

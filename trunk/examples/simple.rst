@@ -3,9 +3,9 @@
    ReStructuredText most basic capabilities.
 
 .. style::
-   layout.valign=center
-   align=center
-   font_size=36
+   :layout.valign: center
+   :align: center
+   :font_size: 36
 
 Text displayed centered on the default white background.
 
