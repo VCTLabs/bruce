@@ -62,12 +62,12 @@ class VideoElement(pyglet.text.document.InlineElement):
         # set up rendering the player texture
         texture = self.player.texture
         group = pyglet.graphics.TextureGroup(texture, layout.top_group)
-        x1 = x
-        y1 = y + self.descent
-        x2 = x + self.width
-        y2 = y + self.height + self.descent
+        x1 = int(x)
+        y1 = int(y + self.descent)
+        x2 = int(x + self.width)
+        y2 = int(y + self.height + self.descent)
         vertex_list = layout.batch.add(4, pyglet.gl.GL_QUADS, group,
-            ('v2f', (x1, y1, x2, y1, x2, y2, x1, y2)),
+            ('v2i', (x1, y1, x2, y1, x2, y2, x1, y2)),
             ('c3B', (255, 255, 255) * 4),
             ('t3f', texture.tex_coords))
         self.vertex_lists[layout] = vertex_list
