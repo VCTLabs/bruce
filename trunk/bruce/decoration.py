@@ -145,21 +145,13 @@ class Decoration(object):
         image = pyglet.resource.image(fname)
         s = pyglet.sprite.Sprite(image, x=0, y=0, batch=self.batch)
         if halign == 'center':
-            image.anchor_x = s.width//2
-            s.x = self.viewport_width//2
+            s.x = self.viewport_width//2 - s.width//2
         elif halign == 'right':
-            image.anchor_x = s.width
-            s.x = self.viewport_width
-        else:
-            image.anchor_x = 0
+            s.x = self.viewport_width - s.width
         if valign == 'center':
-            image.anchor_y = s.height//2
-            s.y = self.viewport_height//2
+            s.y = self.viewport_height//2 - s.height//2
         elif valign == 'top':
-            image.anchor_y = s.height
-            s.y = self.viewport_height
-        else:
-            image.anchor_y = 0
+            s.y = self.viewport_height - s.height
         self.images.append(s)
 
     def handle_quad(self, quad):
