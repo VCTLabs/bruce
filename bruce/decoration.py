@@ -60,6 +60,8 @@ class Decoration(object):
 
     Quad vertex color carries over if it's not specified for each vertex,
     allowing either solid color or blending.
+ 
+    XXX allow expressions to reference the title's position and dimensions
 
     Colors are specified in HTML format with either three or four channels (if three
     then the fourth, alpha channel is set to 255).

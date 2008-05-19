@@ -8,11 +8,10 @@ from docutils.transforms import references
 import pyglet
 from pyglet.text.formats import structured
 
-from bruce import page
-
 # these imports simply cause directives to be registered
 from bruce import decoration
 from bruce import resource
+from bruce.page import Page
 
 from bruce.style import *
 from bruce.video import VideoElement
@@ -67,7 +66,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def finish_page(self):
         if self.len_text:
-            p = TextPage(self.document, copy_stylesheet(self.stylesheet))
+            p = Page(self.document, copy_stylesheet(self.stylesheet))
             self.pages.append(p)
         self.document = None
         self.len_text = 0
@@ -170,6 +169,22 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
         self.add_element(structured.ImageElement(image, **kw))
 
+    def visit_video(self, node):
+        # if the parent is structural - document, section, etc then we need
+        # to break the previous paragraphish
+        if not isinstance(node.parent, nodes.TextElement):
+            self.break_paragraph()
+
+        # XXX allow image to fill the available layout dimensions
+
+        # handle width and height, retaining aspect if only one is specified
+        kw = {}
+        if node.has_key('width'):
+            kw['width'] = int(node['width'])
+        if node.has_key('height'):
+            kw['height'] = int(node['height'])
+        self.add_element(VideoElement(node.get_video(), **kw))
+
     def visit_bullet_list(self, node):
         l = structured.UnorderedListBuilder(bullet_generator.next())
         style = {}
@@ -180,8 +195,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.list_stack.pop()
 
     def visit_enumerated_list(self, node):
-        # XXX node.prefix
-        format = {
+        format = node['prefix'] + {
             'arabic': '1',
             'lowerroman': 'i',
             'upperroman': 'I',
@@ -232,7 +246,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
 
     #
-    # style element
+    # Style and decoration
     #
     def visit_style(self, node):
         for key, value in node.attlist():
@@ -243,23 +257,13 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
                 self.push_style('style-element', {key: value})
             self.stylesheet[group][key] = value
 
-    def visit_field_list(self, node):
-        pass
-
-    def visit_field(self, node):
-        print node
-
-    def visit_video(self, node):
-        # if the parent is structural - document, section, etc then we need
-        # to break the previous paragraphish
-        if not isinstance(node.parent, nodes.TextElement):
-            self.break_paragraph()
-        # XXX handle dimensions
-        self.add_element(VideoElement(node.get_video()))
-
     def visit_decoration(self, node):
         self.stylesheet['decoration'].content = node.get_decoration()
 
+
+    #
+    # Resource location
+    #
     def visit_resource(self, node):
         resource_name = node.get_resource()
         # XXX
@@ -290,42 +294,6 @@ class DocutilsVisitor(nodes.NodeVisitor):
                          self.decoder.depart_unknown)
         method(node)
 
-
-class TextPage(page.Page):
-    def __init__(self, document, stylesheet):
-        self.document = document
-        self.stylesheet = stylesheet
-        self.decoration = stylesheet['decoration']
-
-    def layout(self, x, y, vw, vh):
-        self.batch = pyglet.graphics.Batch()
-
-        # render the text lines to our batch
-        l = self._layout = pyglet.text.layout.IncrementalTextLayout(
-            self.document, vw, vh, multiline=True, batch=self.batch)
-
-        # do alignment
-        l.begin_update()
-        l.valign = self.stylesheet['layout']['valign']
-        if l.valign == 'center': l.y = y + vh//2
-        elif l.valign == 'top': l.y = y + vh
-        else: l.y = y
-        l.end_update()
-
-        # to support auto-resizing elements....
-        # if you give the element a ref to the layout and total size, then it
-        # can base its size off the difference.  you still need to do it in two
-        # passes, but can avoid laying out everything again... just invalidate
-        # the style of the element, which will push the rest of the content
-        # down when pyglet notices its size has increased
-
-    def cleanup(self):
-        self._layout.delete()
-        self._layout = None
-        self.batch = None
-
-    def draw(self):
-        self.batch.draw()
 
 def parse(text, html=False):
     assert not html, 'use rst2html for html!'

@@ -8,16 +8,16 @@ Enumerated Lists
 Enumerated Lists - Start
 ------------------------
 
-3. Numbered from 3
-4. Four
-5. Five
+(3) Numbered from 3
+(4) Four
+(5) Five
 
 Enumerated Lists - alpha
 ------------------------
 
-a. alpha
-b. beta
-c. gamma
+a) alpha
+b) beta
+c) gamma
 
 Enumerated Lists - alpha/start
 ------------------------------

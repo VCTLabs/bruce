@@ -1,14 +1,56 @@
-import os
-import re
+'''
+
+Cocos:
+
+- Page is actually a Scene.
+- Content (current Page) is a Layer in that Scene.
+- Decoration is another Layer.
+- Presentation manages the Scenes.
+
+'''
+
 
 import pyglet
-from pyglet.gl import glPushMatrix, glPopMatrix, glTranslatef
 
 class Page(pyglet.event.EventDispatcher):
-    def draw(self):
-        '''Draw self - assume orthographic projection.
+    def __init__(self, document, stylesheet):
+        self.document = document
+        self.stylesheet = stylesheet
+        self.decoration = stylesheet['decoration']
+
+    def layout(self, x, y, vw, vh):
+        '''Invoked as part of on_enter handling.
         '''
-        raise NotImplementedError('implement draw() in subclass')
+        self.batch = pyglet.graphics.Batch()
+
+        # render the text lines to our batch
+        l = self._layout = pyglet.text.layout.IncrementalTextLayout(
+            self.document, vw, vh, multiline=True, batch=self.batch)
+
+        # do alignment
+        l.begin_update()
+        l.valign = self.stylesheet['layout']['valign']
+        if l.valign == 'center': l.y = y + vh//2
+        elif l.valign == 'top': l.y = y + vh
+        else: l.y = y
+        l.end_update()
+
+        # to support auto-resizing elements....
+        # if you give the element a ref to the layout and total size, then it
+        # can base its size off the difference.  you still need to do it in two
+        # passes, but can avoid laying out everything again... just invalidate
+        # the style of the element, which will push the rest of the content
+        # down when pyglet notices its size has increased
+
+    def cleanup(self):
+        '''Invoked as part of on_leave handling.
+        '''
+        self._layout.delete()
+        self._layout = None
+        self.batch = None
+
+    def draw(self):
+        self.batch.draw()
 
     def update(self, dt):
         '''Invoked periodically with the time since the last
@@ -22,12 +64,6 @@ class Page(pyglet.event.EventDispatcher):
         '''
         self.decoration.on_enter(viewport_width, viewport_height)
         self.layout(*self.decoration.get_viewport())
-
-    def layout(self, viewport_x, viewport_y, viewport_width, viewport_height):
-        '''Invoked as part of on_enter handling, must be provided by an
-        implementation class.
-        '''
-        raise NotImplementedError('implement in subclass')
 
     def on_resize(self, viewport_width, viewport_height):
         '''Invoked when the viewport has changed dimensions.
@@ -58,11 +94,6 @@ class Page(pyglet.event.EventDispatcher):
         self.decoration.on_leave()
         self.cleanup()
 
-    def cleanup(self):
-        '''Invoked as part of on_leave handling, must be provided by an
-        implementation class.
-        '''
-        raise NotImplementedError('implement in subclass')
 
     def do_draw(self):
         '''Invoked to render the page when active.
@@ -71,12 +102,6 @@ class Page(pyglet.event.EventDispatcher):
         '''
         self.decoration.draw()
         self.draw()
-
-    def draw(self):
-        '''Invoked as part of do_draw, must be provided by an
-        implementation class.
-        '''
-        raise NotImplementedError('implement in subclass')
 
 
 Page.register_event_type('set_mouse_visible')
