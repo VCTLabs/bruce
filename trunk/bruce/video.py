@@ -39,6 +39,14 @@ class VideoElement(pyglet.text.document.InlineElement):
         elif video_format.sample_aspect < 1:
             self.video_height /= video_format.sample_aspect
 
+        # scale based on dimensions supplied
+        if height is not None and width is None:
+            scale = height / float(self.video_height)
+            width = int(scale * self.video_width)
+        elif width is not None:
+            scale = width / float(self.video_width)
+            height = int(scale * self.video_height)
+
         self.width = width is None and self.video_width or width
         self.height = height is None and self.video_height or height
 
