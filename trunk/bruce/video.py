@@ -26,7 +26,6 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.video_filename = video_filename
 
         video = pyglet.media.load(self.video_filename)
-
         self.loop = loop
         assert video.video_format
         video_format = video.video_format
@@ -52,12 +51,11 @@ class VideoElement(pyglet.text.document.InlineElement):
 
         self.vertex_lists = {}
 
-        ascent = max(0, self.height)
-        descent = 0 #min(0, -anchor_y)
-        super(VideoElement, self).__init__(ascent, descent, self.width)
+        super(VideoElement, self).__init__(self.height, 0, self.width)
 
     def place(self, layout, x, y):
         self.video = pyglet.media.load(self.video_filename)
+
         # create the player
         self.player = pyglet.media.Player()
         self.player.queue(self.video)
