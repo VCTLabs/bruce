@@ -13,9 +13,10 @@ Cocos:
 import pyglet
 
 class Page(pyglet.event.EventDispatcher):
-    def __init__(self, document, stylesheet):
+    def __init__(self, document, stylesheet, elements):
         self.document = document
         self.stylesheet = stylesheet
+        self.elements = elements
         self.decoration = stylesheet['decoration']
 
     def layout(self, x, y, vw, vh):
@@ -58,21 +59,30 @@ class Page(pyglet.event.EventDispatcher):
         '''
         pass
 
+    def push_element_handlers(self, dispatcher):
+        for element in self.elements:
+            dispatcher.push_handlers(element)
+
+    def pop_element_handlers(self, dispatcher):
+        for element in self.elements:
+            dispatcher.pop_handlers()
+
     def on_enter(self, viewport_width, viewport_height):
         '''Invoked when the page is put up on the screen of the given
         dimensions.
         '''
         self.decoration.on_enter(viewport_width, viewport_height)
+        for element in self.elements:
+            element.on_enter(viewport_width, viewport_height)
         self.layout(*self.decoration.get_viewport())
 
-    def on_resize(self, viewport_width, viewport_height):
+    def xon_resize(self, viewport_width, viewport_height):
         '''Invoked when the viewport has changed dimensions.
 
         Default behaviour is to clear the page and re-enter. Most pages
         will be able to handle this better.
         '''
-        self.on_leave()
-        self.on_enter(viewport_width, viewport_height)
+        raise NotImplementedError('this used to call on_leave/on_enter but sucks')
 
     def on_next(self):
         '''Invoked on the "next" event (cursor right or left mouse
@@ -92,8 +102,9 @@ class Page(pyglet.event.EventDispatcher):
         '''Invoked when the page is removed from the screen.
         '''
         self.decoration.on_leave()
+        for element in self.elements:
+            element.on_leave()
         self.cleanup()
-
 
     def do_draw(self):
         '''Invoked to render the page when active.
