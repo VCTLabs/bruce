@@ -114,6 +114,9 @@ class Page(pyglet.event.EventDispatcher):
         self.decoration.draw()
         self.draw()
 
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        self._layout.view_x -= scroll_x
+        self._layout.view_y += scroll_y * 32
 
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')
