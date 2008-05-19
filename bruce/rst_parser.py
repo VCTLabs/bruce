@@ -50,6 +50,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def prune(self):
         raise docutils.nodes.SkipNode
 
+    def add_element(self, element):
+        self.elements.append(element)
+        super(DocutilsDecoder, self).add_element(element)
 
     #
     # Page construction
@@ -63,10 +66,12 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.first_paragraph = True
         self.next_style = dict(self.current_style)
         self.notes = []
+        self.elements = []
 
     def finish_page(self):
         if self.len_text:
-            p = Page(self.document, copy_stylesheet(self.stylesheet))
+            p = Page(self.document, copy_stylesheet(self.stylesheet),
+                self.elements)
             self.pages.append(p)
         self.document = None
         self.len_text = 0
@@ -183,6 +188,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             kw['width'] = int(node['width'])
         if node.has_key('height'):
             kw['height'] = int(node['height'])
+
         self.add_element(VideoElement(node.get_video(), **kw))
 
     def visit_bullet_list(self, node):

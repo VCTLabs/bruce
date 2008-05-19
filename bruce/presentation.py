@@ -46,6 +46,7 @@ class Presentation(pyglet.event.EventDispatcher):
         self.page = self.pages[self.page_num]
         self.page.push_handlers(self)
         self.window.push_handlers(self.page)
+        self.page.push_element_handlers(self.window)
         self.page.on_enter(self.window.width, self.window.height)
         self.window.set_caption('Presentation: Slide 1')
         pyglet.clock.schedule(self.page.update)
@@ -91,6 +92,7 @@ class Presentation(pyglet.event.EventDispatcher):
         self.page_num = new
         self.page.on_leave()
         self.page.pop_handlers()
+        self.page.pop_element_handlers(self.window)
         self.window.remove_handlers(self.page)
         pyglet.clock.unschedule(self.page.update)
 
