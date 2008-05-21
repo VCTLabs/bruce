@@ -19,13 +19,13 @@ class Page(pyglet.event.EventDispatcher):
         self.elements = elements
         self.decoration = stylesheet['decoration']
 
-    def layout(self, x, y, vw, vh):
+    def do_layout(self, x, y, vw, vh):
         '''Invoked as part of on_enter handling.
         '''
         self.batch = pyglet.graphics.Batch()
 
         # render the text lines to our batch
-        l = self._layout = pyglet.text.layout.IncrementalTextLayout(
+        l = self.layout = pyglet.text.layout.IncrementalTextLayout(
             self.document, vw, vh, multiline=True, batch=self.batch)
 
         # do alignment
@@ -46,8 +46,8 @@ class Page(pyglet.event.EventDispatcher):
     def cleanup(self):
         '''Invoked as part of on_leave handling.
         '''
-        self._layout.delete()
-        self._layout = None
+        self.layout.delete()
+        self.layout = None
         self.batch = None
 
     def draw(self):
@@ -74,7 +74,7 @@ class Page(pyglet.event.EventDispatcher):
         self.decoration.on_enter(viewport_width, viewport_height)
         for element in self.elements:
             element.on_enter(viewport_width, viewport_height)
-        self.layout(*self.decoration.get_viewport())
+        self.do_layout(*self.decoration.get_viewport())
 
     def xon_resize(self, viewport_width, viewport_height):
         '''Invoked when the viewport has changed dimensions.
@@ -115,8 +115,8 @@ class Page(pyglet.event.EventDispatcher):
         self.draw()
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        self._layout.view_x -= scroll_x
-        self._layout.view_y += scroll_y * 32
+        self.layout.view_x -= scroll_x
+        self.layout.view_y += scroll_y * 32
 
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')

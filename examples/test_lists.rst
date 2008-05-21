@@ -4,6 +4,7 @@ Enumerated Lists
 1. Numbered from 1
 2. Two
 3. Three
+4. .. image:: biohazard.png
 
 Enumerated Lists - Start
 ------------------------

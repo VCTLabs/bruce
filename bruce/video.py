@@ -8,7 +8,18 @@ import pyglet
 #
 class video(nodes.Special, nodes.Invisible, nodes.Element):
     def get_video(self):
-        return self.rawsource
+        # XXX allow to fill the available layout dimensions
+
+        # handle width and height, retaining aspect if only one is specified
+        kw = {}
+        if self.has_key('width'):
+            kw['width'] = int(self['width'])
+        if self.has_key('height'):
+            kw['height'] = int(self['height'])
+        if self.has_key('loop'):
+            kw['loop'] = True
+
+        return VideoElement(self.rawsource, **kw)
 
 def video_directive(name, arguments, options, content, lineno,
                           content_offset, block_text, state, state_machine):
@@ -17,6 +28,7 @@ video_directive.arguments = (1, 0, 1)
 video_directive.options = dict(
      width=directives.positive_int,
      height=directives.positive_int,
+     loop=directives.flag,
 )
 video_directive.content = True
 directives.register_directive('video', video_directive)
