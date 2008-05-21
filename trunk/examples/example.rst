@@ -29,8 +29,8 @@ Second line of para.
 
 Some *italic* |biohazard| **bold** text
 
-.. |biohazard| image:: examples/biohazard.png
-.. image:: examples/pyglet.png
+.. |biohazard| image:: biohazard.png
+.. image:: pyglet.png
 
 Some more |biohazard| **bold** text.
 
@@ -39,7 +39,7 @@ Some more |biohazard| **bold** text.
 
 ----
 
-.. video:: examples/tada.avi
+.. video:: tada.avi
 
 Page 2
 ------
