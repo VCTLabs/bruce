@@ -37,7 +37,7 @@ class VideoElement(pyglet.text.document.InlineElement):
     def __init__(self, video_filename, width=None, height=None, loop=False):
         self.video_filename = video_filename
 
-        video = pyglet.media.load(self.video_filename)
+        video = pyglet.resource.media(self.video_filename)
         self.loop = loop
         assert video.video_format
         video_format = video.video_format
@@ -66,7 +66,7 @@ class VideoElement(pyglet.text.document.InlineElement):
         super(VideoElement, self).__init__(self.height, 0, self.width)
 
     def on_enter(self, viewport_width, viewport_height):
-        self.video = pyglet.media.load(self.video_filename)
+        self.video = pyglet.resource.media(self.video_filename)
 
         # create the player
         self.player = pyglet.media.Player()
