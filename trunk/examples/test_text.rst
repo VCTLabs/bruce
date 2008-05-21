@@ -1,23 +1,15 @@
 Text Styles Test
 ----------------
 
-- This is so totally
-- POWERPOINT!
-- with bullets
+Lorem ipsum dolor *sit amet*, **consectetuer adipiscing elit**. Donec ``auctor`` vestibulum risus. Vestibulum porttitor purus sed magna. Aenean gravida augue in sapien. Duis eget augue in ante molestie dapibus. Donec lobortis tortor eu sapien. Sed eu tortor.
 
-  -  nested
-  -  oh my!
+    Proin venenatis egestas dui.
+    Etiam augue elit, pharetra egestas, ornare ut, congue ut, ipsum.
+    Nullam massa felis, rutrum eu, feugiat vitae, congue eu, ipsum.
+    Suspendisse imperdiet, nibh nec sollicitudin eleifend, ante tellus
+    adipiscing mauris, sed eleifend dolor lectus at augue.
 
-     - in a level
-     - still in a level
-
-  - back a level
-
-It continues! And you could have a whole damn ESSAY in here.
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec auctor vestibulum risus. Vestibulum porttitor purus sed magna. Aenean gravida augue in sapien. Duis eget augue in ante molestie dapibus. Donec lobortis tortor eu sapien. Sed eu tortor. Proin venenatis egestas dui. Etiam augue elit, pharetra egestas, ornare ut, congue ut, ipsum. Nullam massa felis, rutrum eu, feugiat vitae, congue eu, ipsum. Suspendisse imperdiet, nibh nec sollicitudin eleifend, ante tellus adipiscing mauris, sed eleifend dolor lectus at augue. Sed viverra dui vitae velit. Vivamus cursus. Nunc eleifend accumsan eros. Cras pede. Fusce tincidunt accumsan ipsum. Donec adipiscing risus. Maecenas vel nisl. Integer lectus metus, ultricies nec, rutrum in, cursus quis, pede.
-
-Proin lobortis lectus semper massa. Mauris scelerisque, sem quis dapibus faucibus, nibh massa faucibus erat, sit amet mattis neque massa sit amet nibh. Sed gravida neque laoreet leo. Suspendisse potenti. Nulla ultrices iaculis diam. Donec pellentesque dolor ut diam. Praesent egestas tellus ac dolor. Mauris suscipit sodales lacus. In commodo sapien et enim. Fusce magna. Nam scelerisque tellus ut dui. Fusce quis justo id urna placerat commodo. Cras orci ipsum, vulputate lobortis, pharetra vel, lacinia porttitor, lorem.
+Proin lobortis lectus semper massa.  Mauris scelerisque, sem quis dapibus faucibus, nibh massa faucibus erat, sit amet mattis neque massa sit amet nibh. Sed gravida neque laoreet leo.  Suspendisse potenti. Nulla ultrices iaculis diam. Donec pellentesque dolor ut diam. Praesent egestas tellus ac dolor. Mauris suscipit sodales lacus.  In commodo sapien et enim. Fusce magna. Nam scelerisque tellus ut dui.  Fusce quis justo id urna placerat commodo. Cras orci ipsum, vulputate lobortis, pharetra vel, lacinia porttitor, lorem.
 
 Nullam at risus. Sed hendrerit. Phasellus rhoncus eleifend dui. Curabitur gravida. Curabitur lorem turpis, consectetuer sit amet, tincidunt ac, aliquet eget, massa. Ut quis libero. Praesent elementum. Sed suscipit viverra libero. Sed ultrices fermentum pede. Etiam tempus nunc et neque tempor dapibus. Proin mi ipsum, tristique eu, rhoncus mattis, consequat eget, est. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nulla feugiat libero eget massa. Nulla adipiscing, dui ac tempor euismod, velit justo pretium mauris, ut aliquet nulla eros eu odio. Phasellus ut odio.
 

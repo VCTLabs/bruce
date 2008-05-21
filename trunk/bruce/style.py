@@ -42,6 +42,8 @@ style_directive.options = {
      'align': halignment, # synonym for...
      'default.align': halignment,
      'layout.valign': valignment,
+     'block_quote.italic': is_boolean,
+     'block_quote.bold': is_boolean,
 }
 for group in ('', 'default.','literal.','emphasis.','strong.'):
     style_directive.options[group + 'color'] = color
@@ -77,6 +79,10 @@ default_stylesheet = dict(
     ),
     literal_block = dict(
         margin_left=20,
+    ),
+    block_quote = dict(
+        italic=True,
+        bold=False,
     ),
     layout = dict(
         valign='top',

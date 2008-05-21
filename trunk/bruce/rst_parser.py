@@ -10,11 +10,14 @@ from pyglet.text.formats import structured
 
 # these imports simply cause directives to be registered
 from bruce import decoration
+from bruce import interpreter, video
 from bruce import resource
+from bruce.image import ImageElement
+
+# the basic page
 from bruce.page import Page
 
 from bruce.style import *
-from bruce.video import VideoElement
 
 def bullet_generator(bullets = u'\u25cf\u25cb\u25a1'):
     i = -1
@@ -153,26 +156,15 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def visit_image(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
-        if not isinstance(node.parent, nodes.TextElement):
+        if not (isinstance(node.parent, nodes.TextElement) or
+                isinstance(node.parent, nodes.Part)):
             self.break_paragraph()
-        image = pyglet.image.load(node['uri'].strip())
-
-        # XXX allow image to fill the available layout dimensions
-
-        # handle width and height, retaining aspect if only one is specified
         kw = {}
         if node.has_key('width'):
             kw['width'] = int(node['width'])
         if node.has_key('height'):
             kw['height'] = int(node['height'])
-            if 'width' not in kw:
-                scale = kw['height'] / float(image.height)
-                kw['width'] = int(scale * image.width)
-        elif 'width' in kw:
-            scale = kw['width'] / float(image.width)
-            kw['height'] = int(scale * image.height)
-
-        self.add_element(structured.ImageElement(image, **kw))
+        self.add_element(ImageElement(node['uri'].strip(), **kw))
 
     def visit_video(self, node):
         # if the parent is structural - document, section, etc then we need
@@ -180,16 +172,15 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         if not isinstance(node.parent, nodes.TextElement):
             self.break_paragraph()
 
-        # XXX allow image to fill the available layout dimensions
+        self.add_element(node.get_video())
 
-        # handle width and height, retaining aspect if only one is specified
-        kw = {}
-        if node.has_key('width'):
-            kw['width'] = int(node['width'])
-        if node.has_key('height'):
-            kw['height'] = int(node['height'])
+    def visit_interpreter(self, node):
+        # if the parent is structural - document, section, etc then we need
+        # to break the previous paragraphish
+        if not isinstance(node.parent, nodes.TextElement):
+            self.break_paragraph()
 
-        self.add_element(VideoElement(node.get_video(), **kw))
+        self.add_element(node.get_interpreter())
 
     def visit_bullet_list(self, node):
         l = structured.UnorderedListBuilder(bullet_generator.next())
@@ -225,6 +216,46 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         # indicate that new paragraphs need to be indented
         self.in_item = True
     def depart_list_item(self, node):
+        self.in_item = False
+
+    def visit_definition_list(self, node):
+        pass
+    def visit_definition_list_item(self, node):
+        self.break_paragraph()
+    def visit_term(self, node):
+        pass
+    def visit_definition(self, node):
+        style = {}
+        left_margin = self.current_style.get('margin_left') or 0
+        tab_stops = self.current_style.get('tab_stops')
+        if tab_stops:
+            tab_stops = list(tab_stops)
+        else:
+            tab_stops = []
+        tab_stops.append(left_margin + 50)
+        style['margin_left'] = left_margin + 50
+        style['indent'] = -30
+        style['tab_stops'] = tab_stops
+        self.push_style(node, style)
+        self.in_item = True
+    def depart_definition(self, node):
+        self.in_item = False
+
+    def visit_block_quote(self, node):
+        style = self.stylesheet['default'].copy()
+        left_margin = self.current_style.get('margin_left') or 0
+        tab_stops = self.current_style.get('tab_stops')
+        if tab_stops:
+            tab_stops = list(tab_stops)
+        else:
+            tab_stops = []
+        tab_stops.append(left_margin + 50)
+        style['margin_left'] = left_margin + 50
+        style['indent'] = -30
+        style['tab_stops'] = tab_stops
+        self.push_style(node, style)
+        self.in_item = True
+    def depart_block_quote(self, node):
         self.in_item = False
 
     def visit_note(self, node):
