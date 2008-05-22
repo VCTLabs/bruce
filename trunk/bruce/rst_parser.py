@@ -126,9 +126,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             doctree = publish_doctree(text)
 
         # transform to allow top-level transitions to create sections
-        printtree(doctree)
+        #printtree(doctree)
         SectionContent(doctree).apply()
-        printtree(doctree)
+        #printtree(doctree)
 
         doctree.walkabout(DocutilsVisitor(doctree, self))
 

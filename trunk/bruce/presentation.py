@@ -44,7 +44,7 @@ class Presentation(pyglet.event.EventDispatcher):
     def start_presentation(self):
         self._enter_page(self.pages[self.page_num])
 
-    def _enter_page(self, page)
+    def _enter_page(self, page):
         # set up the initial page
         self.page = page
 
