@@ -17,15 +17,10 @@ class ImageElement(structured.ImageElement):
         elif width is not None:
             scale = width / float(image.width)
             height = int(scale * image.height)
-        self.width = width or image.width
-        self.height = height or image.height
+        width = width or image.width
+        height = height or image.height
 
-        self.vertex_lists = {}
-
-        anchor_y = self.height / image.height * image.anchor_y
-        ascent = max(0, self.height - anchor_y)
-        descent = min(0, -anchor_y)
-        super(structured.ImageElement, self).__init__(ascent, descent, self.width)
+        super(ImageElement, self).__init__(image, width, height)
 
     def on_enter(self, vw, wh):
         self.image = pyglet.resource.image(self.uri)
