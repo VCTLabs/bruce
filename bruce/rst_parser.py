@@ -3,7 +3,7 @@ import os
 import docutils.parsers.rst
 from docutils.core import publish_doctree
 from docutils import nodes
-from docutils.transforms import references
+from docutils.transforms import references, Transform
 
 import pyglet
 from pyglet.text.formats import structured
@@ -30,6 +30,47 @@ class Section(object):
     def __init__(self, level):
         self.level = level
 
+class SectionContent(Transform):
+    """
+    Ensure all content resides in a section. Top-level content
+    may be split by transitions into multiple sections.
+
+    For example, transform this::
+
+        content
+        <transition>
+        content
+        <section>
+
+    into this::
+
+        <section>
+        <section>
+        <section>
+    """
+    def apply(self):
+        self.current = []
+        index = 0
+        for node in list(self.document):
+            if isinstance(node, nodes.transition):
+                self.document.remove(node)
+                if self.current:
+                    new = nodes.section()
+                    new.children = self.current
+                    self.document.insert(index, new)
+                    self.current = []
+                    index += 1
+            elif isinstance(node, nodes.section):
+                if self.current:
+                    new = nodes.section()
+                    new.children = self.current
+                    self.document.insert(index, new)
+                    self.current = []
+                index += 1
+            else:
+                self.current.append(node)
+                self.document.remove(node)
+
 class DocutilsDecoder(structured.StructuredTextDecoder):
     def __init__(self, stylesheet=None):
         super(DocutilsDecoder, self).__init__()
@@ -45,7 +86,61 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             doctree = publish_doctree(text, source_path=location.path)
         else:
             doctree = publish_doctree(text)
+
+        # transform to allow top-level transitions to create sections
+        SectionContent(doctree).apply()
+
         doctree.walkabout(DocutilsVisitor(doctree, self))
+
+    def depart_unknown(self, node):
+        pass
+
+    #
+    # Structural elements
+    #
+    def visit_document(self, node):
+        pass
+
+    def visit_section(self, node):
+        '''Add a page
+        '''
+        g = DocumentGenerator(self.stylesheet)
+        d = g.decode(node)
+        if g.len_text:
+            p = Page(d, copy_stylesheet(self.stylesheet), d.elements)
+            self.pages.append(p)
+        raise docutils.nodes.SkipNode
+
+class DummyReporter(object):
+    debug = lambda *args: None
+
+class DocumentGenerator(structured.StructuredTextDecoder):
+    def __init__(self, stylesheet):
+        super(DocumentGenerator, self).__init__()
+        self.stylesheet = stylesheet
+
+    def decode_structured(self, doctree, location):
+        # attach a reporter so docutil's walkabout doesn't get confused by us
+        # not using a real document as the root
+        doctree.reporter = DummyReporter()
+
+        # initialise parser
+        self.push_style(doctree, self.stylesheet['default'])
+        self.in_literal = False
+        self.stylesheet['decoration'].title = None
+        self.first_paragraph = True
+        self.next_style = dict(self.current_style)
+        self.notes = []
+        self.elements = self.document.elements = []
+
+        # go walk the doc tree
+        visitor = DocutilsVisitor(doctree, self)
+        children = doctree.children
+        try:
+            for child in children[:]:
+                child.walkabout(visitor)
+        except nodes.SkipSiblings:
+            pass
 
     def depart_unknown(self, node):
         pass
@@ -57,54 +152,10 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.elements.append(element)
         super(DocutilsDecoder, self).add_element(element)
 
-    #
-    # Page construction
-    #
-    def new_page(self, node):
-        self.push_style(node, self.stylesheet['default'])
-        self.in_literal = False
-        self.document = pyglet.text.document.FormattedDocument()
-        self.stylesheet['decoration'].title = None
-        self.len_text = 0
-        self.first_paragraph = True
-        self.next_style = dict(self.current_style)
-        self.notes = []
-        self.elements = []
-
-    def finish_page(self):
-        if self.len_text:
-            p = Page(self.document, copy_stylesheet(self.stylesheet),
-                self.elements)
-            self.pages.append(p)
-        self.document = None
-        self.len_text = 0
-
-
-    #
-    # Structural elements
-    #
-    def visit_document(self, node):
-        self.new_page(node)
-
-    def depart_document(self, node):
-        self.finish_page()
-
     def visit_title(self, node):
         # title is handled separately so it may be placed nicely
         self.stylesheet['decoration'].title = node.children[0].astext().replace('\n', ' ')
         self.prune()
-
-    def visit_section(self, node):
-        # finish off a prior non-section page
-        self.finish_page()
-        self.new_page(node)
-
-    def depart_section(self, node):
-        self.finish_page()
-
-    def visit_transition(self, node):
-        self.finish_page()
-        self.new_page(node)
 
     def visit_substitution_definition(self, node):
         self.prune()
@@ -295,8 +346,15 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             self.stylesheet[group][key] = value
 
     def visit_decoration(self, node):
-        self.stylesheet['decoration'].content = node.get_decoration()
+        if hasattr(node, 'get_decoration'):
+            self.stylesheet['decoration'].content = node.get_decoration()
+        else:
+            # it's probably a footer or something
+            pass
 
+    def visit_footer(self, node):
+        g = DocumentGenerator(self.stylesheet, node)
+        self.stylesheet['decoration'].footer = g.parse()
 
     #
     # Resource location
@@ -325,7 +383,6 @@ class DocutilsVisitor(nodes.NodeVisitor):
 
     def dispatch_departure(self, node):
         self.decoder.pop_style(node)
-
         node_name = node.__class__.__name__
         method = getattr(self.decoder, 'depart_%s' % node_name,
                          self.decoder.depart_unknown)
