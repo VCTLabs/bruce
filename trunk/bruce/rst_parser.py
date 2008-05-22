@@ -37,39 +37,57 @@ class SectionContent(Transform):
 
     For example, transform this::
 
-        content
+        content1
         <transition>
-        content
+        content2
         <section>
+        content3
+        <transition>
+        content4
 
     into this::
 
-        <section>
-        <section>
-        <section>
+        <section content1>
+        <section content2>
+        <section content3>
+        <section content4>
     """
     def apply(self):
-        self.current = []
+        current = []
         index = 0
+        def add_section():
+            new = nodes.section()
+            new.children = list(current)
+            self.document.insert(index, new)
+            current[:] = []
         for node in list(self.document):
             if isinstance(node, nodes.transition):
                 self.document.remove(node)
-                if self.current:
-                    new = nodes.section()
-                    new.children = self.current
-                    self.document.insert(index, new)
-                    self.current = []
+                if current:
+                    add_section()
                     index += 1
             elif isinstance(node, nodes.section):
-                if self.current:
-                    new = nodes.section()
-                    new.children = self.current
-                    self.document.insert(index, new)
-                    self.current = []
+                if current:
+                    add_section()
                 index += 1
+                # grab any transition-delimited pages from the section
+                remove = False
+                for n, child in enumerate(list(node.children)):
+                    current[:] = []
+                    if isinstance(child, nodes.transition):
+                        remove = True
+                        node.remove(child)
+                        if current:
+                            add_section()
+                            index += 1
+                    else:
+                        current.append(child)
+                        if remove:
+                            node.remove(child)
             else:
-                self.current.append(node)
+                current.append(node)
                 self.document.remove(node)
+        add_section()
 
 class DocutilsDecoder(structured.StructuredTextDecoder):
     def __init__(self, stylesheet=None):
@@ -150,7 +168,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def add_element(self, element):
         self.elements.append(element)
-        super(DocutilsDecoder, self).add_element(element)
+        super(DocumentGenerator, self).add_element(element)
 
     def visit_title(self, node):
         # title is handled separately so it may be placed nicely
