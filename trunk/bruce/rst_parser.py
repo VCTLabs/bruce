@@ -53,41 +53,61 @@ class SectionContent(Transform):
         <section content4>
     """
     def apply(self):
-        current = []
+        new_section_content = []
         index = 0
         def add_section():
             new = nodes.section()
-            new.children = list(current)
+            new.children = list(new_section_content)
             self.document.insert(index, new)
-            current[:] = []
+            new_section_content[:] = []
+        record_for_later = True
         for node in list(self.document):
             if isinstance(node, nodes.transition):
                 self.document.remove(node)
-                if current:
+                if new_section_content:
                     add_section()
                     index += 1
+
+                record_for_later = True
             elif isinstance(node, nodes.section):
-                if current:
+                if new_section_content:
+                    # add accumulated content
                     add_section()
+                    index += 1
+
+                # and acknowledge the section
                 index += 1
+                record_for_later = False
+
                 # grab any transition-delimited pages from the section
-                remove = False
+                move_from_section = False
                 for n, child in enumerate(list(node.children)):
-                    current[:] = []
+                    new_section_content[:] = []
                     if isinstance(child, nodes.transition):
-                        remove = True
+                        move_from_section = True
                         node.remove(child)
-                        if current:
+                        if new_section_content:
                             add_section()
                             index += 1
                     else:
-                        current.append(child)
-                        if remove:
+                        if move_from_section:
+                            new_section_content.append(child)
                             node.remove(child)
-            else:
-                current.append(node)
+            elif record_for_later:
+                new_section_content.append(node)
                 self.document.remove(node)
-        add_section()
+        if new_section_content:
+            add_section()
+
+def printtree(node, indent=''):
+    if hasattr(node, 'children') and node.children:
+        print indent + '<%s>'%node.__class__.__name__
+        for child in node.children:
+            printtree(child, indent+'  ')
+        print indent + '</%s>'%node.__class__.__name__
+    else:
+        print indent + repr(node)
+
 
 class DocutilsDecoder(structured.StructuredTextDecoder):
     def __init__(self, stylesheet=None):
@@ -106,7 +126,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             doctree = publish_doctree(text)
 
         # transform to allow top-level transitions to create sections
+        printtree(doctree)
         SectionContent(doctree).apply()
+        printtree(doctree)
 
         doctree.walkabout(DocutilsVisitor(doctree, self))
 

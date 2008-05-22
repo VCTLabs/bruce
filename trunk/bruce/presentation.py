@@ -42,15 +42,34 @@ class Presentation(pyglet.event.EventDispatcher):
         self.player = pyglet.media.Player()
 
     def start_presentation(self):
+        self._enter_page(self.pages[self.page_num])
+
+    def _enter_page(self, page)
         # set up the initial page
-        self.page = self.pages[self.page_num]
+        self.page = page
+
+        # make the presentation listen for events from the page
         self.page.push_handlers(self)
+
+        # add the page's event handlers (including elements) to the window
         self.window.push_handlers(self.page)
         self.page.push_element_handlers(self.window)
+
+        # enter the page
         self.page.on_enter(self.window.width, self.window.height)
+
         self.window.set_caption('Presentation: Slide 1')
         pyglet.clock.schedule(self.page.update)
         self.dispatch_event('on_page_changed', self.page, self.page_num)
+
+        '''
+        # play the next page's sound (if any)
+        # force skip of the rest of the current sound (if any)
+        self.player.next()
+        if self.page.cfg['sound']:
+            self.player.queue(self.page.cfg['sound'])
+            self.player.play()
+        '''
 
     def set_mouse_visible(self, visible):
         '''Invoked by events from pages.
@@ -91,31 +110,18 @@ class Presentation(pyglet.event.EventDispatcher):
         # leave the old page
         self.page_num = new
         self.page.on_leave()
+
+        # pop my handlers off of the page
         self.page.pop_handlers()
+
+        # now remove the page's handlers (including elements) from the window
         self.page.pop_element_handlers(self.window)
         self.window.remove_handlers(self.page)
+
         pyglet.clock.unschedule(self.page.update)
 
         # enter the new page
-        self.page = self.pages[self.page_num]
-        self.page.push_handlers(self)
-        self.window.push_handlers(self.page)
-        self.page.on_enter(self.window.width, self.window.height)
-        pyglet.clock.schedule(self.page.update)
-
-        self.window.set_caption("Presentation: Slide %d"%(self.page_num+1))
-
-        '''
-        # play the next page's sound (if any)
-        # force skip of the rest of the current sound (if any)
-        self.player.next()
-        if self.page.cfg['sound']:
-            self.player.queue(self.page.cfg['sound'])
-            self.player.play()
-        '''
-
-        # let anyone listening know that the page has changed
-        self.dispatch_event('on_page_changed', self.page, self.page_num)
+        self._enter_page(self.pages[self.page_num])
 
     def __next(self):
         if not self.page.on_next():
