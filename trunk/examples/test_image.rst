@@ -1,23 +1,22 @@
-.. image:: examples/pyglet.png
+Raw Image
+---------
 
-----
+.. image:: sample-image.png
 
-.. style::
-   :align: center
-   :layout.valign: center
+Width=200 (no change)
+---------------------
 
-.. image:: examples/pyglet.png
-
-----
-
-.. image:: examples/pyglet.png
+.. image:: sample-image.png
    :width: 200
 
+Height=200
+----------
 
-----
+.. image:: sample-image.png
+   :height: 200
 
-.. style::
-   :align: right
-   :layout.valign: bottom
+Width=400 (no change)
+---------------------
 
-.. image:: examples/pyglet.png
+.. image:: sample-image.png
+   :width: 400

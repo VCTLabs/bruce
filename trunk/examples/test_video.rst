@@ -1,7 +1,7 @@
 Default (unscaled, top left)
 ----------------------------
 
-.. video:: examples/tada.avi
+.. video:: tada.avi
 
 
 Centered (unscaled) and looping
@@ -11,12 +11,12 @@ Centered (unscaled) and looping
    :layout.valign: center
    :align: center
 
-.. video:: examples/tada.avi
+.. video:: tada.avi
    :loop:
 
 Centered, scaled width=200
 --------------------------
 
-.. video:: examples/tada.avi
+.. video:: tada.avi
    :width: 200
 

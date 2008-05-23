@@ -4,7 +4,7 @@ How to write presentations using Bruce the Presentation Tool
 
 Bruce presentations are written as plain-text files in the
 ReStructuredText format with some extensions. See the examples
-folder *.rst files for some samples, the simplest being
+folder \*.rst files for some samples, the simplest being
 "simple.rst" which displays plain text sentences centered
 on a white background::
 
@@ -35,17 +35,20 @@ More Detail
 -----------
 
 Pages in Bruce are defined as being the text contained in a section
-or between transitions (horizontal rules, "----"). It is important that a blank
+or between transitions (horizontal rules, ``----``). It is important that a blank
 surrounds the transition line, otherwise ReST might try to interpret it as a 
-title (which will often mean resulting in a parsing error).
+title (which will often mean resulting in a parsing error). See
+``examples/test_sectioning.rst`` for a file that mixes section-based and transition-based
+page delimiting.
 
 Bruce supports a large amount of ReStructuredText:
 
-. inline markup for emphasis, strong, superscript, subscript and literal
-. literal blocks
-. bullet and enumerated lists (including nesting)
-. images - inline and stand-alone
-. page titles (section headings)
+- inline markup for emphasis, strong, superscript, subscript and literal
+- literal blocks
+- bullet and enumerated lists (including nesting)
+- definition lists
+- images - inline and stand-alone
+- page titles (section headings)
 
 The rendering stylesheet may be altered on the fly using the ".. style::"
 directive. Changes made in this way are immediate and affect all subsequent
@@ -62,7 +65,11 @@ the default decoration having a white background and the page title centered
 at the top of the page.
 
 **images**
-    A width and/or height may be specified to scale the image when displayed.
+    A ``:width:`` and/or ``:height:`` may be specified to scale the image when displayed.
     If only one is specified then the image's other dimension will be scaled
     to ensure the image aspect ration is retained.
+
+**video**
+    Embedded in the same manner as images, and may be scaled in the same way.
+    Additionally video may be asked to loop using the ``:loop:`` flag.
 
