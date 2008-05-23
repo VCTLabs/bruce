@@ -223,13 +223,13 @@ class DocumentGenerator(structured.StructuredTextDecoder):
             self.first_paragraph = False
             return
         self.add_text('\n')
+        if self.in_item:
+            self.add_text('\t')
 
     paragraph_suppress_newline = False
     def visit_paragraph(self, node):
         if not self.paragraph_suppress_newline:
             self.break_paragraph()
-            if self.in_item:
-                self.add_text('\t')
         self.paragraph_suppress_newline = False
 
     def visit_literal_block(self, node):
@@ -247,9 +247,10 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def visit_image(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
-        if not (isinstance(node.parent, nodes.TextElement) or
-                isinstance(node.parent, nodes.Part)):
+        if (not isinstance(node.parent, nodes.TextElement)
+                and not self.paragraph_suppress_newline):
             self.break_paragraph()
+        self.paragraph_suppress_newline = False
         kw = {}
         if node.has_key('width'):
             kw['width'] = int(node['width'])
@@ -312,9 +313,9 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def visit_definition_list(self, node):
         pass
     def visit_definition_list_item(self, node):
-        self.break_paragraph()
-    def visit_term(self, node):
         pass
+    def visit_term(self, node):
+        self.break_paragraph()
     def visit_definition(self, node):
         style = {}
         left_margin = self.current_style.get('margin_left') or 0
