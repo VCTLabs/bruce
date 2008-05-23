@@ -4,31 +4,34 @@ Bruce the Presentation Tool
 
 Bruce the Presentation Tool is for programmers who are tired of fighting
 with presentation tools. In its basic form it allows text, code or image
-pages and even interactive Python sessions. It uses pyglet and is easily
-extensible to add new page types.
+pages and video. It uses pyglet and is extensible to add new page types.
 
 Features:
 
-- simple point-by-point text display with styling and progressive expose
-- audio playback on any page, including blank ones
-- interactive Python interpreter with history
-- page of Python code with execution output
-- code display with scrolling
-- unicode escaped chars in ascii file (or any other source file encoding)
-- html page display with scrolling
-- image display with optional zoom to fit, title and/or caption
-- video playback with optional zoom to fit, title
-- configuration may be changed inside a presentation, including per-page
-- sensible resource location (images, video, sound from zip files etc.)
-- custom Pages via modules found in resource path
+- displays ReStructuredText content with one page per section or transition
+- handling of *most* of ReStructuredText, including:
+
+  * inline markup for emphasis, strong and literal
+  * literal and line blocks
+  * block quotes
+  * definition, bullet and enumerated lists (including nesting)
+  * images - inline and stand-alone, including scaling
+  * page titles (section headings)
+
+- page decorations
+- scrolling of content larger than a screenful
+- sensible resource location (images, video, sound from the same directory
+  as the presentation file)
+- and some extensions of ReST:
+
+  * videos (embedded just like images) with optional looping
+  * stylsheet and decoration changes on the fly (eg. multiple fonts
+    per page)
+
 - timer and page count display for practicing
-- logo display in the corner of every page
 - may specify which screen to open on in multihead
-- runs fullscreen at native resolution (with sensible scaling of pages)
+- runs fullscreen at native resolution
 - may switch to/from fullscreen quickly
-- HTML output of pages including notes
-- may display ReStructuredText files as presentations with one page
-  per section
 
 
 Installation
@@ -58,9 +61,8 @@ left, right arrows; left, right mouse button; space bar (forward)
 page up, page down
   Move back and forward 5 pages (ignores expose/hide text lines)
 mouse scroll wheel
-  Scroll large code or html file contents in the page. You may also drag
-  the contents up or down by dragging a left mouse button press up and
-  down the screen.
+  Scroll large page content. You may also drag the contents up or down
+  by dragging a left mouse button press up and down the screen.
 control-I
   Enter / exit auto-type mode in the interactive interpreter
 control-F
