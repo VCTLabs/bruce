@@ -118,6 +118,8 @@ class Page(pyglet.event.EventDispatcher):
         self.layout.view_x -= scroll_x
         self.layout.view_y += scroll_y * 32
 
+    # XXX scroll by dragging
+
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')
 
