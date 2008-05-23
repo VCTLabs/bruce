@@ -45,6 +45,8 @@ Bruce supports a large amount of ReStructuredText:
 
 - inline markup for emphasis, strong, superscript, subscript and literal
 - literal blocks
+- line blocks
+- block quotes
 - bullet and enumerated lists (including nesting)
 - definition lists
 - images - inline and stand-alone

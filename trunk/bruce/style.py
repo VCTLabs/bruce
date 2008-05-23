@@ -52,7 +52,7 @@ for group in ('', 'default.','literal.','emphasis.','strong.'):
     style_directive.options[group + 'bold'] = is_boolean
     style_directive.options[group + 'italic'] = is_boolean
 
-for group in 'default literal_block'.split():
+for group in 'default literal_block line_block'.split():
     for margin in 'left right top bottom'.split():
         style_directive.options[group + '.margin_' + margin] = directives.positive_int
 
@@ -79,6 +79,9 @@ default_stylesheet = dict(
     ),
     literal_block = dict(
         margin_left=20,
+    ),
+    line_block = dict(
+        margin_left=40,
     ),
     block_quote = dict(
         italic=True,
