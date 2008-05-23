@@ -244,6 +244,22 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def depart_literal_block(self, node):
         self.in_literal = False
 
+    # Line blocks have lines in them, we just have to add a hard-return to the
+    # lines. Line blocks should only indent child blocks.
+    line_block_count = 0
+    def visit_line_block(self, node):
+        if self.line_block_count:
+            self.push_style(node, self.stylesheet['line_block'])
+        else:
+            self.break_paragraph()
+        self.line_block_count += 1
+    def visit_line(self, node):
+        pass
+    def depart_line(self, node):
+        self.add_text(u'\u2028')
+    def depart_line_block(self, node):
+        self.line_block_count -= 1
+
     def visit_image(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
