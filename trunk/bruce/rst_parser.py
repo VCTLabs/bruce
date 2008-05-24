@@ -403,15 +403,15 @@ class DocumentGenerator(structured.StructuredTextDecoder):
             self.stylesheet[group][key] = value
 
     def visit_decoration(self, node):
+        # make sure it's Bruce's decoration node, otherwise it's probably a
+        # footer or something
         if hasattr(node, 'get_decoration'):
             self.stylesheet['decoration'].content = node.get_decoration()
-        else:
-            # it's probably a footer or something
-            pass
 
     def visit_footer(self, node):
-        g = DocumentGenerator(self.stylesheet, node)
-        self.stylesheet['decoration'].footer = g.parse()
+        g = DocumentGenerator(self.stylesheet)
+        self.stylesheet['decoration'].footer = g.decode(node)
+        self.prune()
 
     #
     # Resource location

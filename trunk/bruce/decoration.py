@@ -54,6 +54,7 @@ class Decoration(object):
     Decoration content consists of lines of configuration or drawing commands::
 
         bgcolor: <color spec>
+        footer_align: center
         title:x,y;halign;valign;font_name;font_size;bold;italic;color
         image:filename;halign=right;valign=bottom
         quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
@@ -78,17 +79,19 @@ class Decoration(object):
 
     '''
     bgcolor = (255, 255, 255, 255)
+    footer_align = 'center'
     default_title_style = ('w//2,h', 'center', 'top', 'Arial', '28', 'yes',
         'no', 'black')
 
-    def __init__(self, content, title=None):
+    def __init__(self, content, title=None, footer=None):
         self.content = content
         self.title = title
+        self.footer = footer
 
     def copy(self):
         '''Don't copy the title.
         '''
-        return Decoration(self.content, self.title)
+        return Decoration(self.content, self.title, self.footer)
 
     def get_viewport(self):
         '''A decoration may specify a smaller viewport than the total
@@ -130,6 +133,26 @@ class Decoration(object):
             if self.limited_viewport == (0, 0, viewport_width, viewport_height):
                 self.limited_viewport = (0, 0, viewport_width, viewport_height -
                     l.content_height)
+
+        if self.footer is not None:
+            l = pyglet.text.layout.IncrementalTextLayout(self.footer, viewport_width,
+                viewport_height, multiline=True, batch=self.batch)
+            l.begin_update()
+            l.valign = 'bottom'
+            print 'ALIGN', self.footer_align
+            l.halign = self.footer_align
+            if l.halign == 'center':
+                l.x = viewport_width//2
+            elif l.halign == 'right':
+                l.x = viewport_width
+            l.end_update()
+            self.decorations.append(l)
+            x, y, w, h = self.limited_viewport
+            if y < l.content_height:
+                d = l.content_height - y
+                y = l.content_height
+                h -= d
+                self.limited_viewport = (x, y, w, h)
 
 
     def handle_image(self, image):
@@ -175,6 +198,9 @@ class Decoration(object):
 
     def handle_bgcolor(self, color):
         self.bgcolor = parse_color(color)
+
+    def handle_footer_align(self, align):
+        self.footer_align = align
 
     def handle_viewport(self, viewport):
         loc = dict(w=self.viewport_width, h=self.viewport_height)
