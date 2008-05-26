@@ -54,8 +54,8 @@ class Decoration(object):
     Decoration content consists of lines of configuration or drawing commands::
 
         bgcolor: <color spec>
-        footer_align: center
-        title:x,y;halign;valign;font_name;font_size;bold;italic;color
+        footer:x,y;hanchor;vanchor
+        title:x,y;hanchor;vanchor
         image:filename;halign=right;valign=bottom
         quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
 
@@ -73,25 +73,25 @@ class Decoration(object):
 
     The default "title" is::
 
-        title:w//2,h;center;top;Arial;28;yes;no;0,0,0,255
+        title:w//2,h;center;top
 
-    (black bold 28pt Arial positioned at the top-center of the viewport)
+    (positioned at the top-center of the viewport)
 
     '''
     bgcolor = (255, 255, 255, 255)
-    footer_align = 'center'
-    default_title_style = ('w//2,h', 'center', 'top', 'Arial', '28', 'yes',
-        'no', 'black')
+    default_title_position = ('w//2,h', 'center', 'top')
+    default_footer_position = ('w//2,0', 'center', 'bottom')
 
-    def __init__(self, content, title=None, footer=None):
+    def __init__(self, content, stylesheet, title=None, footer=None):
         self.content = content
+        self.stylesheet = stylesheet
         self.title = title
         self.footer = footer
 
     def copy(self):
         '''Don't copy the title.
         '''
-        return Decoration(self.content, self.title, self.footer)
+        return Decoration(self.content, self.stylesheet, self.title, self.footer)
 
     def get_viewport(self):
         '''A decoration may specify a smaller viewport than the total
@@ -108,51 +108,67 @@ class Decoration(object):
         self.batch = pyglet.graphics.Batch()
 
         # vars for the eval
-        self.title_style = self.default_title_style
+        self.title_position = self.default_title_position
+        self.footer_position = self.default_footer_position
 
         # parse content
         for line in self.content.splitlines():
             directive, rest = line.split(':', 2)
             getattr(self, 'handle_%s'%directive.strip())(rest.strip())
 
+        # detect explicit viewport limiting to avoid automatic setting below
+        viewport_changed = False
+        if self.limited_viewport != (0, 0, viewport_width, viewport_height):
+            viewport_changed = True
+
         # handle rendering the title if there is one
         if self.title is not None:
-            pos, halign, valign, name, size, bold, italic, color = self.title_style
-
-            # create the title positioning
+            # position
+            pos, halign, valign = self.title_position
             loc = dict(w=self.viewport_width, h=self.viewport_height)
             x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
-            size = int(size)
-            bold = bold.lower() in YES_VALUES
-            italic = italic.lower() in YES_VALUES
-            color = parse_color(color)
+
+            # style
+            name = self.stylesheet.value('title', 'font_name')
+            size = self.stylesheet.value('title', 'font_size')
+            italic = self.stylesheet.value('title', 'italic', False)
+            bold = self.stylesheet.value('title', 'bold', False)
+            color = self.stylesheet.value('title', 'color')
+            align = self.stylesheet.value('title', 'align', 'center')
+
+            # XXX align / anchor
+
+            # and create label
             l = pyglet.text.Label(self.title, name, size, bold, italic, color,
                 x, y, halign=halign, valign=valign, batch=self.batch)
             self.decorations.append(l)
 
-            if self.limited_viewport == (0, 0, viewport_width, viewport_height):
+            # adjust viewport restriction
+            if not viewport_changed:
                 self.limited_viewport = (0, 0, viewport_width, viewport_height -
                     l.content_height)
 
         if self.footer is not None:
-            l = pyglet.text.layout.IncrementalTextLayout(self.footer, viewport_width,
-                viewport_height, multiline=True, batch=self.batch)
-            l.begin_update()
-            l.valign = 'bottom'
-            print 'ALIGN', self.footer_align
-            l.halign = self.footer_align
-            if l.halign == 'center':
-                l.x = viewport_width//2
-            elif l.halign == 'right':
-                l.x = viewport_width
-            l.end_update()
+            # position
+            pos, halign, valign = self.footer_position
+            loc = dict(w=self.viewport_width, h=self.viewport_height)
+            x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
+
+            # XXX align / anchor
+
+            # label
+            l = pyglet.text.DocumentLabel(self.footer, x, y, viewport_width,
+                viewport_height, halign, valign, multiline=True, batch=self.batch)
             self.decorations.append(l)
-            x, y, w, h = self.limited_viewport
-            if y < l.content_height:
-                d = l.content_height - y
-                y = l.content_height
-                h -= d
-                self.limited_viewport = (x, y, w, h)
+
+            # adjust viewport restriction
+            if not viewport_changed:
+                x, y, w, h = self.limited_viewport
+                if y < l.content_height:
+                    d = l.content_height - y
+                    y = l.content_height
+                    h -= d
+                    self.limited_viewport = (x, y, w, h)
 
 
     def handle_image(self, image):
@@ -200,7 +216,7 @@ class Decoration(object):
         self.bgcolor = parse_color(color)
 
     def handle_footer_align(self, align):
-        self.footer_align = align
+        self.footer_position = line.split(':')[1].split(';')
 
     def handle_viewport(self, viewport):
         loc = dict(w=self.viewport_width, h=self.viewport_height)
@@ -208,7 +224,7 @@ class Decoration(object):
             for e in viewport.split(',') if '_' not in e)
 
     def handle_title(self, title):
-        self.title_style = line.split(':')[1].split(';')
+        self.title_position = line.split(':')[1].split(';')
 
     def on_leave(self):
         for decoration in self.decorations:
