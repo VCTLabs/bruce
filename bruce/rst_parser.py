@@ -113,8 +113,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def __init__(self, stylesheet=None):
         super(DocutilsDecoder, self).__init__()
         if not stylesheet:
-            stylesheet = dict(default_stylesheet)
+            stylesheet = default_stylesheet.copy()
         self.stylesheet = stylesheet
+        self.decoration = decoration.Decoration('', stylesheet)
         self.pages = []
         self.document = None
 
@@ -144,10 +145,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def visit_section(self, node):
         '''Add a page
         '''
-        g = DocumentGenerator(self.stylesheet)
+        self.decoration.title = None
+        g = DocumentGenerator(self.stylesheet, self.decoration)
         d = g.decode(node)
         if g.len_text:
-            p = Page(d, copy_stylesheet(self.stylesheet), d.elements)
+            p = Page(d, self.stylesheet.copy(), self.decoration.copy(), d.elements)
             self.pages.append(p)
         raise docutils.nodes.SkipNode
 
@@ -155,9 +157,10 @@ class DummyReporter(object):
     debug = lambda *args: None
 
 class DocumentGenerator(structured.StructuredTextDecoder):
-    def __init__(self, stylesheet):
+    def __init__(self, stylesheet, decoration):
         super(DocumentGenerator, self).__init__()
         self.stylesheet = stylesheet
+        self.decoration = decoration
 
     def decode_structured(self, doctree, location):
         # attach a reporter so docutil's walkabout doesn't get confused by us
@@ -167,7 +170,6 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         # initialise parser
         self.push_style(doctree, self.stylesheet['default'])
         self.in_literal = False
-        self.stylesheet['decoration'].title = None
         self.first_paragraph = True
         self.next_style = dict(self.current_style)
         self.notes = []
@@ -194,7 +196,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def visit_title(self, node):
         # title is handled separately so it may be placed nicely
-        self.stylesheet['decoration'].title = node.children[0].astext().replace('\n', ' ')
+        self.decoration.title = node.children[0].astext().replace('\n', ' ')
         self.prune()
 
     def visit_substitution_definition(self, node):
@@ -394,6 +396,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     # Style and decoration
     #
     def visit_style(self, node):
+        # XXX detect changes in footer style
         for key, value in node.attlist():
             if '.' in key:
                 group, key = key.split('.')
@@ -406,11 +409,23 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         # make sure it's Bruce's decoration node, otherwise it's probably a
         # footer or something
         if hasattr(node, 'get_decoration'):
-            self.stylesheet['decoration'].content = node.get_decoration()
+            self.decoration.content = node.get_decoration()
 
     def visit_footer(self, node):
-        g = DocumentGenerator(self.stylesheet)
-        self.stylesheet['decoration'].footer = g.decode(node)
+        # XXX stop footer from being coalesced into one element!
+        stylesheet = self.stylesheet.copy()
+        # XXX ... or instead of the following perhaps a "default class is" param to
+        # initialise the style (instead of 'default')?
+        stylesheet['default'] = dict(
+            name = self.stylesheet.value('footer', 'font_name'),
+            size = self.stylesheet.value('footer', 'font_size'),
+            italic = self.stylesheet.value('footer', 'italic', False),
+            bold = self.stylesheet.value('footer', 'bold', False),
+            color = self.stylesheet.value('footer', 'color'),
+            align = self.stylesheet.value('footer', 'align', 'center'),
+        )
+        g = DocumentGenerator(stylesheet, None)
+        self.decoration.footer = g.decode(node)
         self.prune()
 
     #

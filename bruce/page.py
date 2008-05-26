@@ -13,11 +13,11 @@ Cocos:
 import pyglet
 
 class Page(pyglet.event.EventDispatcher):
-    def __init__(self, document, stylesheet, elements):
+    def __init__(self, document, stylesheet, decoration, elements):
         self.document = document
         self.stylesheet = stylesheet
         self.elements = elements
-        self.decoration = stylesheet['decoration']
+        self.decoration = decoration
 
     def do_layout(self, x, y, vw, vh):
         '''Invoked as part of on_enter handling.
