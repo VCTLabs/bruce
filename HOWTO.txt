@@ -6,12 +6,9 @@ Bruce presentations are written as plain-text files in the
 ReStructuredText format with some extensions. See the examples
 folder \*.rst files for some samples, the simplest being
 "simple.rst" which displays plain text sentences centered
-on a white background::
+on a white background (using the "big-centered" style)::
 
-    .. style::
-       :layout.valign: center
-       :align: center
-       :font_size: 36
+    .. load-style:: big-centered
 
     Text displayed centered on the default white background.
 

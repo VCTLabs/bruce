@@ -11,50 +11,7 @@ from bruce import rst_parser
 from bruce import presentation
 from bruce import progress
 
-def _window(width, height, fullscreen, screen):
-    display = pyglet.window.get_platform().get_default_display()
-    screen = display.get_screens()[screen]
-    if fullscreen:
-        win = pyglet.window.Window(fullscreen=fullscreen, screen=screen)
-        # XXX on_resize to transform to fit width / height from above
-        win._restore_size = (width, height)
-        return win
-    else:
-        return pyglet.window.Window(width=width, height=height, screen=screen)
-
-def run(filename, fullscreen=False, screen=0, width=1024, height=768,
-        progress_screen=None, show_source=False, **kw):
-    directory = os.path.abspath(os.path.dirname(filename))
-    pyglet.resource.path.append(directory)
-    pyglet.resource.reindex()
-
-    w = _window(width, height, fullscreen, screen)
-    content = file(filename).read()
-    pres = presentation.Presentation(w, rst_parser.parse(content), **kw)
-    w.push_handlers(pres)
-
-    if progress_screen is not None:
-        pw = min(1280, progress_screen.width)
-        ph = min(480, progress_screen.height)
-        if fullscreen:
-            pw = pyglet.window.Window(fullscreen=fullscreen,
-                screen=progress_screen)
-        else:
-            pw = pyglet.window.Window(pw, ph, screen=progress_screen)
-        prog = progress.Progress(pw, pres, content.decode('utf8'))
-        pw.push_handlers(prog)
-        pres.push_handlers(prog)
-        prog.push_handlers(pres)
-
-    if show_source:
-        pres.push_handlers(display_source.DisplaySource())
-
-    # now that we're all set up, load up the first page
-    pres.start_presentation()
-
-    pyglet.app.run()
-
-if __name__ == '__main__':
+def main():
     from optparse import OptionParser
     p = OptionParser()
     p.add_option("-f", "--fullscreen", dest="fullscreen",
@@ -98,25 +55,74 @@ if __name__ == '__main__':
 
     if options.version:
         print __version__
+        sys.exit(0)
+
     elif not args:
         print 'Error: argument required'
         print p.get_usage()
+        sys.exit(1)
+
+    filename = args[0]
+
     #elif options.notes:
     #    notes(args[0], options.out_file, int(options.columns))
+
+    display = pyglet.window.get_platform().get_default_display()
+    screen = int(options.screen)-1
+    screen = display.get_screens()[screen]
+    progress_screen = None
+    if options.progress_screen:
+        progress_screen = int(options.progress_screen)-1
+        progress_screen = display.get_screens()[progress_screen]
+    width, height = map(int, options.window_size.split('x'))
+    width = min(width, screen.width)
+    height = min(height, screen.height)
+    screen=int(options.screen)-1
+
+    directory = os.path.abspath(os.path.dirname(filename))
+    pyglet.resource.path.append(directory)
+    pyglet.resource.reindex()
+
+    display = pyglet.window.get_platform().get_default_display()
+    screen = display.get_screens()[screen]
+    if options.fullscreen:
+        w = pyglet.window.Window(fullscreen=options.fullscreen,
+            screen=screen)
+        # XXX on_resize to transform to fit width / height from above
+        w._restore_size = (width, height)
     else:
-        display = pyglet.window.get_platform().get_default_display()
-        screen = int(options.screen)-1
-        screen = display.get_screens()[screen]
-        progress_screen = None
-        if options.progress_screen:
-            progress_screen = int(options.progress_screen)-1
-            progress_screen = display.get_screens()[progress_screen]
-        width, height = map(int, options.window_size.split('x'))
-        width = min(width, screen.width)
-        height = min(height, screen.height)
-        run(args[0], fullscreen=options.fullscreen,
-            show_timer=options.timer, show_count=options.page_count,
-            start_page=int(options.start_page)-1,
-            progress_screen=progress_screen, show_source=options.source,
-            screen=int(options.screen)-1, width=width, height=height)
+        w = pyglet.window.Window(width=width, height=height,
+            screen=screen)
+
+    content = file(filename).read()
+    pres = presentation.Presentation(w, rst_parser.parse(content),
+        show_timer=options.timer, show_count=options.page_count,
+        start_page=int(options.start_page)-1)
+
+    w.push_handlers(pres)
+
+    if progress_screen is not None:
+        pw = min(1280, progress_screen.width)
+        ph = min(480, progress_screen.height)
+        if options.fullscreen:
+            pw = pyglet.window.Window(fullscreen=options.fullscreen,
+                screen=progress_screen)
+        else:
+            pw = pyglet.window.Window(pw, ph, screen=progress_screen)
+        prog = progress.Progress(pw, pres, content.decode('utf8'))
+        pw.push_handlers(prog)
+        pres.push_handlers(prog)
+        prog.push_handlers(pres)
+
+    if options.source:
+        pres.push_handlers(display_source.DisplaySource())
+
+    # now that we're all set up, load up the first page
+    pres.start_presentation()
+
+    pyglet.app.run()
+
+
+if __name__ == '__main__':
+    main()
 

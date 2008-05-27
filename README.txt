@@ -6,7 +6,8 @@ Bruce the Presentation Tool is for programmers who are tired of fighting
 with presentation tools. In its basic form it allows text, code or image
 pages and video. It uses pyglet and is extensible to add new page types.
 
-Features:
+Bruce 3.0 Features (this being the first 3.0 release)
+=====================================================
 
 - displays ReStructuredText content with one page per section or transition
 - handling of *most* of ReStructuredText, including:

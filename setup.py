@@ -12,46 +12,73 @@ setup(
     description = "Bruce the Presentation Tool",
     long_description = '''Bruce the Presentation Tool is for
 programmers who are tired of fighting with presentation tools. In its
-basic form it allows text, code or image pages and even interactive
-Python sessions. It uses pyglet and is easily extensible to add new
-page types.
+basic form it allows text, code, image and video. It uses pyglet and
+is easily extensible to add new page types.
 
-2.0beta2 released on 2008-03-10 includes:
 
-- add initial text expose effect (fade in)
-- allow configuration to be set per-page and combine page flags and config
-- pause on video EOS
-- allow Pages to communicate back to Presentation through events
-- custom Pages via modules found in resource path
-- resources now much more tightly controlled
-- add Python code + execution page (still has interactivity issues)
-- more robust presentation file parser
-- fix caret positioning on history navigation and in-line editing
-- BrucePoint(tm) styling (bullet points, text page alignment)
-- scale fonts based on the actual viewport size
+Bruce 3.0 Features (this being the first 3.0 release)
+=====================================================
 
-Bruce 2.0 has:
+- displays ReStructuredText content with one page per section or transition
+- handling of *most* of ReStructuredText, including:
 
-- audio playback on any page, including blank ones
-- simple point-by-point text display with styling and progressive expose
-- interactive python interpreter with history
-- code display with scrolling
-- unicode escaped chars in ascii file
-- html page display with scrolling
-- image display with optional title and/or caption
-- configuration may be changed inside a presentation, affecting subsequent pages
-- resource location (images, video, sound from zip files etc.)
+  * inline markup for emphasis, strong and literal
+  * literal and line blocks
+  * block quotes
+  * definition, bullet and enumerated lists (including nesting)
+  * images - inline and stand-alone, including scaling
+  * page titles (section headings)
+
+- page decorations
+- scrolling of content larger than a screenful
+- sensible resource location (images, video, sound from the same directory
+  as the presentation file)
+- and some extensions of ReST:
+
+  * videos (embedded just like images) with optional looping
+  * stylsheet and decoration changes on the fly (eg. multiple fonts
+    per page)
+
 - timer and page count display for practicing
-- logo display in the corner of every page
 - may specify which screen to open on in multihead
-- may switch to/from fullscreen
-- HTML output of pages including notes
-- video playback
+- runs fullscreen at native resolution
+- may switch to/from fullscreen quickly
+
+
+How to write presentations using Bruce the Presentation Tool
+============================================================
+
+Bruce presentations are written as plain-text files in the
+ReStructuredText format with some extensions. See the examples
+folder \*.rst files for some samples, the simplest being
+"simple.rst" which displays plain text sentences centered
+on a white background (using the "big-centered" style)::
+
+    .. load-style:: big-centered
+
+    Text displayed centered on the default white background.
+
+    ----
+
+    A new page, separated from the previous using the four
+    dashes.
+
+    Ut enim ad minim veniam.
+
+    A Page Title
+    ------------
+
+    Pages may optionally have titles which are displayed
+    centered at the top by default.
+
+and so on.
+
 ''',
     author = "Richard Jones",
     author_email = "richard@mechanicalcat.net",
     url = "http://bruce.python-hosting.com/",
     packages = ["bruce"],
+    scripts = ['scripts/bruce'],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Topic :: Multimedia :: Graphics :: Presentation',

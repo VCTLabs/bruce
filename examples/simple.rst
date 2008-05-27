@@ -2,10 +2,7 @@
    This is a simple demonstration of Bruce, the Presentation Tool's
    ReStructuredText most basic capabilities.
 
-.. style::
-   :layout.valign: center
-   :align: center
-   :font_size: 36
+.. load-style:: big-centered
 
 Text displayed centered on the default white background.
 
