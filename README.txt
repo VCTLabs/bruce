@@ -6,6 +6,7 @@ Bruce the Presentation Tool is for programmers who are tired of fighting
 with presentation tools. In its basic form it allows text, code or image
 pages and video. It uses pyglet and is extensible to add new page types.
 
+
 Bruce 3.0 Features (this being the first 3.0 release)
 =====================================================
 
@@ -38,7 +39,8 @@ Bruce 3.0 Features (this being the first 3.0 release)
 Installation
 ============
 
-Bruce REQUIRES Python 2.5 and pyglet 1.1
+Bruce REQUIRES Python 2.5 and pyglet latest Subversion (or 1.1 final when
+it's released)
 
 To install Bruce, run::
 
@@ -48,8 +50,7 @@ To install Bruce, run::
 Usage
 =====
 
-Run Bruce using "python -m bruce <arguments>". Use the -h switch to get usage
-help.
+Run Bruce using "bruce <arguments>". Use the -h switch to get usage help.
 
 See HOWTO.txt for the presentation file format.
 
