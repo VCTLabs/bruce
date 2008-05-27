@@ -1,9 +1,9 @@
 .. decoration::
    image: pyglet-trans-64.png
 
-left, top
+text left, top
 
-image left bottom
+decoration image left bottom
 
 ----
 
@@ -15,9 +15,9 @@ image left bottom
 .. decoration::
    image: pyglet-trans-64.png;halign=center;valign=top
 
-centered?
+text centered
 
-image center top
+decoration image center top
 
 ----
 
@@ -28,6 +28,6 @@ image center top
 .. decoration::
    image: pyglet-trans-64.png;halign=right;valign=center
 
-right, bottom
+text right, bottom
 
-image right center
+decoration image right center

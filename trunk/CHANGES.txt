@@ -1,4 +1,9 @@
-2.0beta4 - 2008-03-??
+3.0beta1
+
+Rewritten to use ReStructuredText as the input format
+
+
+2.0beta4 - unreleased
 
 - initial second-display window with source and progress display
 - refactoring based on new event: presentation dispatching on_page_changed

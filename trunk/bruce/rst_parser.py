@@ -395,6 +395,12 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     #
     # Style and decoration
     #
+    def visit_load_style(self, node):
+        self.stylesheet.update(stylesheets[node.get_style()])
+        self.stack = []
+        self.push_style('default', self.stylesheet['default'])
+        self.next_style = dict(self.current_style)
+
     def visit_style(self, node):
         # XXX detect changes in footer style
         for key, value in node.attlist():

@@ -30,6 +30,17 @@ def valignment(argument):
 #
 # Style directive
 #
+class load_style(nodes.Special, nodes.Invisible, nodes.Element):
+    def get_style(self):
+        # XXX do the load...
+        return self.rawsource
+def load_style_directive(name, arguments, options, content, lineno,
+                          content_offset, block_text, state, state_machine):
+    return [ load_style(arguments[0]) ]
+load_style_directive.arguments = (1, 0, 1)
+load_style_directive.content = False
+directives.register_directive('load-style', load_style_directive)
+
 class style(nodes.Special, nodes.Invisible, nodes.Element):
     def get_style(self):
         return self.rawsource
@@ -111,8 +122,20 @@ default_stylesheet = Stylesheet(
     layout = dict(
         valign='top',
     ),
-    #decoration = Decoration(''),
 )
 
-__all__ = ['default_stylesheet']
+big_centered = default_stylesheet.copy()
+big_centered['default']['font_size'] = 48
+big_centered['default']['align'] = 'center'
+big_centered['default']['margin_bottom'] = 32
+big_centered['literal']['font_size'] = 48
+big_centered['title']['font_size'] = 64
+big_centered['layout']['valign'] = 'center'
+
+stylesheets = {
+    'default': default_stylesheet,
+    'big-centered': big_centered,
+}
+
+__all__ = ['default_stylesheet', 'stylesheets']
 
