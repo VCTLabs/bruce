@@ -45,6 +45,19 @@ Bruce 3.0 Features (this being the first 3.0 release)
 - may switch to/from fullscreen quickly
 
 
+
+Installation
+============
+
+Bruce REQUIRES Python 2.5 and pyglet latest Subversion (or 1.1 final when
+it's released)
+
+To install Bruce, run::
+
+    # python setup.py install
+
+
+
 How to write presentations using Bruce the Presentation Tool
 ============================================================
 
@@ -72,7 +85,6 @@ on a white background (using the "big-centered" style)::
     centered at the top by default.
 
 and so on.
-
 ''',
     author = "Richard Jones",
     author_email = "richard@mechanicalcat.net",

@@ -37,9 +37,6 @@ Some more |biohazard| **bold** text.
 .. style::
    :default.font_name: Times New Roman
 
-----
-
-.. video:: tada.avi
 
 Page 2
 ------

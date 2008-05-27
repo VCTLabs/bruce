@@ -23,8 +23,8 @@ decoration_directive.content = True
 directives.register_directive('decoration', decoration_directive)
 
 class QuadGroup(pyglet.graphics.Group):
-    def __init__(self, blend_src=GL_SRC_ALPHA, blend_dest=GL_ONE_MINUS_SRC_ALPHA,
-            parent=None):
+    def __init__(self, blend_src=GL_SRC_ALPHA,
+            blend_dest=GL_ONE_MINUS_SRC_ALPHA, parent=None):
         super(QuadGroup, self).__init__(parent)
         self.blend_src = blend_src
         self.blend_dest = blend_dest
@@ -61,11 +61,11 @@ class Decoration(object):
 
     Quad vertex color carries over if it's not specified for each vertex,
     allowing either solid color or blending.
- 
+
     XXX allow expressions to reference the title's position and dimensions
 
-    Colors are specified in HTML format with either three or four channels (if three
-    then the fourth, alpha channel is set to 255).
+    Colors are specified in HTML format with either three or four channels
+    (if three then the fourth, alpha channel is set to 255).
 
     Vertexes may be expressions (which will be eval()'ed). The expressions have
     the variables "w" and "h" available which are the width and height of the
@@ -91,7 +91,8 @@ class Decoration(object):
     def copy(self):
         '''Don't copy the title.
         '''
-        return Decoration(self.content, self.stylesheet, self.title, self.footer)
+        return Decoration(self.content, self.stylesheet, self.title,
+            self.footer)
 
     def get_viewport(self):
         '''A decoration may specify a smaller viewport than the total
@@ -99,9 +100,9 @@ class Decoration(object):
         '''
         return self.limited_viewport
 
-    def on_enter(self, viewport_width, viewport_height):
-        self.viewport_width, self.viewport_height = viewport_width, viewport_height
-        self.limited_viewport = (0, 0, viewport_width, viewport_height)
+    def on_enter(self, vw, vh):
+        self.viewport_width, self.viewport_height = vw, vh
+        self.limited_viewport = (0, 0, vw, vh)
 
         self.decorations = []
         self.images = []
@@ -118,7 +119,7 @@ class Decoration(object):
 
         # detect explicit viewport limiting to avoid automatic setting below
         viewport_changed = False
-        if self.limited_viewport != (0, 0, viewport_width, viewport_height):
+        if self.limited_viewport != (0, 0, vw, vh):
             viewport_changed = True
 
         # handle rendering the title if there is one
@@ -145,8 +146,7 @@ class Decoration(object):
 
             # adjust viewport restriction
             if not viewport_changed:
-                self.limited_viewport = (0, 0, viewport_width, viewport_height -
-                    l.content_height)
+                self.limited_viewport = (0, 0, vw, vh - l.content_height)
 
         if self.footer is not None:
             # position
@@ -157,8 +157,8 @@ class Decoration(object):
             # XXX align / anchor
 
             # label
-            l = pyglet.text.DocumentLabel(self.footer, x, y, viewport_width,
-                viewport_height, halign, valign, multiline=True, batch=self.batch)
+            l = pyglet.text.DocumentLabel(self.footer, x, y, vw, vh,
+                halign, valign, multiline=True, batch=self.batch)
             self.decorations.append(l)
 
             # adjust viewport restriction
@@ -169,6 +169,11 @@ class Decoration(object):
                     y = l.content_height
                     h -= d
                     self.limited_viewport = (x, y, w, h)
+
+    def on_leave(self):
+        for decoration in self.decorations:
+            decoration.delete()
+        self.batch = None
 
 
     def handle_image(self, image):
@@ -205,7 +210,8 @@ class Decoration(object):
                 cur_color = parse_color(entry[1:])
             elif entry[0] == 'V':
                 if cur_color is None:
-                    raise ValueError('invalid quad spec %r: needs color first'%quad)
+                    raise ValueError(
+                        'invalid quad spec %r: needs color first'%quad)
                 c.extend(cur_color)
                 v.extend([eval(e, {}, loc) for e in entry[1:].split(',')
                     if '_' not in e])
@@ -226,28 +232,11 @@ class Decoration(object):
     def handle_title(self, title):
         self.title_position = line.split(':')[1].split(';')
 
-    def on_leave(self):
-        for decoration in self.decorations:
-            decoration.delete()
-        self.batch = None
-
     def draw(self):
-        # set the clear color which is specified in 0-255 (and glClearColor
-        # takes 0-1)
         glPushAttrib(GL_COLOR_BUFFER_BIT)
         glClearColor(*self.bgcolor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glPopAttrib()
 
         self.batch.draw()
-
-    @classmethod
-    def as_html(cls, content, **kw):
-        return ''
-
-    @classmethod
-    def as_page(cls, content, **kw):
-        from bruce.config import config
-        config['decoration'] = cls(content, **kw)
-        return None
 
