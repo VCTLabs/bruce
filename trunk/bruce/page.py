@@ -101,6 +101,8 @@ class Page(pyglet.event.EventDispatcher):
     def on_leave(self):
         '''Invoked when the page is removed from the screen.
         '''
+        if self._cb_hide_mouse_scheduled:
+            self.cb_hide_mouse(0)
         self.decoration.on_leave()
         for element in self.elements:
             element.on_leave()
@@ -118,7 +120,20 @@ class Page(pyglet.event.EventDispatcher):
         self.layout.view_x -= scroll_x
         self.layout.view_y += scroll_y * 32
 
-    # XXX scroll by dragging
+    def on_mouse_motion(self, x, y, dx, dy):
+        self.dispatch_event('set_mouse_visible', True)
+
+        if not self._cb_hide_mouse_scheduled:
+            pyglet.clock.schedule_once(self.cb_hide_mouse, 2)
+            self._cb_hide_mouse_scheduled = True
+
+    _cb_hide_mouse_scheduled = False
+    def cb_hide_mouse(self, dt):
+        self._cb_hide_mouse_scheduled = False
+        self.dispatch_event('set_mouse_visible', False)
+
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        self.layout.view_y -= dy
 
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')
