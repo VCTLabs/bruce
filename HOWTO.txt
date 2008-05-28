@@ -49,20 +49,6 @@ Bruce supports a large amount of ReStructuredText:
 - images - inline and stand-alone
 - page titles (section headings)
 
-The rendering stylesheet may be altered on the fly using the ".. style::"
-directive. Changes made in this way are immediate and affect all subsequent
-text. The exception to this is the "layout" style which applies to the
-entire current and subsequent pages.
-
-The page decoration may also be defined on the fly. Unlike the stylesheet
-which may be modified, the page decoration must be specified entirely with
-each directive. The decoration directive applies to the current and subsequent
-pages. The decoration also controls the placement of the page title.
-
-A blank decoration directive ".. decoration::" will result in
-the default decoration having a white background and the page title centered
-at the top of the page.
-
 **images**
     A ``:width:`` and/or ``:height:`` may be specified to scale the image when displayed.
     If only one is specified then the image's other dimension will be scaled
@@ -72,3 +58,98 @@ at the top of the page.
     Embedded in the same manner as images, and may be scaled in the same way.
     Additionally video may be asked to loop using the ``:loop:`` flag.
 
+
+Style Changes
+-------------
+
+The rendering stylesheet may be altered on the fly using the ".. style::"
+directive. Changes made in this way are immediate and affect all subsequent
+text. The exception to this is the "layout" style which applies to the
+entire current and subsequent pages.
+
+The stylesheet is broken up into sections: default, literal, emphasis, strong,
+title, footer, block_quote, line_block and literal_block.
+
+Default, title and footer may specify an alignment.
+
+Default, literal_block and line_block may specify margin_left, margin_right,
+margin_top and margin_bottom.
+
+All sections except literal_block may specify character styling in color,
+font_size, font_name, old and italic.
+
+**color**
+    Specified as an HTML-like RGB or RGBA hex value, eg. '#ff00ff' for red=255,
+    green=0 and blue=255, ie. purple. May also use the common HTML color names
+    like "red", "white", "gray" etc.
+**font_size**
+    Size in points of the font.
+**font_name**
+    Name of the font. Must be loadable using pyglet.resource.font, so must be
+    discoverable using pyglet.resource. Use the inspect_font.py tool in the
+    pyglet distribution to discover a font file's name and other attributes
+    if you're not sure.
+**bold**
+    Use a font's bold variant.
+**italic**
+    Use a font's italic variant.
+**alignment**
+    One of 'left' (default), 'center' or 'right'.
+**margin_left, margin_right, margin_top and margin_bottom**
+    Margins surrounding paragraphs specified in pixels.
+
+The default stylesheet contains:
+
+XXX check block margin left values
+
+        default.font_name=Arial
+        default.font_size=20
+        default.margin_bottom=12,
+        default.align=left
+        default.color=black
+        emphasis.italic
+        strong.bold
+        literal.font_name=Courier New
+        literal.font_size=20
+        literal_block.margin_left=20
+        line_block.margin_left=40
+        block_quote.italic
+        title.font_size=28
+        title.align=center
+        title.bold
+        footer.font_size=16
+        footer.align=center
+        footer.italic
+        layout.valign=top
+
+
+The "default" group is used as a fallback when a particular style is looked up and
+no explicit attribute is set. Thus all text is rendered in 'Arial' by default, except
+in literal text where 'Courier New' is used. You may set 'title.font_name' to override
+the font used in the title or 'default.font_name' to override the font used everywhere
+(except literal text). You may refer to defaults using bare style attributes, so
+the following are both equivalent:
+
+- default.font_name
+- font_name
+
+Style changes are specified using the style directive. To change the font to
+64-point bold, you would::
+
+   .. style::
+      :font_size: 64
+      :bold:
+
+To change a single style element you may 
+
+Page Decoration
+---------------
+
+The page decoration may also be defined on the fly. Unlike the stylesheet
+which may be modified, the page decoration must be specified entirely with
+each directive. The decoration directive applies to the current and subsequent
+pages. The decoration also controls the placement of the page title.
+
+A blank decoration directive ".. decoration::" will result in
+the default decoration having a white background and the page title centered
+at the top of the page.
