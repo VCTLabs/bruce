@@ -132,8 +132,8 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         # position
         self.layout.begin_update()
         self.layout.x = x
-        self.layout.y = y
-        self.layout.valign = 'bottom'
+        self.layout.y = 0
+        self.layout.valign = 'top'
         self.layout.end_update()
 
         # store off a reference to the surrounding layout's group so we can
@@ -147,7 +147,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def remove(self, layout):
         self.layout.delete()
         self.quad.delete()
-        self.caret = None
+        self.caret.delete()
 
     doing_more = False
     def on_key_press(self, symbol, modifiers):
@@ -240,7 +240,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         # on key press always move the view to the bottom of the screen
         if self.layout.height < self.layout.content_height:
             self.layout.valign = 'bottom'
-            self.layout.y = 0
+            self.layout.y = -self.layout.height
             self.layout.view_y = 0
         if self.caret.position < self.start_of_line:
             self.caret.position = len(self.document.text)

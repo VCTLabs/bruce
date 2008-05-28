@@ -13,9 +13,6 @@ from docutils.parsers.rst import directives
 
 from bruce.color import parse_color
 
-#from bruce.decoration import Decoration
-
-# XXX validate the values here
 def is_boolean(value, boolean_true = set('yes true on'.split())):
     return value in boolean_true
 def stripped(argument):
@@ -32,8 +29,10 @@ def valignment(argument):
 #
 class load_style(nodes.Special, nodes.Invisible, nodes.Element):
     def get_style(self):
-        # XXX do the load...
-        return self.rawsource
+        if self.rawsource in stylesheets:
+            return stylesheets[self.rawsource]
+        else:
+            raise NotImplementedError('loading of stylesheets not implemented')
 def load_style_directive(name, arguments, options, content, lineno,
                           content_offset, block_text, state, state_machine):
     return [ load_style(arguments[0]) ]
@@ -51,10 +50,9 @@ def style_directive(name, arguments, options, content, lineno,
 style_directive.arguments = (0, 0, 0)
 style_directive.options = {
      'layout.valign': valignment,
-     'block_quote.italic': is_boolean,
-     'block_quote.bold': is_boolean,
 }
-for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.', 'footer.'):
+for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
+        'footer.', 'block_quote.'):
     style_directive.options[group + 'color'] = color
     style_directive.options[group + 'font_size'] = directives.positive_int
     style_directive.options[group + 'font_name'] = stripped
@@ -125,11 +123,11 @@ default_stylesheet = Stylesheet(
 )
 
 big_centered = default_stylesheet.copy()
-big_centered['default']['font_size'] = 48
+big_centered['default']['font_size'] = 64
 big_centered['default']['align'] = 'center'
 big_centered['default']['margin_bottom'] = 32
-big_centered['literal']['font_size'] = 48
-big_centered['title']['font_size'] = 64
+big_centered['literal']['font_size'] = 64
+big_centered['title']['font_size'] = 84
 big_centered['layout']['valign'] = 'center'
 
 stylesheets = {
@@ -137,5 +135,5 @@ stylesheets = {
     'big-centered': big_centered,
 }
 
-__all__ = ['default_stylesheet', 'stylesheets']
+__all__ = ['default_stylesheet']
 
