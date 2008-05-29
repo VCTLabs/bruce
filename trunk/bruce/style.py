@@ -18,6 +18,8 @@ def is_boolean(value, boolean_true = set('yes true on'.split())):
 def stripped(argument):
     return argument and argument.strip() or ''
 def color(argument):
+    if not argument:
+        return None
     return parse_color(argument)
 def halignment(argument):
     return directives.choice(argument, ('left', 'center', 'right'))
@@ -54,6 +56,7 @@ style_directive.options = {
 for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
         'footer.', 'block_quote.'):
     style_directive.options[group + 'color'] = color
+    style_directive.options[group + 'background_color'] = color
     style_directive.options[group + 'font_size'] = directives.positive_int
     style_directive.options[group + 'font_name'] = stripped
     style_directive.options[group + 'bold'] = is_boolean
@@ -96,6 +99,7 @@ default_stylesheet = Stylesheet(
     literal = dict(
         font_name='Courier New',
         font_size=20,
+        background_color=(220, 220, 220, 255),
     ),
     literal_block = dict(
         margin_left=20,

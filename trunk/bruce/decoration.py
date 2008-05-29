@@ -218,6 +218,7 @@ class Decoration(object):
         self.decorations.append(q)
 
     def handle_bgcolor(self, color):
+        print 'BGCOLOR', `color`
         self.bgcolor = parse_color(color)
 
     def handle_footer_align(self, align):
