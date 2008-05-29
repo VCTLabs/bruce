@@ -158,10 +158,11 @@ class DummyReporter(object):
     debug = lambda *args: None
 
 class DocumentGenerator(structured.StructuredTextDecoder):
-    def __init__(self, stylesheet, decoration):
+    def __init__(self, stylesheet, decoration, style_base_class='default'):
         super(DocumentGenerator, self).__init__()
         self.stylesheet = stylesheet
         self.decoration = decoration
+        self.style_base_class = style_base_class
 
     def decode_structured(self, doctree, location):
         # attach a reporter so docutil's walkabout doesn't get confused by us
@@ -169,7 +170,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         doctree.reporter = DummyReporter()
 
         # initialise parser
-        self.push_style(doctree, self.stylesheet['default'])
+        self.push_style(doctree, self.stylesheet[self.style_base_class])
         self.in_literal = False
         self.first_paragraph = True
         self.next_style = dict(self.current_style)
@@ -353,7 +354,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.in_item = False
 
     def visit_block_quote(self, node):
-        style = self.stylesheet['default'].copy()
+        style = self.stylesheet[self.style_base_class].copy()
         left_margin = self.current_style.get('margin_left') or 0
         tab_stops = self.current_style.get('tab_stops')
         if tab_stops:
@@ -420,18 +421,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def visit_footer(self, node):
         # XXX stop footer from being coalesced into one element!
-        stylesheet = self.stylesheet.copy()
-        # XXX ... or instead of the following perhaps a "default class is" param to
-        # initialise the style (instead of 'default')?
-        stylesheet['default'] = dict(
-            name = self.stylesheet.value('footer', 'font_name'),
-            size = self.stylesheet.value('footer', 'font_size'),
-            italic = self.stylesheet.value('footer', 'italic', False),
-            bold = self.stylesheet.value('footer', 'bold', False),
-            color = self.stylesheet.value('footer', 'color'),
-            align = self.stylesheet.value('footer', 'align', 'center'),
-        )
-        g = DocumentGenerator(stylesheet, None)
+        g = DocumentGenerator(self.stylesheet, None, style_base_class='footer')
         self.decoration.footer = g.decode(node)
         self.prune()
 
@@ -440,11 +430,18 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     #
     def visit_resource(self, node):
         resource_name = node.get_resource()
-        # XXX
-        #if not os.path.isabs(resource_name):
-            #resource_name = os.path.join(config.get('directory'), line)
         if resource_name.lower().endswith('.ttf'):
             pyglet.resource.add_font(resource_name)
+        elif not os.path.isabs(resource_name):
+            # try to find the resource inside an existing resource directory
+            for path in pyglet.resource.path:
+                if not os.path.isdir(path): continue
+                p = os.path.join(path, resource_name)
+                if os.path.exists(p):
+                    pyglet.resource.path.append(p)
+                    break
+            else:
+                raise ValueError('Resource %s not found'%resource_name)
         else:
             pyglet.resource.path.append(resource_name)
         pyglet.resource.reindex()

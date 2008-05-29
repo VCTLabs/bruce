@@ -57,6 +57,7 @@ class Decoration(object):
         footer:x,y;hanchor;vanchor
         title:x,y;hanchor;vanchor
         image:filename;halign=right;valign=bottom
+        viewport:x,y,w,h
         quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
 
     Quad vertex color carries over if it's not specified for each vertex,
