@@ -62,7 +62,7 @@ Bruce supports a large amount of ReStructuredText:
 Style Changes
 -------------
 
-The rendering stylesheet may be altered on the fly using the ".. style::"
+The rendering stylesheet may be altered on the fly using the ``.. style::``
 directive. Changes made in this way are immediate and affect all subsequent
 text. The exception to this is the "layout" style which applies to the
 entire current and subsequent pages.
@@ -88,7 +88,7 @@ font_size, font_name, old and italic.
     Name of the font. Must be loadable using pyglet.resource.font, so must be
     discoverable using pyglet.resource. Use the inspect_font.py tool in the
     pyglet distribution to discover a font file's name and other attributes
-    if you're not sure.
+    if you're not sure. You may add new fonts using the resource directive.
 **bold**
     Use a font's bold variant.
 **italic**
@@ -98,40 +98,35 @@ font_size, font_name, old and italic.
 **margin_left, margin_right, margin_top and margin_bottom**
     Margins surrounding paragraphs specified in pixels.
 
-The default stylesheet contains:
+The default stylesheet contains::
 
-XXX check block margin left values
-
-        default.font_name=Arial
-        default.font_size=20
-        default.margin_bottom=12,
-        default.align=left
-        default.color=black
-        emphasis.italic
-        strong.bold
-        literal.font_name=Courier New
-        literal.font_size=20
-        literal_block.margin_left=20
-        line_block.margin_left=40
-        block_quote.italic
-        title.font_size=28
-        title.align=center
-        title.bold
-        footer.font_size=16
-        footer.align=center
-        footer.italic
-        layout.valign=top
-
+    default.font_name = Arial
+    default.font_size = 20
+    default.margin_bottom = 12
+    default.align = left
+    default.color = black
+    emphasis.italic = yes
+    strong.bold = yes
+    literal.font_name = Courier New
+    literal.font_size = 20
+    literal_block.margin_left = 20
+    line_block.margin_left = 40
+    block_quote.italic
+    title.font_size = 28
+    title.align = center
+    title.bold = yes
+    footer.font_size = 16
+    footer.align = center
+    footer.italic = yes
+    layout.valign = top
 
 The "default" group is used as a fallback when a particular style is looked up and
 no explicit attribute is set. Thus all text is rendered in 'Arial' by default, except
 in literal text where 'Courier New' is used. You may set 'title.font_name' to override
 the font used in the title or 'default.font_name' to override the font used everywhere
 (except literal text). You may refer to defaults using bare style attributes, so
-the following are both equivalent:
+``default.font_name`` and ``font_name`` are both equivalent.
 
-- default.font_name
-- font_name
 
 Style changes are specified using the style directive. To change the font to
 64-point bold, you would::
@@ -142,6 +137,7 @@ Style changes are specified using the style directive. To change the font to
 
 To change a single style element you may 
 
+
 Page Decoration
 ---------------
 
@@ -150,6 +146,96 @@ which may be modified, the page decoration must be specified entirely with
 each directive. The decoration directive applies to the current and subsequent
 pages. The decoration also controls the placement of the page title.
 
-A blank decoration directive ".. decoration::" will result in
+A blank decoration directive ``.. decoration::`` will result in
 the default decoration having a white background and the page title centered
 at the top of the page.
+
+Decorations actually control a few elements of display:
+
+**background color**
+   The background color is specified using the HTML-like notation used in styles.
+   The color is specified using::
+
+        bgcolor: <color spec>
+
+**title positioning**
+   The position of the title is controlled here. The style of the title is controlled
+   by the stylesheet. The title is specified as::
+
+        title:x,y;hanchor;vanchor
+
+   The default "title" is::
+
+        title:w//2,h;center;top
+
+    (positioned at the top-center of the viewport and anchored in the center/top
+    of the text)
+
+**footer positioning**
+   The position of the footer is controlled here. The style of the footer is controlled
+   by the stylesheet. The footer is specified as::
+
+        footer:x,y;hanchor;vanchor
+
+   The default "footer" is::
+
+        footer:w,0;right;bottom
+
+    (positioned at the bottom-right of the viewport and anchored in the right/bottom
+    of the text)
+
+**viewport**
+   You may restrict the size of the display usable by pages. By default some space
+   is allocated so the page contents don't overwrite the page title and footer, if they
+   are present. The viewport is specified as::
+
+        viewport:x,y,width,height
+
+   Giving the bottom-left corner x,y position and the width and height.
+
+**quad-based decoration**
+   You may draw quads on the page which will appear under any content. The quads may
+   have gradients by specifying different colors for each corner. The syntax for
+   specifying a quad is::
+
+        quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
+
+   Quad vertex color carries over if it's not specified for each vertex,
+   allowing either solid color or blending.
+
+   Colors are specified in HTML format with either three or four channels
+   (if three then the fourth, alpha channel is set to 255).
+
+All positions (quad vertexes, title position, etc) may be Python expressions which will
+be evaluated. The expressions have the variables "w" and "h" available which are
+the width and height of the presentation viewport. To center the title, for example,
+the width could be specified as:
+
+    w//2
+
+Which will divide the width by two producing an integer (always try to produce an
+integer as it will result in more pleasing rendering).
+
+
+Resource Discovery
+------------------
+
+Bruce can display images and video found in the same directory as the
+presentation source. You may enable Bruce to search additional paths
+to find images and video. Additionally you may load new fonts for display 
+by referring to TrueType Font files. You do so using the ``.. resource::``
+directive.
+
+**adding a directory of resources**::
+
+    .. resource:: <path to directory>
+
+**adding a font file**::
+
+    .. resource:: <font filename>.ttf
+
+To refer to the font later you'll need to know its name, which may differ
+from the filename. You may use the inspect_font.py tool in the pyglet
+source to do so.
+
+
