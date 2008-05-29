@@ -127,15 +127,16 @@ the font used in the title or 'default.font_name' to override the font used ever
 (except literal text). You may refer to defaults using bare style attributes, so
 ``default.font_name`` and ``font_name`` are both equivalent.
 
-
 Style changes are specified using the style directive. To change the font to
 64-point bold, you would::
 
    .. style::
       :font_size: 64
-      :bold:
+      :bold: yes
 
-To change a single style element you may 
+To change a single style element you may have the declaration on a single line::
+
+   .. style:: :font_size: 64
 
 
 Page Decoration
@@ -168,8 +169,8 @@ Decorations actually control a few elements of display:
 
         title:w//2,h;center;top
 
-    (positioned at the top-center of the viewport and anchored in the center/top
-    of the text)
+   Which will be positioned at the top-center of the viewport and anchored
+   in the center/top of the text.
 
 **footer positioning**
    The position of the footer is controlled here. The style of the footer is controlled
@@ -181,8 +182,8 @@ Decorations actually control a few elements of display:
 
         footer:w,0;right;bottom
 
-    (positioned at the bottom-right of the viewport and anchored in the right/bottom
-    of the text)
+   Which will be positioned at the bottom-right of the viewport and anchored
+   in the right/bottom of the text.
 
 **viewport**
    You may restrict the size of the display usable by pages. By default some space
