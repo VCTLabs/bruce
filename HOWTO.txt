@@ -3,10 +3,14 @@ How to write presentations using Bruce the Presentation Tool
 ============================================================
 
 Bruce presentations are written as plain-text files in the
-ReStructuredText format with some extensions. See the examples
-folder \*.rst files for some samples, the simplest being
-"simple.rst" which displays plain text sentences centered
-on a white background (using the "big-centered" style)::
+ReStructuredText format with some extensions. If you have
+access to this HOWTO file in its original text format you
+may view it using Bruce (the HTML version is produced using
+the standard rst2html conversion tool.)
+
+See the examples folder \*.rst files for some samples, the
+simplest being "simple.rst" which displays plain text sentences
+centered on a white background (using the "big-centered" style)::
 
     .. load-style:: big-centered
 
@@ -27,16 +31,19 @@ on a white background (using the "big-centered" style)::
 
 and so on.
 
+There's a lot of examples in the examples/ directory, showing off
+most of Bruce's features.
+
 
 More Detail
 -----------
 
 Pages in Bruce are defined as being the text contained in a section
-or between transitions (horizontal rules, ``----``). It is important that a blank
-surrounds the transition line, otherwise ReST might try to interpret it as a 
-title (which will often mean resulting in a parsing error). See
-``examples/test_sectioning.rst`` for a file that mixes section-based and transition-based
-page delimiting.
+or between transitions (horizontal rules, ``----``). It is important
+that a blank surrounds the transition line, otherwise ReST might
+try to interpret it as a title (which will often mean resulting in
+a parsing error). See "examples/test_sectioning.rst" for a file
+that mixes section-based and transition-based page delimiting.
 
 Bruce supports a large amount of ReStructuredText:
 
@@ -76,12 +83,14 @@ Default, literal_block and line_block may specify margin_left, margin_right,
 margin_top and margin_bottom.
 
 All sections except literal_block may specify character styling in color,
-font_size, font_name, old and italic.
+background_color, font_size, font_name, old and italic.
 
 **color**
-    Specified as an HTML-like RGB or RGBA hex value, eg. '#ff00ff' for red=255,
+    Specified as an HTML-like RGB or RGBA hex value, eg. ``#ff00ff`` for red=255,
     green=0 and blue=255, ie. purple. May also use the common HTML color names
-    like "red", "white", "gray" etc.
+    like ``red``, ``white``, ``gray`` etc.
+**background_color**
+    Specified as per color above, indicates the color to place behind the text.
 **font_size**
     Size in points of the font.
 **font_name**
@@ -90,11 +99,11 @@ font_size, font_name, old and italic.
     pyglet distribution to discover a font file's name and other attributes
     if you're not sure. You may add new fonts using the resource directive.
 **bold**
-    Use a font's bold variant.
+    Use a font's bold variant. Use ``yes`` or ``no``.
 **italic**
-    Use a font's italic variant.
+    Use a font's italic variant. Use ``yes`` or ``no``.
 **alignment**
-    One of 'left' (default), 'center' or 'right'.
+    One of ``left`` (default), ``center`` or ``right``.
 **margin_left, margin_right, margin_top and margin_bottom**
     Margins surrounding paragraphs specified in pixels.
 
@@ -109,6 +118,7 @@ The default stylesheet contains::
     strong.bold = yes
     literal.font_name = Courier New
     literal.font_size = 20
+    literal.background_color = #e0e0e0
     literal_block.margin_left = 20
     line_block.margin_left = 40
     block_quote.italic
@@ -121,9 +131,9 @@ The default stylesheet contains::
     layout.valign = top
 
 The "default" group is used as a fallback when a particular style is looked up and
-no explicit attribute is set. Thus all text is rendered in 'Arial' by default, except
-in literal text where 'Courier New' is used. You may set 'title.font_name' to override
-the font used in the title or 'default.font_name' to override the font used everywhere
+no explicit attribute is set. Thus all text is rendered in ``Arial`` by default, except
+in literal text where ``Courier New`` is used. You may set ``title.font_name`` to override
+the font used in the title or ``default.font_name`` to override the font used everywhere
 (except literal text). You may refer to defaults using bare style attributes, so
 ``default.font_name`` and ``font_name`` are both equivalent.
 
@@ -165,11 +175,11 @@ Decorations actually control a few elements of display:
 
         title:x,y;hanchor;vanchor
 
-   The default "title" is::
+   The default ``title`` is::
 
         title:w//2,h;center;top
 
-   Which will be positioned at the top-center of the viewport and anchored
+   Which positions the title at the top-center of the viewport, anchored
    in the center/top of the text.
 
 **footer positioning**
@@ -178,11 +188,11 @@ Decorations actually control a few elements of display:
 
         footer:x,y;hanchor;vanchor
 
-   The default "footer" is::
+   The default ``footer`` is::
 
         footer:w,0;right;bottom
 
-   Which will be positioned at the bottom-right of the viewport and anchored
+   Which positions the foorer at the bottom-right of the viewport, anchored
    in the right/bottom of the text.
 
 **viewport**
@@ -210,9 +220,7 @@ Decorations actually control a few elements of display:
 All positions (quad vertexes, title position, etc) may be Python expressions which will
 be evaluated. The expressions have the variables "w" and "h" available which are
 the width and height of the presentation viewport. To center the title, for example,
-the width could be specified as:
-
-    w//2
+the width could be specified as ``w//2``.
 
 Which will divide the width by two producing an integer (always try to produce an
 integer as it will result in more pleasing rendering).
