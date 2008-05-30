@@ -54,7 +54,6 @@ class MyScrollableTextLayoutGroup(pyglet.text.layout.ScrollableTextLayoutGroup):
                   self._scissor_height)
         glTranslatef(self.translate_x, self.translate_y, 0)
 
-
 class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
     def _init_groups(self, group):
         # override with our scrolledd scrollable ... er layout
@@ -120,7 +119,19 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def on_leave(self):
         self.document = None
 
+    layout = None
     def place(self, layout, x, y):
+        # XXX allow myself to be added to multiple layouts for whatever that's worth
+        if self.layout is not None:
+            # just position
+            self.layout.begin_update()
+            self.layout.x = x
+            self._placed_y = y
+            self.layout.y = y + self.height
+            self.layout.anchor_y = 'top'
+            self.layout.end_update()
+            return
+
         self.quad = layout.batch.add(4, GL_QUADS, layout.top_group,
             ('c4B', (220, 220, 220, 255)*4),
             ('v2i', (x, y, x, y+self.height, x+self.width, y+self.height, x+self.width, y))
@@ -132,8 +143,9 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         # position
         self.layout.begin_update()
         self.layout.x = x
-        self.layout.y = 0
-        self.layout.valign = 'top'
+        self.layout.y = y + self.height
+        self._placed_y = y
+        self.layout.anchor_y = 'top'
         self.layout.end_update()
 
         # store off a reference to the surrounding layout's group so we can
@@ -145,7 +157,11 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.caret.position = len(self.document.text)
 
     def remove(self, layout):
+        pass
+
+    def on_leave(self):
         self.layout.delete()
+        self.layout = None
         self.quad.delete()
         self.caret.delete()
 
@@ -239,9 +255,12 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def _scroll_to_bottom(self):
         # on key press always move the view to the bottom of the screen
         if self.layout.height < self.layout.content_height:
-            self.layout.valign = 'bottom'
-            self.layout.y = -self.layout.height
-            self.layout.view_y = 0
+            #self.layout.begin_update()
+            #self.layout.anchor_y = 'bottom'
+            #self.layout.y = self._placed_y #- self.height
+            self.layout.view_y = self.layout.content_height - self.layout.height
+            #self.layout.end_update()
+            #self.layout.view_y = 0
         if self.caret.position < self.start_of_line:
             self.caret.position = len(self.document.text)
 
