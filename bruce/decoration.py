@@ -1,3 +1,7 @@
+'''Page decoration directive for Bruce pages.
+
+Handles the directive declaration and rendering of the decoration.
+'''
 import os
 
 from docutils.parsers.rst import directives
@@ -23,6 +27,7 @@ decoration_directive.content = True
 directives.register_directive('decoration', decoration_directive)
 
 class QuadGroup(pyglet.graphics.Group):
+    ' pyglet.graphics group defining the blending operation for decoration quads '
     def __init__(self, blend_src=GL_SRC_ALPHA,
             blend_dest=GL_ONE_MINUS_SRC_ALPHA, parent=None):
         super(QuadGroup, self).__init__(parent)
@@ -47,35 +52,8 @@ class QuadGroup(pyglet.graphics.Group):
     def __hash__(self):
         return hash((id(self.parent), self.blend_src, self.blend_dest))
 
-YES_VALUES = set('yes y on true'.split())
-
 class Decoration(object):
-    '''
-    Decoration content consists of lines of configuration or drawing commands::
-
-        bgcolor: <color spec>
-        footer:x,y;hanchor;vanchor
-        title:x,y;hanchor;vanchor
-        image:filename;halign=right;valign=bottom
-        viewport:x,y,w,h
-        quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
-
-    Quad vertex color carries over if it's not specified for each vertex,
-    allowing either solid color or blending.
-
-    Colors are specified in HTML format with either three or four channels
-    (if three then the fourth, alpha channel is set to 255).
-
-    Vertexes may be expressions (which will be eval()'ed). The expressions have
-    the variables "w" and "h" available which are the width and height of the
-    presentation viewport.
-
-    The default "title" is::
-
-        title:w//2,h;center;top
-
-    (positioned at the top-center of the viewport)
-
+    '''Rendering of page decorations.
     '''
     bgcolor = (255, 255, 255, 255)
     default_title_position = ('w//2,h', 'center', 'top')
@@ -88,7 +66,7 @@ class Decoration(object):
         self.footer = footer
 
     def copy(self):
-        '''Don't copy the title.
+        '''Make a copy of this decoration, usually to keep for a given page.
         '''
         return Decoration(self.content, self.stylesheet, self.title,
             self.footer)
@@ -100,6 +78,9 @@ class Decoration(object):
         return self.limited_viewport
 
     def on_enter(self, vw, vh):
+        # set up the rendering for this decoration by parsing its spec
+
+        # this also sets the limited viewport
         self.viewport_width, self.viewport_height = vw, vh
         self.limited_viewport = (0, 0, vw, vh)
 
@@ -136,15 +117,13 @@ class Decoration(object):
             color = self.stylesheet.value('title', 'color')
             align = self.stylesheet.value('title', 'align', 'center')
 
-            # XXX align / anchor
-
             # and create label
             l = pyglet.text.Label(self.title, name, size, bold, italic, color,
-                x, y, halign=halign, valign=valign, batch=self.batch)
+                x, y, anchor_x=halign, anchor_y=valign, halign=halign, batch=self.batch)
             self.decorations.append(l)
 
             # adjust viewport restriction
-            if not viewport_changed:
+            if not viewport_changed and valign == 'top':
                 self.limited_viewport = (0, 0, vw, vh - l.content_height)
 
         if self.footer is not None:
@@ -153,19 +132,20 @@ class Decoration(object):
             loc = dict(w=self.viewport_width, h=self.viewport_height)
             x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
 
-            # XXX align / anchor
-
             # label
-            l = pyglet.text.DocumentLabel(self.footer, x, y, vw, vh,
-                halign, valign, multiline=True, batch=self.batch)
+            # XXX should only need width for this label if centering
+            l = pyglet.text.DocumentLabel(self.footer, x, y, vw,
+                anchor_x=halign, anchor_y=valign, multiline=True,
+                batch=self.batch)
             self.decorations.append(l)
 
-            # adjust viewport restriction
-            if not viewport_changed:
+            # adjust viewport restriction automatically if the footer is at the bottom
+            if not viewport_changed and valign == 'bottom':
                 x, y, w, h = self.limited_viewport
-                if y < l.content_height:
-                    d = l.content_height - y
-                    y = l.content_height
+                footer_height = l.content_height + l.y
+                if y < footer_height:
+                    d = footer_height - y
+                    y = footer_height
                     h -= d
                     self.limited_viewport = (x, y, w, h)
 
@@ -218,7 +198,6 @@ class Decoration(object):
         self.decorations.append(q)
 
     def handle_bgcolor(self, color):
-        print 'BGCOLOR', `color`
         self.bgcolor = parse_color(color)
 
     def handle_footer_align(self, align):

@@ -1,7 +1,19 @@
 Text Styles Test
 ----------------
 
-Lorem ipsum dolor *italic sit amet*, **bold consectetuer adipiscing elit**. Donec ``literal auctor`` vestibulum risus. Vestibulum porttitor purus sed magna. Aenean gravida augue in sapien. Duis eget augue in ante molestie dapibus. Donec lobortis tortor eu sapien. Sed eu tortor.
+Left-aligned. Lorem ipsum dolor *italic sit amet*, **bold consectetuer adipiscing elit**.
+
+.. style:: :align: center
+
+Center-aligned. Donec ``literal auctor`` vestibulum risus. Vestibulum porttitor purus sed magna.
+
+.. style:: :align: right
+
+Right-aligned. Aenean gravida augue in sapien. Duis eget augue in ante molestie dapibus. Donec lobortis tortor eu sapien.
+
+.. style:: :align: left
+
+Left-aligned again. Sed eu tortor.
 
     Block quoted. Proin venenatis egestas dui.
     Etiam augue elit, pharetra egestas, ornare ut, congue ut, ipsum.
