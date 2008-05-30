@@ -1,0 +1,6 @@
+KNOWN BUGS
+
+- intepreter element more-needed executes loops while grabbing more data
+- indentation issue in first line of definition on definition lists second page
+- indentation of list item content varies when list enumeration gets wide 
+
