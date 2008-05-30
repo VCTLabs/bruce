@@ -31,8 +31,9 @@ class Page(pyglet.event.EventDispatcher):
         # do alignment
         l.begin_update()
         l.valign = self.stylesheet['layout']['valign']
-        if l.valign == 'center': l.y = y + vh//2
-        elif l.valign == 'top': l.y = y + vh
+        l.anchor_y = self.stylesheet['layout']['valign']
+        if l.anchor_y == 'center': l.y = y + vh//2
+        elif l.anchor_y == 'top': l.y = y + vh
         else: l.y = y
         l.end_update()
 

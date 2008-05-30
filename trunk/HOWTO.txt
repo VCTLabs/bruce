@@ -56,6 +56,10 @@ Bruce supports a large amount of ReStructuredText:
 - images - inline and stand-alone
 - page titles (section headings)
 
+**titles**
+    Bruce will not line-wrap title text (doing so messes with layout way too much),
+    so make sure your title fits in one line!
+
 **images**
     A ``:width:`` and/or ``:height:`` may be specified to scale the image when displayed.
     If only one is specified then the image's other dimension will be scaled
@@ -198,7 +202,8 @@ Decorations actually control a few elements of display:
 **viewport**
    You may restrict the size of the display usable by pages. By default some space
    is allocated so the page contents don't overwrite the page title and footer, if they
-   are present. The viewport is specified as::
+   are present and positioned in the usual top and bottom places. The viewport is
+   specified as::
 
         viewport:x,y,width,height
 
