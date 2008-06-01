@@ -1,8 +1,8 @@
 '''
 
-Cocos:
+Cocos thoughts:
 
-- Page is actually a Scene.
+- Page is actually a Scene?
 - Content (current Page) is a Layer in that Scene.
 - Decoration is another Layer.
 - Presentation manages the Scenes.
@@ -18,31 +18,6 @@ class Page(pyglet.event.EventDispatcher):
         self.stylesheet = stylesheet
         self.elements = elements
         self.decoration = decoration
-
-    def do_layout(self, x, y, vw, vh):
-        '''Invoked as part of on_enter handling.
-        '''
-        self.batch = pyglet.graphics.Batch()
-
-        # render the text lines to our batch
-        l = self.layout = pyglet.text.layout.IncrementalTextLayout(
-            self.document, vw, vh, multiline=True, batch=self.batch)
-
-        # do alignment
-        l.begin_update()
-        l.valign = self.stylesheet['layout']['valign']
-        l.anchor_y = self.stylesheet['layout']['valign']
-        if l.anchor_y == 'center': l.y = y + vh//2
-        elif l.anchor_y == 'top': l.y = y + vh
-        else: l.y = y
-        l.end_update()
-
-        # to support auto-resizing elements....
-        # if you give the element a ref to the layout and total size, then it
-        # can base its size off the difference.  you still need to do it in two
-        # passes, but can avoid laying out everything again... just invalidate
-        # the style of the element, which will push the rest of the content
-        # down when pyglet notices its size has increased
 
     def cleanup(self):
         '''Invoked as part of on_leave handling.
@@ -75,7 +50,31 @@ class Page(pyglet.event.EventDispatcher):
         self.decoration.on_enter(viewport_width, viewport_height)
         for element in self.elements:
             element.on_enter(viewport_width, viewport_height)
-        self.do_layout(*self.decoration.get_viewport())
+
+        self.batch = pyglet.graphics.Batch()
+
+        x, y, vw, vh = self.decoration.get_viewport()
+
+        # render the text lines to our batch
+        l = self.layout = pyglet.text.layout.IncrementalTextLayout(
+            self.document, vw, vh,
+            multiline=True, batch=self.batch)
+
+        l.begin_update()
+        valign = self.stylesheet['layout']['valign']
+        if valign == 'center': l.y = y + vh//2
+        elif valign == 'top': l.y = y + vh
+        else: l.y = y
+        l.anchor_y=valign
+        l.content_valign=valign
+        l.end_update()
+
+        # XXX to support auto-resizing elements....
+        # if you give the element a ref to the layout and total size, then it
+        # can base its size off the difference.  you still need to do it in two
+        # passes, but can avoid laying out everything again... just invalidate
+        # the style of the element, which will push the rest of the content
+        # down when pyglet notices its size has increased
 
     def xon_resize(self, viewport_width, viewport_height):
         '''Invoked when the viewport has changed dimensions.

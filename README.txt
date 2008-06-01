@@ -39,8 +39,8 @@ Bruce 3.0 Features (this being the first 3.0 release)
 Installation
 ============
 
-Bruce REQUIRES Python 2.5 and pyglet latest Subversion (or 1.1 final when
-it's released)
+Bruce REQUIRES Python 2.5 and pyglet Subversion r2029, or 1.1 *later than beta1*
+when it's released.
 
 To install Bruce, run::
 
