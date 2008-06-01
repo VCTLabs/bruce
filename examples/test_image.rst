@@ -1,3 +1,7 @@
+.. style::
+   :layout.valign: center
+   :align: center
+
 Raw Image
 ---------
 

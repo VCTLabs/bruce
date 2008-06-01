@@ -14,9 +14,10 @@ Centered (unscaled) and looping
 .. video:: tada.avi
    :loop:
 
-Centered, scaled width=200
---------------------------
+
+Centered, scaled width=1024
+---------------------------
 
 .. video:: tada.avi
-   :width: 200
+   :width: 1024
 
