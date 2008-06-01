@@ -1,4 +1,5 @@
 recursive-include bruce *.*
+recursive-exclude old *.*
 global-exclude *.pyc *.pyo
 include *.txt MANIFEST.in MANIFEST
 recursive-include examples *.*
