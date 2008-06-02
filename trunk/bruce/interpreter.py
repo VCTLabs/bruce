@@ -63,6 +63,15 @@ class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
         self.foreground_decoration_group = \
             pyglet.text.layout.TextLayoutForegroundDecorationGroup(2, self.top_group)
 
+    def get_screen_rect(self):
+        tg = self.top_group
+        parent_x = tg.parent_group.translate_x
+        parent_y = tg.parent_group.translate_y
+        return (parent_x + tg._scissor_x - 1,
+                  parent_y + tg._scissor_y - tg._scissor_height,
+                  tg._scissor_width + 1,
+                  tg._scissor_height)
+
 class Output:
     def __init__(self, display, realstdout):
         self.out = display
@@ -165,7 +174,6 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.quad.delete()
         self.caret.delete()
 
-    doing_more = False
     def on_key_press(self, symbol, modifiers):
         if symbol == pyglet.window.key.TAB:
             return self.caret.on_text('\t')
@@ -176,21 +184,18 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             line = self.document.text[self.start_of_line:]
             if line == 'help()':
                 line = 'print "help() not supported, sorry!"'
+            line = line.rstrip()
             self.current_input.append(line)
             self.history_pos = len(self.history)
-            if line.strip():
-                self.history[self.history_pos-1] = line.strip()
+            if line:
+                self.history[self.history_pos-1] = line
                 self.history.append('')
             more = self.interpreter.execute('\n'.join(self.current_input))
-            if self.doing_more and not line.strip():
-                self.doing_more = False
-            more = more or self.doing_more
-            if not more:
+            if more:
+                self._write(self.prompt_more)
+            else:
                 self.current_input = []
                 self._write(self.prompt)
-            else:
-                self.doing_more = True
-                self._write(self.prompt_more)
             self.start_of_line = len(self.document.text)
             self.caret.position = len(self.document.text)
         elif symbol == pyglet.window.key.SPACE:
@@ -255,12 +260,15 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def _scroll_to_bottom(self):
         # on key press always move the view to the bottom of the screen
         if self.layout.height < self.layout.content_height:
-            #self.layout.begin_update()
-            #self.layout.anchor_y = 'bottom'
-            #self.layout.y = self._placed_y #- self.height
             self.layout.view_y = self.layout.content_height - self.layout.height
-            #self.layout.end_update()
-            #self.layout.view_y = 0
         if self.caret.position < self.start_of_line:
             self.caret.position = len(self.document.text)
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        sx, sy, sw, sh = self.layout.get_screen_rect()
+        if x < sx or x > sx + sw: return
+        if y < sy or y > sy + sh: return
+        self.layout.view_x -= scroll_x
+        self.layout.view_y += scroll_y * 32
+        return True
 

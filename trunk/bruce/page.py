@@ -13,11 +13,16 @@ Cocos thoughts:
 import pyglet
 
 class Page(pyglet.event.EventDispatcher):
-    def __init__(self, document, stylesheet, decoration, elements):
+    def __init__(self, document, stylesheet, decoration, elements, docnode):
         self.document = document
         self.stylesheet = stylesheet
         self.elements = elements
         self.decoration = decoration
+        self.docnode = docnode
+
+    def print_source(self):
+        for child in self.docnode.children:
+            print str(child)
 
     def cleanup(self):
         '''Invoked as part of on_leave handling.
