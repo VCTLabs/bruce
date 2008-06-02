@@ -11,9 +11,10 @@ setup(
     version = __version__,
     description = "Bruce the Presentation Tool",
     long_description = '''Bruce the Presentation Tool is for
-programmers who are tired of fighting with presentation tools. In its
-basic form it allows text, code, image and video. It uses pyglet and
-is easily extensible to add new page types.
+people who are tired of fighting with presentation tools.
+Presentations are composed (edited) in plain text files. In its
+basic form it allows text, code, image, interative Python sessions
+and video. It uses pyglet to render in OpenGL.
 
 
 Bruce 3.0 Features (this being the first 3.0 release)
@@ -35,8 +36,9 @@ Bruce 3.0 Features (this being the first 3.0 release)
   as the presentation file)
 - and some extensions of ReST:
 
+  * embedded Python interative interpreter sessions
   * videos (embedded just like images) with optional looping
-  * stylsheet and decoration changes on the fly (eg. multiple fonts
+  * stylesheet and decoration changes on the fly (eg. multiple fonts
     per page)
 
 - timer and page count display for practicing
@@ -49,8 +51,8 @@ Bruce 3.0 Features (this being the first 3.0 release)
 Installation
 ============
 
-Bruce REQUIRES Python 2.5 and pyglet latest Subversion (or 1.1 final when
-it's released)
+Bruce REQUIRES Python 2.5 and pyglet Subversion r2093, or 1.1 *later than beta1*
+when it's released.
 
 To install Bruce, run::
 
@@ -84,11 +86,14 @@ on a white background (using the "big-centered" style)::
     Pages may optionally have titles which are displayed
     centered at the top by default.
 
-and so on.
+and so on. For more information see the HOWTO__ at the Bruce
+website.
+
+__ http://r1chardj0n3s.googlepages.com/howto
 ''',
     author = "Richard Jones",
     author_email = "richard@mechanicalcat.net",
-    url = "http://bruce.python-hosting.com/",
+    url = "http://r1chardj0n3s.googlepages.com/bruce",
     packages = ["bruce"],
     scripts = ['scripts/bruce'],
     classifiers = [
