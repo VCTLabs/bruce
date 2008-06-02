@@ -1,9 +1,7 @@
 .. decoration::
-   image: pyglet-trans-64.png
+   image: pyglet-trans-64.png;halign=left;valign=top
 
-text left, top
-
-decoration image left bottom
+left, top
 
 ----
 
@@ -13,11 +11,9 @@ decoration image left bottom
    :align: center
 
 .. decoration::
-   image: pyglet-trans-64.png;halign=center;valign=top
+   image: pyglet-trans-64.png;halign=center;valign=center
 
-text centered
-
-decoration image center top
+centered
 
 ----
 
@@ -26,8 +22,6 @@ decoration image center top
    :align: right
 
 .. decoration::
-   image: pyglet-trans-64.png;halign=right;valign=center
+   image: pyglet-trans-64.png;halign=right;valign=bottom
 
-text right, bottom
-
-decoration image right center
+right, bottom
