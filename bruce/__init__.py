@@ -9,7 +9,7 @@ import pyglet
 
 from bruce import rst_parser
 from bruce import presentation
-from bruce import progress
+from bruce import display_source
 
 def main():
     from optparse import OptionParser
@@ -41,9 +41,9 @@ def main():
     p.add_option("-v", "--version", dest="version",
                       action="store_true", default=False,
                       help="display version and quit")
-    p.add_option("-d", "--progress-screen", dest="progress_screen",
-                      default=None,
-                      help="display progress in screen (1+, default none)")
+    #p.add_option("-d", "--progress-screen", dest="progress_screen",
+    #                  default=None,
+    #                  help="display progress in screen (1+, default none)")
     p.add_option("-D", "--display-source", dest="source",
                       action="store_true", default=False,
                       help="display source in terminal")
@@ -70,10 +70,10 @@ def main():
     display = pyglet.window.get_platform().get_default_display()
     screen = int(options.screen)-1
     screen = display.get_screens()[screen]
-    progress_screen = None
-    if options.progress_screen:
-        progress_screen = int(options.progress_screen)-1
-        progress_screen = display.get_screens()[progress_screen]
+    #progress_screen = None
+    #if options.progress_screen:
+    #    progress_screen = int(options.progress_screen)-1
+    #    progress_screen = display.get_screens()[progress_screen]
     width, height = map(int, options.window_size.split('x'))
     width = min(width, screen.width)
     height = min(height, screen.height)
@@ -101,18 +101,18 @@ def main():
 
     w.push_handlers(pres)
 
-    if progress_screen is not None:
-        pw = min(1280, progress_screen.width)
-        ph = min(480, progress_screen.height)
-        if options.fullscreen:
-            pw = pyglet.window.Window(fullscreen=options.fullscreen,
-                screen=progress_screen)
-        else:
-            pw = pyglet.window.Window(pw, ph, screen=progress_screen)
-        prog = progress.Progress(pw, pres, content.decode('utf8'))
-        pw.push_handlers(prog)
-        pres.push_handlers(prog)
-        prog.push_handlers(pres)
+#    if progress_screen is not None:
+#        pw = min(1280, progress_screen.width)
+#        ph = min(480, progress_screen.height)
+#        if options.fullscreen:
+#            pw = pyglet.window.Window(fullscreen=options.fullscreen,
+#                screen=progress_screen)
+#        else:
+#            pw = pyglet.window.Window(pw, ph, screen=progress_screen)
+#        prog = progress.Progress(pw, pres, content.decode('utf8'))
+#        pw.push_handlers(prog)
+#        pres.push_handlers(prog)
+#        prog.push_handlers(pres)
 
     if options.source:
         pres.push_handlers(display_source.DisplaySource())

@@ -150,7 +150,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         d = g.decode(node)
         if g.len_text:
             p = Page(d, self.stylesheet.copy(), self.decoration.copy(),
-                d.elements)
+                d.elements, node)
             self.pages.append(p)
         raise docutils.nodes.SkipNode
 
