@@ -2,9 +2,11 @@
 Bruce the Presentation Tool
 ---------------------------
 
-Bruce the Presentation Tool is for programmers who are tired of fighting
-with presentation tools. In its basic form it allows text, code or image
-pages and video. It uses pyglet and is extensible to add new page types.
+Bruce the Presentation Tool is for people who are tired of fighting
+with presentation tools. Presentations are composed (edited) in plain text
+files.
+In its basic form it allows text, code, image, interative Python sessions
+and video. It uses pyglet to render in OpenGL.
 
 
 Bruce 3.0 Features (this being the first 3.0 release)
@@ -26,8 +28,9 @@ Bruce 3.0 Features (this being the first 3.0 release)
   as the presentation file)
 - and some extensions of ReST:
 
+  * embedded Python interative interpreter sessions
   * videos (embedded just like images) with optional looping
-  * stylsheet and decoration changes on the fly (eg. multiple fonts
+  * stylesheet and decoration changes on the fly (eg. multiple fonts
     per page)
 
 - timer and page count display for practicing
@@ -39,9 +42,7 @@ Bruce 3.0 Features (this being the first 3.0 release)
 Installation
 ============
 
-XXX check version
-
-Bruce REQUIRES Python 2.5 and pyglet Subversion r2030?, or 1.1 *later than beta1*
+Bruce REQUIRES Python 2.5 and pyglet Subversion r2093, or 1.1 *later than beta1*
 when it's released.
 
 To install Bruce, run::
@@ -61,14 +62,15 @@ Controls
 ========
 
 left, right arrows; left, right mouse button; space bar (forward)
-  Move back and forward pages (and expose/hide "-" marked text lines)
+  Move back and forward pages.
 page up, page down
-  Move back and forward 5 pages (ignores expose/hide text lines)
+  Move back and forward 5 pages.
 mouse scroll wheel
   Scroll large page content. You may also drag the contents up or down
-  by dragging a left mouse button press up and down the screen.
-control-I
-  Enter / exit auto-type mode in the interactive interpreter
+  by dragging a left mouse button press up and down the screen. If a
+  page has an embedded Python Interpreter you may use the scroll-wheel
+  to scroll its contents (when the mouse is over the interpreter).
+  Clicking and dragging always scrolls the whole page.
 control-F
   Switch between fullscreen and windowed mode
 escape

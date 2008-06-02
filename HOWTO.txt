@@ -76,7 +76,7 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 **interpreter**
     Embeds a Python interpreter in the page. The options available are ``:width:`` and
     ``:height:`` (default 800 by 300). You may also have the optional flag ``:sysver:``
-    which will cause the standard Python interactive intepreter greeting with the 
+    which will cause the standard Python interactive intepreter greeting with the
     Python version to be displayed.
 
 
