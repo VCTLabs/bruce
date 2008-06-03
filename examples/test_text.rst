@@ -49,7 +49,7 @@ A second Page!
 
 .. style:: :font_name: Times New Roman
 
-.. decoration::
+.. layout::
    quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
    quad:C#ffc0a0;V0,0;V0,64;Vw,64;Vw,0
    viewport:0,64,w,h-(64+48)

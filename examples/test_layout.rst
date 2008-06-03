@@ -1,7 +1,7 @@
 The Title
 ---------
 
-.. decoration::
+.. layout::
    bgcolor: silver
    image:pyglet-trans-64.png;halign=right;valign=bottom
    quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h

@@ -13,7 +13,7 @@ Bruce the Presentation Tool version 3.0, that is
 Page 1
 ------
 
-.. decoration::
+.. layout::
    bgcolor: silver
    image:pyglet-trans-64.png;halign=right;valign=bottom
    quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h

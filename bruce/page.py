@@ -1,23 +1,11 @@
-'''
-
-Cocos thoughts:
-
-- Page is actually a Scene?
-- Content (current Page) is a Layer in that Scene.
-- Decoration is another Layer.
-- Presentation manages the Scenes.
-
-'''
-
-
 import pyglet
 
 class Page(pyglet.event.EventDispatcher):
-    def __init__(self, document, stylesheet, decoration, elements, docnode):
+    def __init__(self, document, stylesheet, layout, elements, docnode):
         self.document = document
         self.stylesheet = stylesheet
         self.elements = elements
-        self.decoration = decoration
+        self.layout = layout
         self.docnode = docnode
 
     def print_source(self):
@@ -27,8 +15,8 @@ class Page(pyglet.event.EventDispatcher):
     def cleanup(self):
         '''Invoked as part of on_leave handling.
         '''
-        self.layout.delete()
-        self.layout = None
+        self.text_layout.delete()
+        self.text_layout = None
         self.batch = None
 
     def draw(self):
@@ -52,16 +40,16 @@ class Page(pyglet.event.EventDispatcher):
         '''Invoked when the page is put up on the screen of the given
         dimensions.
         '''
-        self.decoration.on_enter(viewport_width, viewport_height)
+        self.layout.on_enter(viewport_width, viewport_height)
         for element in self.elements:
             element.on_enter(viewport_width, viewport_height)
 
         self.batch = pyglet.graphics.Batch()
 
-        x, y, vw, vh = self.decoration.get_viewport()
+        x, y, vw, vh = self.layout.get_viewport()
 
         # render the text lines to our batch
-        l = self.layout = pyglet.text.layout.IncrementalTextLayout(
+        l = self.text_layout = pyglet.text.layout.IncrementalTextLayout(
             self.document, vw, vh,
             multiline=True, batch=self.batch)
 
@@ -108,7 +96,7 @@ class Page(pyglet.event.EventDispatcher):
         '''
         if self._cb_hide_mouse_scheduled:
             self.cb_hide_mouse(0)
-        self.decoration.on_leave()
+        self.layout.on_leave()
         for element in self.elements:
             element.on_leave()
         self.cleanup()
@@ -116,14 +104,14 @@ class Page(pyglet.event.EventDispatcher):
     def do_draw(self):
         '''Invoked to render the page when active.
 
-        Renders the decoration and then the implementation page's contents.
+        Renders the layout and then the implementation page's contents.
         '''
-        self.decoration.draw()
+        self.layout.draw()
         self.draw()
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        self.layout.view_x -= scroll_x
-        self.layout.view_y += scroll_y * 32
+        self.text_layout.view_x -= scroll_x
+        self.text_layout.view_y += scroll_y * 32
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.dispatch_event('set_mouse_visible', True)
@@ -138,7 +126,7 @@ class Page(pyglet.event.EventDispatcher):
         self.dispatch_event('set_mouse_visible', False)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        self.layout.view_y -= dy
+        self.text_layout.view_y -= dy
 
 Page.register_event_type('set_mouse_visible')
 Page.register_event_type('set_fullscreen')

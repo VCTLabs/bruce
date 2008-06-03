@@ -9,7 +9,7 @@ import pyglet
 from pyglet.text.formats import structured
 
 # these imports simply cause directives to be registered
-from bruce import decoration
+from bruce import layout
 from bruce import interpreter, video
 from bruce import resource
 from bruce.image import ImageElement
@@ -61,8 +61,13 @@ class SectionContent(Transform):
             self.document.insert(index, new)
             new_section_content[:] = []
         record_for_later = True
+        decoration = None
         for node in list(self.document):
-            if isinstance(node, nodes.transition):
+            if isinstance(node, nodes.decoration):
+                decoration = node
+                self.document.remove(node)
+
+            elif isinstance(node, nodes.transition):
                 self.document.remove(node)
                 if new_section_content:
                     add_section()
@@ -99,6 +104,9 @@ class SectionContent(Transform):
         if new_section_content:
             add_section()
 
+        if decoration is not None:
+            self.document.append(decoration)
+
 def printtree(node, indent=''):
     if hasattr(node, 'children') and node.children:
         print indent + '<%s>'%node.__class__.__name__
@@ -115,7 +123,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         if not stylesheet:
             stylesheet = default_stylesheet.copy()
         self.stylesheet = stylesheet
-        self.decoration = decoration.Decoration('', stylesheet)
+        self.layout = layout.Layout('', stylesheet)
         self.pages = []
         self.document = None
 
@@ -145,23 +153,34 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def visit_section(self, node):
         '''Add a page
         '''
-        self.decoration.title = None
-        g = DocumentGenerator(self.stylesheet, self.decoration)
+        self.layout.title = None
+        g = DocumentGenerator(self.stylesheet, self.layout)
         d = g.decode(node)
         if g.len_text:
-            p = Page(d, self.stylesheet.copy(), self.decoration.copy(),
+            p = Page(d, self.stylesheet.copy(), self.layout.copy(),
                 d.elements, node)
             self.pages.append(p)
+        raise docutils.nodes.SkipNode
+
+    def visit_decoration(self, node):
+        pass
+
+    def visit_footer(self, node):
+        # XXX stop footer from being coalesced into one element?
+        g = DocumentGenerator(self.stylesheet, None, style_base_class='footer')
+        footer = g.decode(node)
+        for p in self.pages:
+            p.layout.footer = footer
         raise docutils.nodes.SkipNode
 
 class DummyReporter(object):
     debug = lambda *args: None
 
 class DocumentGenerator(structured.StructuredTextDecoder):
-    def __init__(self, stylesheet, decoration, style_base_class='default'):
+    def __init__(self, stylesheet, layout, style_base_class='default'):
         super(DocumentGenerator, self).__init__()
         self.stylesheet = stylesheet
-        self.decoration = decoration
+        self.layout = layout
         self.style_base_class = style_base_class
 
     def decode_structured(self, doctree, location):
@@ -169,8 +188,13 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         # not using a real document as the root
         doctree.reporter = DummyReporter()
 
+        # initialise style
+        style = self.stylesheet['default'].copy()
+        if self.style_base_class != 'default':
+            style.update(self.stylesheet[self.style_base_class])
+        self.push_style(doctree, style)
+
         # initialise parser
-        self.push_style(doctree, self.stylesheet[self.style_base_class])
         self.in_literal = False
         self.first_paragraph = True
         self.next_style = dict(self.current_style)
@@ -198,7 +222,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def visit_title(self, node):
         # title is handled separately so it may be placed nicely
-        self.decoration.title = node.children[0].astext().replace('\n', ' ')
+        self.layout.title = node.children[0].astext().replace('\n', ' ')
         self.prune()
 
     def visit_substitution_definition(self, node):
@@ -354,7 +378,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.in_item = False
 
     def visit_block_quote(self, node):
-        style = self.stylesheet[self.style_base_class].copy()
+        style = {}
         left_margin = self.current_style.get('margin_left') or 0
         tab_stops = self.current_style.get('tab_stops')
         if tab_stops:
@@ -395,7 +419,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
 
     #
-    # Style and decoration
+    # Style and layout
     #
     def visit_load_style(self, node):
         self.stylesheet.update(node.get_style())
@@ -413,17 +437,8 @@ class DocumentGenerator(structured.StructuredTextDecoder):
                 self.push_style('style-element', {key: value})
             self.stylesheet[group][key] = value
 
-    def visit_decoration(self, node):
-        # make sure it's Bruce's decoration node, otherwise it's probably a
-        # footer or something
-        if hasattr(node, 'get_decoration'):
-            self.decoration.content = node.get_decoration()
-
-    def visit_footer(self, node):
-        # XXX stop footer from being coalesced into one element!
-        g = DocumentGenerator(self.stylesheet, None, style_base_class='footer')
-        self.decoration.footer = g.decode(node)
-        self.prune()
+    def visit_layout(self, node):
+        self.layout.content = node.get_layout()
 
     #
     # Resource location

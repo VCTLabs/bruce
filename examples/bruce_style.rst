@@ -1,6 +1,6 @@
 .. load-style:: big-centered
 .. style:: :color: white
-.. decoration:: bgcolor: black
+.. layout:: bgcolor: black
 
 Euro symbol €
 
