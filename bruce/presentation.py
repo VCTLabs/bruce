@@ -26,7 +26,7 @@ class Presentation(pyglet.event.EventDispatcher):
             self.timer_label = pyglet.text.Label('--:--',
                 font_name='Courier New', font_size=24,
                 color=(128, 128, 128, 128),
-                halign='right', valign='bottom', batch=self.batch,
+                anchor_x='right', anchor_y='bottom', batch=self.batch,
                 x=self.window.width, y=0)
             y = self.timer_label.content_height
 
@@ -36,7 +36,7 @@ class Presentation(pyglet.event.EventDispatcher):
                 '%d/%d'%(self.page_num+1, len(pages)),
                 font_name='Courier New', font_size=24,
                 color=(128, 128, 128, 128),
-                halign='right', valign='bottom', batch=self.batch,
+                anchor_x='right', anchor_y='bottom', batch=self.batch,
                 x=self.window.width, y=y)
 
         self.player = pyglet.media.Player()
