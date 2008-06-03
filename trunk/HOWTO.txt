@@ -57,7 +57,7 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 - page titles (section headings)
 - interactive Python interpreter sessions
 - styling
-- decorations
+- backgrounds
 
 
 **titles**
@@ -163,19 +163,19 @@ To change a single style element you may have the declaration on a single line::
    .. style:: :font_size: 64
 
 
-Page Decoration
----------------
+Page Layout
+-----------
 
-The page decoration may also be defined on the fly. Unlike the stylesheet
-which may be modified, the page decoration must be specified entirely with
-each directive. The decoration directive applies to the current and subsequent
-pages. The decoration also controls the placement of the page title.
+The page layout may also be defined on the fly. Unlike the stylesheet
+which may be modified, the page layout must be specified entirely with
+each directive. The layout directive applies to the current and subsequent
+pages. The layout also controls the placement of the page title.
 
-A blank decoration directive ``.. decoration::`` will result in
-the default decoration having a white background and the page title centered
+A blank layout directive ``.. layout::`` will result in
+the default layout having a white layout and the page title centered
 at the top of the page.
 
-Decorations actually control a few elements of display:
+Layout controls a few elements of display:
 
 **background color**
    The background color is specified using the HTML-like notation used in styles.

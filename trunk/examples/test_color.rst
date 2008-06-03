@@ -1,5 +1,5 @@
 
-.. decoration::
+.. layout::
    bgcolor: yellow
 
 Black on yellow

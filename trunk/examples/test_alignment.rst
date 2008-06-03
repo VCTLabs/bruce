@@ -1,4 +1,4 @@
-.. decoration::
+.. layout::
    image: pyglet-trans-64.png;halign=left;valign=top
 
 left, top
@@ -10,7 +10,7 @@ left, top
    :layout.valign: center
    :align: center
 
-.. decoration::
+.. layout::
    image: pyglet-trans-64.png;halign=center;valign=center
 
 centered
@@ -21,7 +21,7 @@ centered
    :layout.valign: bottom
    :align: right
 
-.. decoration::
+.. layout::
    image: pyglet-trans-64.png;halign=right;valign=bottom
 
 right, bottom

@@ -1,3 +1,10 @@
+3.0beta2
+
+- mention docutils requirement
+- fix page count / timer display
+- allow default style to affect footer style
+
+
 3.0beta1
 
 Rewritten to use ReStructuredText as the input format
