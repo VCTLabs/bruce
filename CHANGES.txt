@@ -1,5 +1,6 @@
 3.0beta2
 
+- IMPORTANT: "decoration" is now called "layout"
 - mention docutils requirement
 - fix page count / timer display
 - allow default style to affect footer style
