@@ -30,7 +30,7 @@ Bruce 3.0 Features (this being the first 3.0 release)
   * images - inline and stand-alone, including scaling
   * page titles (section headings)
 
-- page decorations
+- page layout and decorations
 - scrolling of content larger than a screenful
 - sensible resource location (images, video, sound from the same directory
   as the presentation file)
@@ -38,7 +38,7 @@ Bruce 3.0 Features (this being the first 3.0 release)
 
   * embedded Python interative interpreter sessions
   * videos (embedded just like images) with optional looping
-  * stylesheet and decoration changes on the fly (eg. multiple fonts
+  * stylesheet and layout changes on the fly (eg. multiple fonts
     per page)
 
 - timer and page count display for practicing
