@@ -77,7 +77,7 @@ class VideoElement(pyglet.text.document.InlineElement):
             self.player.eos_action = self.player.EOS_PAUSE
         self.player.play()
 
-    def on_leave(self):
+    def on_exit(self):
         self.player.next()
         self.player = None
         self.video = None

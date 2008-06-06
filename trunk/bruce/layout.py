@@ -152,13 +152,13 @@ class Layout(cocos.layer.Layer):
                     h -= d
                     self.limited_viewport = (x, y, w, h)
 
-    def on_leave(self):
+    def on_exit(self):
         for decoration in self.decorations:
             decoration.delete()
         self.batch = None
 
     def on_resize(self, w, h):
-        self.on_leave()
+        self.on_exit()
         self.on_enter()
 
     def handle_image(self, image):

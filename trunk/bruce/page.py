@@ -112,15 +112,15 @@ class PageContent(cocos.layer.Layer):
         l.height = vh
         l.end_update()
 
-    def on_leave(self):
+    def on_exit(self):
         '''Invoked when the page is removed from the screen.
         '''
         self._remove_all_handlers()
-        super(PageContent, self).on_leave()
+        super(PageContent, self).on_exit()
         if self._cb_hide_mouse_scheduled:
             self.cb_hide_mouse(0)
         for element in self.elements:
-            element.on_leave()
+            element.on_exit()
         self.text_layout.delete()
         self.text_layout = None
         self.batch = None

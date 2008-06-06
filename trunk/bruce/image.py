@@ -25,6 +25,6 @@ class ImageElement(structured.ImageElement):
     def on_enter(self, vw, wh):
         self.image = pyglet.resource.image(self.uri)
 
-    def on_leave(self):
+    def on_exit(self):
         self.image = None
 

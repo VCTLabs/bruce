@@ -125,9 +125,6 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         })
         self.start_of_line = len(self.document.text)
 
-    def on_leave(self):
-        self.document = None
-
     layout = None
     def place(self, layout, x, y):
         # XXX allow myself to be added to multiple layouts for whatever that's worth
@@ -168,7 +165,8 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def remove(self, layout):
         pass
 
-    def on_leave(self):
+    def on_exit(self):
+        self.document = None
         self.layout.delete()
         self.layout = None
         self.quad.delete()
