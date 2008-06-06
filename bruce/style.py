@@ -13,6 +13,9 @@ from docutils.parsers.rst import directives
 
 from bruce.color import parse_color
 
+from cocos.scenes import transitions
+from cocos.director import director
+
 def is_boolean(value, boolean_true = set('yes true on'.split())):
     return value in boolean_true
 def stripped(argument):
@@ -25,6 +28,35 @@ def halignment(argument):
     return directives.choice(argument, ('left', 'center', 'right'))
 def valignment(argument):
     return directives.choice(argument, ('top', 'center', 'bottom'))
+
+_transitions = dict(
+    fade=transitions.FadeTransition,
+    roto_zoom=transitions.RotoZoomTransition,
+    jump_zoom=transitions.JumpZoomTransition,
+    move_in_left=transitions.MoveInLTransition,
+    move_in_right=transitions.MoveInRTransition,
+    move_in_bottom=transitions.MoveInBTransition,
+    move_in_top=transitions.MoveInTTransition,
+    slide_in_left=transitions.SlideInLTransition,
+    slide_in_right=transitions.SlideInRTransition,
+    slide_in_bottom=transitions.SlideInBTransition,
+    slide_in_top=transitions.SlideInTTransition,
+    flip_x=transitions.FlipX3DTransition,
+    flip_y=transitions.FlipY3DTransition,
+    flip_angle=transitions.FlipAngular3DTransition,
+    shuffle=transitions.ShuffleTransition,
+    turn_off_tiles=transitions.TurnOffTilesTransition,
+    fade_top_right=transitions.FadeTRTransition,
+    fade_bottom_left=transitions.FadeBLTransition,
+    fade_up=transitions.FadeUpTransition,
+    fade_down=transitions.FadeDownTransition,
+    shrink_grow=transitions.ShrinkGrowTransition,
+    corner_move=transitions.CornerMoveTransition,
+    envelope=transitions.EnvelopeTransition,
+    split_rows=transitions.SplitRowsTransition,
+    split_cols=transitions.SplitColsTransition,
+    none=None,
+)
 
 #
 # Style directive
@@ -52,6 +84,8 @@ def style_directive(name, arguments, options, content, lineno,
 style_directive.arguments = (0, 0, 0)
 style_directive.options = {
      'layout.valign': valignment,
+     'transition.name': stripped,
+     'transition.duration': float,
 }
 for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
         'footer.', 'block_quote.'):
@@ -81,6 +115,13 @@ class Stylesheet(dict):
         for k in self:
             new[k] = self[k].copy()
         return new
+
+    def get_transition(self):
+        klass = _transitions[self['transition']['name']]
+        if klass is None: return None
+        def _transition(new_scene, klass=klass, duration=self['transition']['duration']):
+            director.replace(klass(new_scene, duration=duration))
+        return _transition
 
 default_stylesheet = Stylesheet(
     default = dict(
@@ -124,6 +165,10 @@ default_stylesheet = Stylesheet(
     layout = dict(
         valign='top',
     ),
+    transition = dict(
+        name='none',
+        duration=0.5,
+    )
 )
 
 big_centered = default_stylesheet.copy()

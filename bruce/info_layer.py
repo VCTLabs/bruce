@@ -43,9 +43,8 @@ class InfoLayer(cocos.layer.Layer):
             self.count_label.y = y
 
     def on_page_changed(self, page, page_num):
-        print 'ON PAGE CHANGE', page_num
         # start the timer if we're displaying one
-        if self.show_timer:
+        if self.show_timer and self.start_time is None:
             self.start_time = time.time()
 
         self.page_num = page_num
@@ -53,10 +52,8 @@ class InfoLayer(cocos.layer.Layer):
         if self.show_count:
             self.count_label.text = '%d/%d'%(self.page_num+1, self.num_pages)
 
-        print 'ADD??', self in page, self not in page
         if self not in page:
-            print 'ADD', self, page
-            page.add(self, z=1)
+            page.add(self, z=.5)
 
     def update(self, dt):
         if self.start_time is not None:

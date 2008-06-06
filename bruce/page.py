@@ -7,10 +7,11 @@ class Page(cocos.scene.Scene):
         cocos.scene.Scene.__init__(self)
         pyglet.event.EventDispatcher.__init__(self)
         self.layout = layout
-        self.add(self.layout, z=-1)
+        self.add(self.layout, z=-.5)
         self.content = PageContent(document, stylesheet, elements)
         self.add(self.content, z=0)
         self.docnode = docnode
+        self.transition = stylesheet.get_transition()
 
         viewport_width, viewport_height = director.get_window_size()
 
