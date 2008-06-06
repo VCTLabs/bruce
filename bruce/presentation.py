@@ -37,8 +37,11 @@ class Presentation(pyglet.event.EventDispatcher):
         if first:
             director.run(page)
         else:
-            # XXX transitions director.replace(transitions.FadeTRTransition(page, duration=1))
-            director.replace(page)
+            #director.replace(transitions.FadeTRTransition(page, duration=1))
+            #director.replace(transitions.FadeTransition(page, duration=1))
+            #director.replace(transitions.ShrinkGrowTransition(page, duration=1))
+            director.replace(transitions.FlipY3DTransition(page, duration=1))
+            #director.replace(page)
 
         director.window.set_caption('Presentation: Slide 1')
         self.dispatch_event('on_page_changed', self.page, self.page_num)
