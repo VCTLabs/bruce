@@ -55,7 +55,8 @@ Bruce REQUIRES:
 
 - Python 2.5
 - docutils 0.4.1 or later
-- pyglet Subversion r2093, or 1.1 *later than beta1* when it's released
+- pyglet 1.1 beta 2 or later
+- Cocos subversion r680, or 0.3 *later than beta2* when it's released
 
 To install Bruce, run::
 
