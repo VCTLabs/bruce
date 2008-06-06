@@ -2,7 +2,6 @@ import time
 import pyglet
 import cocos
 from cocos.director import director
-from cocos.scenes import transitions
 from pyglet.window import key, mouse
 
 from bruce import info_layer
@@ -24,43 +23,31 @@ class Presentation(pyglet.event.EventDispatcher):
             self.info_layer = info_layer.InfoLayer(show_timer, show_count, self.num_pages)
             self.push_handlers(self.info_layer)
 
-        self.player = pyglet.media.Player()
-
     def start_presentation(self):
-        self._enter_page(self.pages[self.page_num], first=True)
+        self.page = self.pages[self.page_num]
+        director.window.set_caption('Presentation: Slide 1')
+        self.dispatch_event('on_page_changed', self.page, self.page_num)
+        director.run(self.page)
 
-    def _enter_page(self, page, first=False):
+    def _enter_page(self, page):
         # set up the initial page
+        old_page = self.page
         self.page = page
 
         # enter the page
-        if first:
-            director.run(page)
+        if old_page.transition is not None:
+            old_page.transition(page)
         else:
-            #director.replace(transitions.FadeTRTransition(page, duration=1))
-            #director.replace(transitions.FadeTransition(page, duration=1))
-            #director.replace(transitions.ShrinkGrowTransition(page, duration=1))
-            director.replace(transitions.FlipY3DTransition(page, duration=1))
-            #director.replace(page)
+            director.replace(page)
 
         director.window.set_caption('Presentation: Slide 1')
         self.dispatch_event('on_page_changed', self.page, self.page_num)
-
-        '''
-        # play the next page's sound (if any)
-        # force skip of the rest of the current sound (if any)
-        self.player.next()
-        if self.page.cfg['sound']:
-            self.player.queue(self.page.cfg['sound'])
-            self.player.play()
-        '''
 
     def on_resize(self, viewport_width, viewport_height):
         # XXX set DPI scaled according to viewport change.
         pass
 
     def __move(self, dir):
-
         # determine the new page, with limits
         new = min(self.num_pages-1, max(0, self.page_num + dir))
         if new == self.page_num: return
