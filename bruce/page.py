@@ -1,26 +1,60 @@
 import pyglet
+import cocos
+from cocos.director import director
 
-class Page(pyglet.event.EventDispatcher):
+class Page(cocos.scene.Scene):
     def __init__(self, document, stylesheet, layout, elements, docnode):
-        self.document = document
-        self.stylesheet = stylesheet
-        self.elements = elements
+        cocos.scene.Scene.__init__(self)
+        pyglet.event.EventDispatcher.__init__(self)
         self.layout = layout
+        self.add(self.layout, z=-1)
+        self.content = PageContent(document, stylesheet, elements)
+        self.add(self.content, z=0)
         self.docnode = docnode
+
+        viewport_width, viewport_height = director.get_window_size()
+
+    def on_next(self):
+        '''Invoked on the "next" event (cursor right or left mouse
+        button). If the handler returns event.EVENT_HANDLED then
+        the presentation does not leave this page.
+        '''
+        pass
+
+    def on_previous(self):
+        '''Invoked on the "previous" event (cursor left or right mouse
+        button). If the handler returns event.EVENT_HANDLED then
+        the presentation does not leave this page.
+        '''
+        pass
 
     def print_source(self):
         for child in self.docnode.children:
             print str(child)
 
-    def cleanup(self):
-        '''Invoked as part of on_leave handling.
-        '''
-        self.text_layout.delete()
-        self.text_layout = None
-        self.batch = None
+    def get_viewport(self):
+        return self.layout.get_viewport()
 
-    def draw(self):
-        self.batch.draw()
+
+class PageContent(cocos.layer.Layer):
+    is_event_handler = True
+    def __init__(self, document, stylesheet, elements):
+        self.document = document
+        self.stylesheet = stylesheet
+        self.elements = elements
+        super(PageContent, self).__init__()
+
+    # XXX Cocos doesn't invoke a push_all_handlers for some reason
+    # so I do it manually in on_enter
+    def _push_all_handlers(self):
+#        director.window.push_handlers(self)
+        for element in self.elements:
+            director.window.push_handlers(element)
+
+    def _remove_all_handlers(self):
+        for element in self.elements:
+            director.window.pop_handlers()
+#        director.window.pop_handlers()
 
     def update(self, dt):
         '''Invoked periodically with the time since the last
@@ -28,25 +62,20 @@ class Page(pyglet.event.EventDispatcher):
         '''
         pass
 
-    def push_element_handlers(self, dispatcher):
-        for element in self.elements:
-            dispatcher.push_handlers(element)
 
-    def pop_element_handlers(self, dispatcher):
-        for element in self.elements:
-            dispatcher.pop_handlers()
-
-    def on_enter(self, viewport_width, viewport_height):
+    def on_enter(self):
         '''Invoked when the page is put up on the screen of the given
         dimensions.
         '''
-        self.layout.on_enter(viewport_width, viewport_height)
+        super(PageContent, self).on_enter()
+        self._push_all_handlers()
+
+        x, y, vw, vh = self.parent.get_viewport()
+
         for element in self.elements:
-            element.on_enter(viewport_width, viewport_height)
+            element.on_enter(vw, vh)
 
         self.batch = pyglet.graphics.Batch()
-
-        x, y, vw, vh = self.layout.get_viewport()
 
         # render the text lines to our batch
         l = self.text_layout = pyglet.text.layout.IncrementalTextLayout(
@@ -69,53 +98,39 @@ class Page(pyglet.event.EventDispatcher):
         # the style of the element, which will push the rest of the content
         # down when pyglet notices its size has increased
 
-    def xon_resize(self, viewport_width, viewport_height):
-        '''Invoked when the viewport has changed dimensions.
 
-        Default behaviour is to clear the page and re-enter. Most pages
-        will be able to handle this better.
-        '''
-        raise NotImplementedError('this used to call on_leave/on_enter but sucks')
-
-    def on_next(self):
-        '''Invoked on the "next" event (cursor right or left mouse
-        button). If the handler returns event.EVENT_HANDLED then
-        the presentation does not leave this page.
-        '''
-        pass
-
-    def on_previous(self):
-        '''Invoked on the "previous" event (cursor left or right mouse
-        button). If the handler returns event.EVENT_HANDLED then
-        the presentation does not leave this page.
-        '''
-        pass
+    def on_resize(self, w, h):
+        self.parent.layout.on_resize(w, h)
+        x, y, vw, vh = self.parent.get_viewport()
+        l = self.text_layout
+        l.begin_update()
+        l.x = x
+        if l.anchor_y == 'center': l.y = y + vh//2
+        elif l.anchor_y == 'top': l.y = y + vh
+        else: l.y = y
+        l.width = vw
+        l.height = vh
+        l.end_update()
 
     def on_leave(self):
         '''Invoked when the page is removed from the screen.
         '''
+        self._remove_all_handlers()
+        super(PageContent, self).on_leave()
         if self._cb_hide_mouse_scheduled:
             self.cb_hide_mouse(0)
-        self.layout.on_leave()
         for element in self.elements:
             element.on_leave()
-        self.cleanup()
-
-    def do_draw(self):
-        '''Invoked to render the page when active.
-
-        Renders the layout and then the implementation page's contents.
-        '''
-        self.layout.draw()
-        self.draw()
+        self.text_layout.delete()
+        self.text_layout = None
+        self.batch = None
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         self.text_layout.view_x -= scroll_x
         self.text_layout.view_y += scroll_y * 32
 
     def on_mouse_motion(self, x, y, dx, dy):
-        self.dispatch_event('set_mouse_visible', True)
-
+        director.window.set_mouse_visible(True)
         if not self._cb_hide_mouse_scheduled:
             pyglet.clock.schedule_once(self.cb_hide_mouse, 2)
             self._cb_hide_mouse_scheduled = True
@@ -123,11 +138,11 @@ class Page(pyglet.event.EventDispatcher):
     _cb_hide_mouse_scheduled = False
     def cb_hide_mouse(self, dt):
         self._cb_hide_mouse_scheduled = False
-        self.dispatch_event('set_mouse_visible', False)
+        director.window.set_mouse_visible(False)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         self.text_layout.view_y -= dy
 
-Page.register_event_type('set_mouse_visible')
-Page.register_event_type('set_fullscreen')
+    def draw(self):
+        self.batch.draw()
 

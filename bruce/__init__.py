@@ -6,6 +6,7 @@ import time
 from cgi import escape as html_quote
 
 import pyglet
+from cocos.director import director
 
 from bruce import rst_parser
 from bruce import presentation
@@ -86,20 +87,20 @@ def main():
     display = pyglet.window.get_platform().get_default_display()
     screen = display.get_screens()[screen]
     if options.fullscreen:
-        w = pyglet.window.Window(fullscreen=options.fullscreen,
-            screen=screen)
+        director.init(fullscreen=options.fullscreen,
+            screen=screen, do_not_scale=True)
         # on_resize to transform to fit width / height from above
-        w._restore_size = (width, height)
+        # XXX w._restore_size = (width, height)
     else:
-        w = pyglet.window.Window(width=width, height=height,
-            screen=screen)
+        director.init(width=width, height=height,
+            screen=screen, do_not_scale=True)
 
     content = file(filename).read()
-    pres = presentation.Presentation(w, rst_parser.parse(content),
+    pres = presentation.Presentation(rst_parser.parse(content),
         show_timer=options.timer, show_count=options.page_count,
         start_page=int(options.start_page)-1)
 
-    w.push_handlers(pres)
+    director.window.push_handlers(pres)
 
 #    if progress_screen is not None:
 #        pw = min(1280, progress_screen.width)
@@ -119,8 +120,6 @@ def main():
 
     # now that we're all set up, load up the first page
     pres.start_presentation()
-
-    pyglet.app.run()
 
 
 if __name__ == '__main__':

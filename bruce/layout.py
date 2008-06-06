@@ -10,6 +10,8 @@ from docutils import nodes
 import pyglet
 from pyglet.gl import *
 
+import cocos
+
 from bruce.color import parse_color
 
 #
@@ -52,7 +54,7 @@ class QuadGroup(pyglet.graphics.Group):
     def __hash__(self):
         return hash((id(self.parent), self.blend_src, self.blend_dest))
 
-class Layout(object):
+class Layout(cocos.layer.Layer):
     '''Rendering of page layouts.
     '''
     bgcolor = (255, 255, 255, 255)
@@ -64,6 +66,7 @@ class Layout(object):
         self.stylesheet = stylesheet
         self.title = title
         self.footer = footer
+        super(Layout, self).__init__()
 
     def copy(self):
         '''Make a copy of this layout, usually to keep for a given page.
@@ -77,8 +80,8 @@ class Layout(object):
         '''
         return self.limited_viewport
 
-    def on_enter(self, vw, vh):
-        # set up the rendering for this layout by parsing its spec
+    def on_enter(self):
+        vw, vh = cocos.director.director.get_window_size()
 
         # this also sets the limited viewport
         self.viewport_width, self.viewport_height = vw, vh
@@ -92,7 +95,7 @@ class Layout(object):
         self.title_position = self.default_title_position
         self.footer_position = self.default_footer_position
 
-        # parse content
+        # set up the rendering for this layout by parsing its spec
         for line in self.content.splitlines():
             directive, rest = line.split(':', 2)
             getattr(self, 'handle_%s'%directive.strip())(rest.strip())
@@ -154,6 +157,9 @@ class Layout(object):
             decoration.delete()
         self.batch = None
 
+    def on_resize(self, w, h):
+        self.on_leave()
+        self.on_enter()
 
     def handle_image(self, image):
         halign='left'

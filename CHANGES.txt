@@ -4,6 +4,7 @@
 - mention docutils requirement
 - fix page count / timer display
 - allow default style to affect footer style
+- display is now managed using Cocos
 
 
 3.0beta1
