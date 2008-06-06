@@ -1,13 +1,17 @@
 import time
 import pyglet
+import cocos
+from cocos.director import director
+from cocos.scenes import transitions
 from pyglet.window import key, mouse
+
+from bruce import info_layer
 
 class Presentation(pyglet.event.EventDispatcher):
 
-    def __init__(self, window, pages, start_page=0, show_timer=False,
+    def __init__(self, pages, start_page=0, show_timer=False,
             show_count=False):
-        self.window = window
-        self.window.set_mouse_visible(False)
+        director.window.set_mouse_visible(False)
 
         self.pages = pages
         if start_page < 0:
@@ -15,51 +19,28 @@ class Presentation(pyglet.event.EventDispatcher):
         self.page_num = start_page
         self.num_pages = len(pages)
 
+        self.info_layer = None
         if show_timer or show_count:
-            self.batch = pyglet.graphics.Batch()
-        else:
-            self.batch = None
-        self.show_timer = show_timer
-        self.start_time = None
-        y = 0
-        if show_timer:
-            self.timer_label = pyglet.text.Label('--:--',
-                font_name='Courier New', font_size=24,
-                color=(128, 128, 128, 128),
-                anchor_x='right', anchor_y='bottom', batch=self.batch,
-                x=self.window.width, y=0)
-            y = self.timer_label.content_height
-
-        self.show_count = show_count
-        if show_count:
-            self.count_label = pyglet.text.Label(
-                '%d/%d'%(self.page_num+1, len(pages)),
-                font_name='Courier New', font_size=24,
-                color=(128, 128, 128, 128),
-                anchor_x='right', anchor_y='bottom', batch=self.batch,
-                x=self.window.width, y=y)
+            self.info_layer = info_layer.InfoLayer(show_timer, show_count, self.num_pages)
+            self.push_handlers(self.info_layer)
 
         self.player = pyglet.media.Player()
 
     def start_presentation(self):
-        self._enter_page(self.pages[self.page_num])
+        self._enter_page(self.pages[self.page_num], first=True)
 
-    def _enter_page(self, page):
+    def _enter_page(self, page, first=False):
         # set up the initial page
         self.page = page
 
-        # make the presentation listen for events from the page
-        self.page.push_handlers(self)
-
-        # add the page's event handlers (including elements) to the window
-        self.window.push_handlers(self.page)
-        self.page.push_element_handlers(self.window)
-
         # enter the page
-        self.page.on_enter(self.window.width, self.window.height)
+        if first:
+            director.run(page)
+        else:
+            # XXX transitions director.replace(transitions.FadeTRTransition(page, duration=1))
+            director.replace(page)
 
-        self.window.set_caption('Presentation: Slide 1')
-        pyglet.clock.schedule(self.page.update)
+        director.window.set_caption('Presentation: Slide 1')
         self.dispatch_event('on_page_changed', self.page, self.page_num)
 
         '''
@@ -71,37 +52,11 @@ class Presentation(pyglet.event.EventDispatcher):
             self.player.play()
         '''
 
-    def set_mouse_visible(self, visible):
-        '''Invoked by events from pages.
-        '''
-        self.window.set_mouse_visible(visible)
-        return pyglet.event.EVENT_HANDLED
-
-    def set_fullscreen(self, fullscreen):
-        '''Invoked by events from pages.
-        '''
-        self.window.set_fullscreen(fullscreen)
-        return pyglet.event.EVENT_HANDLED
-
-    def on_draw(self):
-        self.page.do_draw()
-
-        if self.start_time is not None:
-            t = time.time() - self.start_time
-            self.timer_label.text = '%02d:%02d'%(t//60, t%60)
-        if self.show_count:
-            self.count_label.text = '%d/%d'%(self.page_num+1, len(self.pages))
-        if self.batch is not None:
-            self.batch.draw()
-
     def on_resize(self, viewport_width, viewport_height):
         # XXX set DPI scaled according to viewport change.
         pass
 
     def __move(self, dir):
-        # start the timer if we're displaying one
-        if self.show_timer and self.start_time is None:
-            self.start_time = time.time()
 
         # determine the new page, with limits
         new = min(self.num_pages-1, max(0, self.page_num + dir))
@@ -109,16 +64,6 @@ class Presentation(pyglet.event.EventDispatcher):
 
         # leave the old page
         self.page_num = new
-        self.page.on_leave()
-
-        # pop my handlers off of the page
-        self.page.pop_handlers()
-
-        # now remove the page's handlers (including elements) from the window
-        self.page.pop_element_handlers(self.window)
-        self.window.remove_handlers(self.page)
-
-        pyglet.clock.unschedule(self.page.update)
 
         # enter the new page
         self._enter_page(self.pages[self.page_num])
@@ -135,7 +80,6 @@ class Presentation(pyglet.event.EventDispatcher):
         '''Overridden so it doesn't invoke the method on self and cause a loop
         '''
         assert event_type in self.event_types
-
         # Search handler stack for matching event handlers
         for frame in list(self._event_stack):
             handler = frame.get(event_type, None)
@@ -156,7 +100,8 @@ class Presentation(pyglet.event.EventDispatcher):
             self.__next()
 
         # switch fullscreen/windowed on ctrl-F
-        if pressed == key.F and modifiers & key.MOD_CTRL:
+        # XXX maybe keep this depending on how well Cocos' fullscreen switch works
+        if 0: #pressed == key.F and modifiers & key.MOD_CTRL:
             if not self.window.fullscreen:
                 self.window._restore_size = (
                     self.window.width, self.window.height)
