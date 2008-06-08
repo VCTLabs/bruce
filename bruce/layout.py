@@ -81,7 +81,8 @@ class Layout(cocos.layer.Layer):
         return self.limited_viewport
 
     def on_enter(self):
-        vw, vh = cocos.director.director.get_window_size()
+        # use the *actual* window size, not the "logical" one returned by get_window_size()
+        vw, vh = cocos.director.director.window.get_size()
 
         # this also sets the limited viewport
         self.viewport_width, self.viewport_height = vw, vh

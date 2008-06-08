@@ -43,9 +43,11 @@ class Presentation(pyglet.event.EventDispatcher):
         director.window.set_caption('Presentation: Slide 1')
         self.dispatch_event('on_page_changed', self.page, self.page_num)
 
+    '''
     def on_resize(self, viewport_width, viewport_height):
         # XXX set DPI scaled according to viewport change.
         pass
+    '''
 
     def __move(self, dir):
         # determine the new page, with limits
