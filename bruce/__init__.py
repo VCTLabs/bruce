@@ -89,8 +89,6 @@ def main():
     if options.fullscreen:
         director.init(fullscreen=options.fullscreen,
             screen=screen, do_not_scale=True)
-        # on_resize to transform to fit width / height from above
-        # XXX w._restore_size = (width, height)
     else:
         director.init(width=width, height=height,
             screen=screen, do_not_scale=True)
@@ -98,7 +96,8 @@ def main():
     content = file(filename).read()
     pres = presentation.Presentation(rst_parser.parse(content),
         show_timer=options.timer, show_count=options.page_count,
-        start_page=int(options.start_page)-1)
+        start_page=int(options.start_page)-1,
+        desired_size=(width, height))
 
     director.window.push_handlers(pres)
 

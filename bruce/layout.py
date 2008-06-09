@@ -81,12 +81,23 @@ class Layout(cocos.layer.Layer):
         return self.limited_viewport
 
     def on_enter(self):
-        # use the *actual* window size, not the "logical" one returned by get_window_size()
-        vw, vh = cocos.director.director.window.get_size()
+        vx = vy = 0
+        # scale the desired size up /down to the physical size
+        ow, oh = self.parent.desired_size
+        w, h = cocos.director.director.window.get_size()
+        sx = w / float(ow)
+        sy = h / float(oh)
+        scale = min(sx, sy)
+        vw = int(ow * scale)
+        vh = int(oh * scale)
+        if vw < w:
+            vx = (w - vw)//2
+        if vh < h:
+            vy = (h - vh)//2
 
         # this also sets the limited viewport
         self.viewport_width, self.viewport_height = vw, vh
-        self.limited_viewport = (0, 0, vw, vh)
+        self.limited_viewport = (vx, vy, vw, vh)
 
         self.decorations = []
         self.images = []
@@ -103,7 +114,7 @@ class Layout(cocos.layer.Layer):
 
         # detect explicit viewport limiting to avoid automatic setting below
         viewport_changed = False
-        if self.limited_viewport != (0, 0, vw, vh):
+        if self.limited_viewport != (vx, vy, vw, vh):
             viewport_changed = True
 
         # handle rendering the title if there is one
@@ -128,7 +139,7 @@ class Layout(cocos.layer.Layer):
 
             # adjust viewport restriction
             if not viewport_changed and valign == 'top':
-                self.limited_viewport = (0, 0, vw, vh - l.content_height)
+                self.limited_viewport = (vx, vy, vw, vh - l.content_height)
 
         if self.footer is not None:
             # position
@@ -158,7 +169,7 @@ class Layout(cocos.layer.Layer):
             decoration.delete()
         self.batch = None
 
-    def on_resize(self, w, h):
+    def handle_resize(self):
         self.on_exit()
         self.on_enter()
 

@@ -36,6 +36,31 @@ class Page(cocos.scene.Scene):
     def get_viewport(self):
         return self.layout.get_viewport()
 
+    def get_scale(self):
+        '''Determine how to scale the original resolution to the current
+        physical display. Passed in the new physical resolution (most
+        likely from on_resize).
+        '''
+        w, h = director.window.get_size()
+        ow, oh = self.desired_size
+        sx = w / float(ow)
+        sy = h / float(oh)
+        return min(sx, sy)
+
+    _old_dimensions = None
+    def on_resize(self, w, h):
+        if (w, h) == self._old_dimensions:
+            return
+        self._old_dimensions = (w, h)
+
+        # figure the scaling factor
+        scale = self.get_scale()
+
+        # right, now resize bits
+        self.layout.handle_resize()
+        x, y, vw, vh = self.get_viewport()
+        self.content.handle_resize(x, y, vw, vh, scale)
+
 
 class PageContent(cocos.layer.Layer):
     is_event_handler = True
@@ -77,17 +102,20 @@ class PageContent(cocos.layer.Layer):
             element.on_enter(vw, vh)
 
         self.batch = pyglet.graphics.Batch()
+        scale = self.parent.get_scale()
+        self.create_layout(x, y, vw, vh, int(scale*96))
 
+    def create_layout(self, x, y, vw, vh, dpi):
         # render the text lines to our batch
         l = self.text_layout = pyglet.text.layout.IncrementalTextLayout(
-            self.document, vw, vh,
-            multiline=True, batch=self.batch)
+            self.document, vw, vh, dpi=dpi, multiline=True, batch=self.batch)
 
         l.begin_update()
         valign = self.stylesheet['layout']['valign']
         if valign == 'center': l.y = y + vh//2
         elif valign == 'top': l.y = y + vh
         else: l.y = y
+        l.x = x
         l.anchor_y=valign
         l.content_valign=valign
         l.end_update()
@@ -99,19 +127,9 @@ class PageContent(cocos.layer.Layer):
         # the style of the element, which will push the rest of the content
         # down when pyglet notices its size has increased
 
-
-    def on_resize(self, w, h):
-        self.parent.layout.on_resize(w, h)
-        x, y, vw, vh = self.parent.get_viewport()
-        l = self.text_layout
-        l.begin_update()
-        l.x = x
-        if l.anchor_y == 'center': l.y = y + vh//2
-        elif l.anchor_y == 'top': l.y = y + vh
-        else: l.y = y
-        l.width = vw
-        l.height = vh
-        l.end_update()
+    def handle_resize(self, x, y, vw, vh, scale):
+        self.text_layout.delete()
+        self.create_layout(x, y, vw, vh, int(96*scale))
 
     def on_exit(self):
         '''Invoked when the page is removed from the screen.
