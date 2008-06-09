@@ -8,8 +8,8 @@ from bruce import info_layer
 
 class Presentation(pyglet.event.EventDispatcher):
 
-    def __init__(self, pages, start_page=0, show_timer=False,
-            show_count=False):
+    def __init__(self, pages, start_page, show_timer,
+            show_count, desired_size):
         director.window.set_mouse_visible(False)
 
         self.pages = pages
@@ -23,8 +23,11 @@ class Presentation(pyglet.event.EventDispatcher):
             self.info_layer = info_layer.InfoLayer(show_timer, show_count, self.num_pages)
             self.push_handlers(self.info_layer)
 
+        self.desired_size = desired_size
+
     def start_presentation(self):
         self.page = self.pages[self.page_num]
+        self.page.desired_size = self.desired_size
         director.window.set_caption('Presentation: Slide 1')
         self.dispatch_event('on_page_changed', self.page, self.page_num)
         director.run(self.page)
@@ -33,6 +36,7 @@ class Presentation(pyglet.event.EventDispatcher):
         # set up the initial page
         old_page = self.page
         self.page = page
+        page.desired_size = self.desired_size
 
         # enter the page
         if old_page.transition is not None:
@@ -43,11 +47,8 @@ class Presentation(pyglet.event.EventDispatcher):
         director.window.set_caption('Presentation: Slide 1')
         self.dispatch_event('on_page_changed', self.page, self.page_num)
 
-    '''
     def on_resize(self, viewport_width, viewport_height):
-        # XXX set DPI scaled according to viewport change.
-        pass
-    '''
+        self.page.on_resize(viewport_width, viewport_height)
 
     def __move(self, dir):
         # determine the new page, with limits
