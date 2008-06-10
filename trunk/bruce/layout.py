@@ -119,7 +119,7 @@ class Layout(cocos.layer.Layer):
         if self.title is not None:
             # position
             pos, halign, valign = self.title_position
-            loc = dict(w=vw, h=wh)
+            loc = dict(w=vw, h=vh)
             x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
 
             # style
@@ -143,7 +143,7 @@ class Layout(cocos.layer.Layer):
         if self.footer is not None:
             # position
             pos, halign, valign = self.footer_position
-            loc = dict(w=vw, h=wh)
+            loc = dict(w=vw, h=vh)
             x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
 
             # label
