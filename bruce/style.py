@@ -20,8 +20,6 @@ def boolean(value, boolean_true=set('yes true on'.split())):
     return value.lower() in boolean_true
 def stripped(argument):
     return argument and argument.strip() or ''
-def stripped_str(argument):
-    return str(argument and argument.strip() or '')
 def color(argument):
     if not argument:
         return None
@@ -94,7 +92,7 @@ for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
     style_directive.options[group + 'color'] = color
     style_directive.options[group + 'background_color'] = color
     style_directive.options[group + 'font_size'] = directives.positive_int
-    style_directive.options[group + 'font_name'] = stripped_str
+    style_directive.options[group + 'font_name'] = stripped
     style_directive.options[group + 'bold'] = boolean
     style_directive.options[group + 'italic'] = boolean
 
