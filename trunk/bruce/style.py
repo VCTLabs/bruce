@@ -16,7 +16,7 @@ from bruce.color import parse_color
 from cocos.scenes import transitions
 from cocos.director import director
 
-def is_boolean(value, boolean_true = set('yes true on'.split())):
+def boolean(value, boolean_true=set('yes true on'.split())):
     return value.lower() in boolean_true
 def stripped(argument):
     return argument and argument.strip() or ''
@@ -93,8 +93,8 @@ for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
     style_directive.options[group + 'background_color'] = color
     style_directive.options[group + 'font_size'] = directives.positive_int
     style_directive.options[group + 'font_name'] = stripped
-    style_directive.options[group + 'bold'] = is_boolean
-    style_directive.options[group + 'italic'] = is_boolean
+    style_directive.options[group + 'bold'] = boolean
+    style_directive.options[group + 'italic'] = boolean
 
 for group in ('', 'default.', 'title.', 'footer.'):
     style_directive.options[group + 'align'] = halignment
