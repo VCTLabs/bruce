@@ -17,7 +17,7 @@ from cocos.scenes import transitions
 from cocos.director import director
 
 def is_boolean(value, boolean_true = set('yes true on'.split())):
-    return value in boolean_true
+    return value.lower() in boolean_true
 def stripped(argument):
     return argument and argument.strip() or ''
 def color(argument):
