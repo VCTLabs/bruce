@@ -2,15 +2,15 @@
    :align: center
    :layout.valign: center
 
-Default 20pt Arial
+Default 20pt (Arial or Helvetica)
 
 .. style:: :font_size: 24
 
-24pt Arial
+24pt (Arial or Helvetica)
 
 .. style:: :font_size: 64
 
-64pt Arial
+64pt (Arial or Helvetica)
 
 ----
 
