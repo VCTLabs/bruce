@@ -84,6 +84,7 @@ def style_directive(name, arguments, options, content, lineno,
 style_directive.arguments = (0, 0, 0)
 style_directive.options = {
      'layout.valign': valignment,
+     'layout.background_color': color,
      'transition.name': stripped,
      'transition.duration': float,
 }
@@ -164,6 +165,7 @@ default_stylesheet = Stylesheet(
     ),
     layout = dict(
         valign='top',
+        background_color=(255, 255, 255, 255),
     ),
     transition = dict(
         name='none',

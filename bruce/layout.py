@@ -57,7 +57,6 @@ class QuadGroup(pyglet.graphics.Group):
 class Layout(cocos.layer.Layer):
     '''Rendering of page layouts.
     '''
-    bgcolor = (255, 255, 255, 255)
     default_title_position = ('w//2,h', 'center', 'top')
     default_footer_position = ('w//2,0', 'center', 'bottom')
 
@@ -85,19 +84,18 @@ class Layout(cocos.layer.Layer):
         # scale the desired size up /down to the physical size
         ow, oh = self.parent.desired_size
         w, h = cocos.director.director.window.get_size()
-        sx = w / float(ow)
-        sy = h / float(oh)
-        scale = min(sx, sy)
+        scale = self.parent.get_scale()
         vw = int(ow * scale)
         vh = int(oh * scale)
         if vw < w:
             vx = (w - vw)//2
         if vh < h:
             vy = (h - vh)//2
-
-        # this also sets the limited viewport
         self.viewport_width, self.viewport_height = vw, vh
+
+        # set up defaults
         self.limited_viewport = (vx, vy, vw, vh)
+        self.bgcolor = self.stylesheet['layout']['background_color']
 
         self.decorations = []
         self.images = []
@@ -121,7 +119,7 @@ class Layout(cocos.layer.Layer):
         if self.title is not None:
             # position
             pos, halign, valign = self.title_position
-            loc = dict(w=self.viewport_width, h=self.viewport_height)
+            loc = dict(w=vw, h=wh)
             x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
 
             # style
@@ -134,7 +132,8 @@ class Layout(cocos.layer.Layer):
 
             # and create label
             l = pyglet.text.Label(self.title, name, size, bold, italic, color,
-                x, y, anchor_x=halign, anchor_y=valign, halign=halign, batch=self.batch)
+                x, y, anchor_x=halign, anchor_y=valign, halign=halign,
+                dpi=int(scale*96), batch=self.batch)
             self.decorations.append(l)
 
             # adjust viewport restriction
@@ -144,14 +143,14 @@ class Layout(cocos.layer.Layer):
         if self.footer is not None:
             # position
             pos, halign, valign = self.footer_position
-            loc = dict(w=self.viewport_width, h=self.viewport_height)
+            loc = dict(w=vw, h=wh)
             x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
 
             # label
             # XXX should only need width for this label if centering
             l = pyglet.text.DocumentLabel(self.footer, x, y, vw,
                 anchor_x=halign, anchor_y=valign, multiline=True,
-                batch=self.batch)
+                dpi=int(scale*96), batch=self.batch)
             self.decorations.append(l)
 
             # adjust viewport restriction automatically if the footer is at the bottom

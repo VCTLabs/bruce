@@ -142,6 +142,7 @@ The default stylesheet contains::
     footer.font_size = 16
     footer.align = center
     footer.italic = yes
+    layout.background_color = white
     layout.valign = top
 
 The "default" group is used as a fallback when a particular style is looked up and
@@ -176,12 +177,6 @@ the default layout having a white layout and the page title centered
 at the top of the page.
 
 Layout controls a few elements of display:
-
-**background color**
-   The background color is specified using the HTML-like notation used in styles.
-   The color is specified using::
-
-        bgcolor: <color spec>
 
 **title positioning**
    The position of the title is controlled here. The style of the title is controlled
