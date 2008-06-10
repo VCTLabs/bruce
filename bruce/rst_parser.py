@@ -150,6 +150,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def visit_document(self, node):
         pass
 
+    def visit_comment(self, node):
+        self.prune()
+
     def visit_section(self, node):
         '''Add a page
         '''
@@ -231,6 +234,8 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def visit_system_message(self, node):
         self.prune()
 
+    def visit_comment(self, node):
+        self.prune()
 
     #
     # Body elements
