@@ -369,9 +369,8 @@ class DocumentGenerator(structured.StructuredTextDecoder):
             tab_stops = list(tab_stops)
         else:
             tab_stops = []
-        tab_stops.append(left_margin + 50)
-        style['margin_left'] = left_margin + 50
-        style['indent'] = -30
+        tab_stops.append(left_margin + 30)
+        style['margin_left'] = left_margin + 30
         style['tab_stops'] = tab_stops
         self.push_style(node, style)
         self.in_item = True
