@@ -61,7 +61,6 @@ class Page(cocos.scene.Scene):
         x, y, vw, vh = self.get_viewport()
         self.content.handle_resize(x, y, vw, vh, scale)
 
-
 class PageContent(cocos.layer.Layer):
     is_event_handler = True
     def __init__(self, document, stylesheet, elements):
@@ -129,6 +128,8 @@ class PageContent(cocos.layer.Layer):
 
     def handle_resize(self, x, y, vw, vh, scale):
         self.text_layout.delete()
+        for element in self.elements:
+            element.set_scale(scale)
         self.create_layout(x, y, vw, vh, int(96*scale))
 
     def on_exit(self):

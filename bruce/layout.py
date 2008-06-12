@@ -65,6 +65,9 @@ class Layout(cocos.layer.Layer):
         self.stylesheet = stylesheet
         self.title = title
         self.footer = footer
+        self.explicit_viewport = None
+        self.quads = []
+        self.images = []
         super(Layout, self).__init__()
 
     def copy(self):
@@ -79,10 +82,22 @@ class Layout(cocos.layer.Layer):
         '''
         return self.limited_viewport
 
+    _parsed = False
     def on_enter(self):
-        vx = vy = 0
-        # scale the desired size up /down to the physical size
         ow, oh = self.parent.desired_size
+        vars = dict(w=ow, h=oh)
+
+        if not self._parsed:
+            # set up the rendering for this layout by parsing its spec
+            for line in self.content.splitlines():
+                directive, rest = line.split(':', 2)
+                getattr(self, 'handle_%s'%directive.strip())(rest.strip(), vars)
+            self._parsed = True
+
+        # figure the offset we need to center the viewport
+        vx = vy = 0
+
+        # scale the desired size up /down to the physical size
         w, h = cocos.director.director.window.get_size()
         scale = self.parent.get_scale()
         vw = int(ow * scale)
@@ -91,36 +106,68 @@ class Layout(cocos.layer.Layer):
             vx = (w - vw)//2
         if vh < h:
             vy = (h - vh)//2
-        self.viewport_width, self.viewport_height = vw, vh
 
         # set up defaults
-        self.limited_viewport = (vx, vy, vw, vh)
         self.bgcolor = self.stylesheet['layout']['background_color']
-
-        self.decorations = []
-        self.images = []
-        self.batch = pyglet.graphics.Batch()
 
         # vars for the eval
         self.title_position = self.default_title_position
         self.footer_position = self.default_footer_position
 
-        # set up the rendering for this layout by parsing its spec
-        for line in self.content.splitlines():
-            directive, rest = line.split(':', 2)
-            getattr(self, 'handle_%s'%directive.strip())(rest.strip())
+        if self.explicit_viewport:
+            # scale / shift explicit viewport position and dimensions
+            self.limited_viewport = [int(n * scale)
+                for n in self.explicit_viewport]
+            self.limited_viewport[0] += vx
+            self.limited_viewport[1] += vy
+        else:
+            # set up automatic viewport initial values
+            self.limited_viewport = (vx, vy, vw, vh)
 
-        # detect explicit viewport limiting to avoid automatic setting below
-        viewport_changed = False
-        if self.limited_viewport != (vx, vy, vw, vh):
-            viewport_changed = True
+        # set up rendering of the quads
+        self.batch = pyglet.graphics.Batch()
+        self.decorations = []
+
+        # background 
+        c = tuple(self.bgcolor) * 4
+        v = [vx, vy, vx+vw, vy, vx+vw, vy+vh, vx, vy+vh]
+        q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
+        self.decorations.append(q)
+
+        # quads
+        for (c, v) in self.quads:
+            # scale and shift
+            v = [int(n * scale) for n in v]
+            for i in range(4):
+                if vx: v[i*2] += vx
+                if vy: v[i*2 + 1] += vy
+            q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
+            self.decorations.append(q)
+
+        # position images
+        for fname, halign, valign in self.images:
+            image = pyglet.resource.image(fname)
+            s = pyglet.sprite.Sprite(image, x=0, y=0, batch=self.batch)
+            s.scale = scale
+            if halign == 'center':
+                s.x = vw//2 - s.width//2
+            elif halign == 'right':
+                s.x = vw - int(s.width)
+            if valign == 'center':
+                s.y = vh//2 - s.height//2
+            elif valign == 'top':
+                s.y = vh - int(s.height)
+            s.x += vx
+            s.y += vy
+            self.decorations.append(s)
 
         # handle rendering the title if there is one
         if self.title is not None:
             # position
             pos, halign, valign = self.title_position
-            loc = dict(w=vw, h=vh)
-            x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
+            x, y = [eval(e, {}, {'w':vw,'h':vh}) for e in pos.split(',') if '_' not in e]
+            x += vx
+            y += vy
 
             # style
             name = self.stylesheet.value('title', 'font_name')
@@ -136,15 +183,16 @@ class Layout(cocos.layer.Layer):
                 dpi=int(scale*96), batch=self.batch)
             self.decorations.append(l)
 
-            # adjust viewport restriction
-            if not viewport_changed and valign == 'top':
+            # adjust automatic viewport restriction if the title is at the top
+            if not self.explicit_viewport and valign == 'top':
                 self.limited_viewport = (vx, vy, vw, vh - l.content_height)
 
         if self.footer is not None:
             # position
             pos, halign, valign = self.footer_position
-            loc = dict(w=vw, h=vh)
-            x, y = [eval(e, {}, loc) for e in pos.split(',') if '_' not in e]
+            x, y = [eval(e, {}, {'w':vw,'h':vh}) for e in pos.split(',') if '_' not in e]
+            x += vx
+            y += vy
 
             # label
             # XXX should only need width for this label if centering
@@ -153,8 +201,8 @@ class Layout(cocos.layer.Layer):
                 dpi=int(scale*96), batch=self.batch)
             self.decorations.append(l)
 
-            # adjust viewport restriction automatically if the footer is at the bottom
-            if not viewport_changed and valign == 'bottom':
+            # adjust automatic viewport restriction if the footer is at the bottom
+            if not self.explicit_viewport and valign == 'bottom':
                 x, y, w, h = self.limited_viewport
                 footer_height = l.content_height + l.y
                 if y < footer_height:
@@ -169,10 +217,11 @@ class Layout(cocos.layer.Layer):
         self.batch = None
 
     def handle_resize(self):
+        # handle resize by causing everything to layout again
         self.on_exit()
         self.on_enter()
 
-    def handle_image(self, image):
+    def handle_image(self, image, vars):
         halign='left'
         valign='bottom'
         if ';' in image:
@@ -183,24 +232,12 @@ class Layout(cocos.layer.Layer):
                 elif k == 'valign': valign=v
         else:
             fname = image
+        self.images.append((fname, halign, valign))
 
-        image = pyglet.resource.image(fname)
-        s = pyglet.sprite.Sprite(image, x=0, y=0, batch=self.batch)
-        if halign == 'center':
-            s.x = self.viewport_width//2 - s.width//2
-        elif halign == 'right':
-            s.x = self.viewport_width - s.width
-        if valign == 'center':
-            s.y = self.viewport_height//2 - s.height//2
-        elif valign == 'top':
-            s.y = self.viewport_height - s.height
-        self.images.append(s)
-
-    def handle_quad(self, quad):
+    def handle_quad(self, quad, vars):
         cur_color = None
         c = []
         v = []
-        loc = dict(w=self.viewport_width, h=self.viewport_height)
         for entry in [e.strip() for e in quad.split(';')]:
             if entry[0] == 'C':
                 cur_color = parse_color(entry[1:])
@@ -209,30 +246,23 @@ class Layout(cocos.layer.Layer):
                     raise ValueError(
                         'invalid quad spec %r: needs color first'%quad)
                 c.extend(cur_color)
-                v.extend([eval(e, {}, loc) for e in entry[1:].split(',')
+                v.extend([eval(e, {}, vars) for e in entry[1:].split(',')
                     if '_' not in e])
-        q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
-        self.decorations.append(q)
+        self.quads.append((c, v))
 
-    def handle_bgcolor(self, color):
+    def handle_bgcolor(self, color, vars):
         self.bgcolor = parse_color(color)
 
-    def handle_footer_align(self, align):
+    def handle_footer_align(self, align, vars):
         self.footer_position = line.split(':')[1].split(';')
 
-    def handle_viewport(self, viewport):
-        loc = dict(w=self.viewport_width, h=self.viewport_height)
-        self.limited_viewport = tuple(eval(e, {}, loc)
+    def handle_viewport(self, viewport, vars):
+        self.explicit_viewport = tuple(eval(e, {}, vars)
             for e in viewport.split(',') if '_' not in e)
 
-    def handle_title(self, title):
+    def handle_title(self, title, vars):
         self.title_position = line.split(':')[1].split(';')
 
     def draw(self):
-        glPushAttrib(GL_COLOR_BUFFER_BIT)
-        glClearColor(*self.bgcolor)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glPopAttrib()
-
         self.batch.draw()
 
