@@ -100,8 +100,9 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     prompt_more = "... "
 
     def __init__(self, content, width=800, height=300, sysver=False):
-        self.width = width
-        self.height = height
+        self.width_spec = self.width = width
+        self.height_spec = self.height = height
+        self.dpi = 96
 
         # set up the interpreter
         if sysver:
@@ -114,6 +115,17 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.history_pos = 0
 
         super(InterpreterElement, self).__init__(self.height, 0, self.width)
+
+    def set_scale(self, scale):
+        self.width = int(self.width_spec * scale)
+        self.height = int(self.height_spec * scale)
+        self.dpi = int(scale * 96)
+
+        # force re-layout
+        self.layout.delete()
+        self.layout = None
+        self.quad.delete()
+        self.caret.delete()
 
     def on_enter(self, w, h):
         # format the code
@@ -143,7 +155,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             ('v2i', (x, y, x, y+self.height, x+self.width, y+self.height, x+self.width, y))
         )
         self.layout = ScrolledIncrementalTextLayout(self.document,
-            self.width, self.height, multiline=True, batch=layout.batch,
+            self.width, self.height, dpi=self.dpi, multiline=True, batch=layout.batch,
             group=layout.top_group)
 
         # position

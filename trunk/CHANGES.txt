@@ -5,6 +5,7 @@
 - fix page count / timer display
 - allow default style to affect footer style
 - display is now managed using Cocos
+- nicely handle resize when switching to fullscreen
 
 
 3.0beta1

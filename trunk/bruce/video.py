@@ -37,6 +37,9 @@ class VideoElement(pyglet.text.document.InlineElement):
     def __init__(self, video_filename, width=None, height=None, loop=False):
         self.video_filename = video_filename
 
+        self.width_spec = width
+        self.height_spec = height
+
         video = pyglet.resource.media(self.video_filename)
         self.loop = loop
         assert video.video_format
@@ -58,12 +61,31 @@ class VideoElement(pyglet.text.document.InlineElement):
             scale = width / float(self.video_width)
             height = int(scale * self.video_height)
 
-        self.width = width is None and self.video_width or width
-        self.height = height is None and self.video_height or height
+        self.width = width or self.video_width
+        self.height = height or self.video_height
 
         self.vertex_lists = {}
 
         super(VideoElement, self).__init__(self.height, 0, self.width)
+
+    def set_scale(self, scale):
+        width, height = self.width_spec, self.height_spec
+
+        # scale based on dimensions supplied
+        if height is not None and width is None:
+            scale = height / float(self.video_height)
+            width = int(scale * self.video_width)
+        elif width is not None:
+            scale = width / float(self.video_width)
+            height = int(scale * self.video_height)
+
+        self.width = int((width or self.video_width)*scale)
+        self.height = int((height or self.video_height)*scale)
+
+        # update InlineElement attributes
+        self.ascent = self.height
+        self.descent = 0
+        self.advance = self.width
 
     def on_enter(self, viewport_width, viewport_height):
         self.video = pyglet.resource.media(self.video_filename)
