@@ -19,12 +19,7 @@ from bruce.page import Page
 
 from bruce.style import *
 
-def bullet_generator(bullets = u'\u25cf\u25cb\u25a1'):
-    i = -1
-    while 1:
-        i = (i + 1)%3
-        yield bullets[i]
-bullet_generator = bullet_generator()
+BULLETS = u'\u25cf\u25cb\u25a1'
 
 class Section(object):
     def __init__(self, level):
@@ -324,7 +319,8 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.add_element(node.get_interpreter())
 
     def visit_bullet_list(self, node):
-        l = structured.UnorderedListBuilder(bullet_generator.next())
+        bullet = BULLETS[len(self.list_stack)%3]
+        l = structured.UnorderedListBuilder(bullet)
         style = {}
         l.begin(self, style)
         self.push_style(node, style)
