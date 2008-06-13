@@ -325,6 +325,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         l.begin(self, style)
         self.push_style(node, style)
         self.list_stack.append(l)
+        self.in_item = False
     def depart_bullet_list(self, node):
         self.list_stack.pop()
 
@@ -342,6 +343,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         l.begin(self, style)
         self.push_style(node, style)
         self.list_stack.append(l)
+        self.in_item = False
     def depart_enumerated_list(self, node):
         self.list_stack.pop()
 
@@ -361,6 +363,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         pass
     def visit_term(self, node):
         self.break_paragraph()
+        self.in_item = False
     def visit_definition(self, node):
         style = {}
         left_margin = self.current_style.get('margin_left') or 0

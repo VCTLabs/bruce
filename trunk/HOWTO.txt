@@ -58,7 +58,7 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 - interactive Python interpreter sessions
 - styling
 - backgrounds
-
+- transitions between pages
 
 **titles**
     Bruce will not line-wrap title text (doing so messes with layout way too much),
@@ -89,15 +89,21 @@ text. The exception to this is the "layout" style which applies to the
 entire current and subsequent pages.
 
 The stylesheet is broken up into sections: default, literal, emphasis, strong,
-title, footer, block_quote, line_block and literal_block.
+title, footer, block_quote, line_block, literal_block, layout and transition.
 
-Default, title and footer may specify an alignment.
+Default, title and footer may specify a horizontal alignment.
 
 Default, literal_block and line_block may specify margin_left, margin_right,
 margin_top and margin_bottom.
 
-All sections except literal_block may specify character styling in color,
-background_color, font_size, font_name, old and italic.
+All sections except layout, transition and literal_block may specify character
+styling in color, background_color, font_size, font_name, old and italic.
+
+The layout section specifies the background_color and vertical alignment for
+page contents.
+
+The transition section specifies the name of the page transition and time
+to run it for.
 
 **color**
     Specified as an HTML-like RGB or RGBA hex value, eg. ``#ff00ff`` for red=255,
@@ -120,6 +126,15 @@ background_color, font_size, font_name, old and italic.
     One of ``left`` (default), ``center`` or ``right``.
 **margin_left, margin_right, margin_top and margin_bottom**
     Margins surrounding paragraphs specified in pixels.
+**valign**
+    Only valid in the **layout** section; one of ``top`` (default), ``center``
+    or ``bottom``.
+**name**
+    Only valid in the **transition** section; one of the `transition names`_
+    listed below. Default is ``none``.
+**duration**
+    Only valid in the **transition** section; gives the duration in seconds
+    to run the current transition for. Default is ``0.5``.
 
 The default stylesheet contains::
 
@@ -162,6 +177,35 @@ Style changes are specified using the style directive. To change the font to
 To change a single style element you may have the declaration on a single line::
 
    .. style:: :font_size: 64
+
+
+Transition Names
+""""""""""""""""
+
+none
+  No transition effect. Immediate page change, no delay.
+fade
+  Fades to background color and then to next page.
+jump_zoom
+  Zoom out current page and zoom in new page.
+shrink_grow
+  Like jump_zoom but smoother.
+roto_zoom
+  Rotate and zoom our current page, rotate and zoom in new page.
+move_in_left, move_in_right, move_in_bottom, move_in_top
+  Move the next page in from the specified side.
+slide_in_left, slide_in_right, slide_in_bottom, slide_in_top
+  Slide the current page off and new page on from the specified side.
+
+The following do not work on all machines:
+
+- flip_x, flip_y, flip_angle
+- shuffle
+- turn_off_tiles
+- fade_top_right, fade_bottom_left, fade_up, fade_down
+- corner_move
+- envelope
+- split_rows, split_cols
 
 
 Page Layout
@@ -256,5 +300,4 @@ directive.
 To refer to the font later you'll need to know its name, which may differ
 from the filename. You may use the inspect_font.py tool in the pyglet
 source to do so.
-
 

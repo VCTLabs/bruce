@@ -2,11 +2,12 @@
 
 - IMPORTANT: "decoration" is now called "layout"
 - mention docutils requirement
-- fix page count / timer display
+- fixed page count / timer display
 - allow default style to affect footer style
 - display is now managed using Cocos
 - nicely handle resize when switching to fullscreen
 - fixed bullet symbol consistency
+- fixed sub-list first item indentation
 
 
 3.0beta1
