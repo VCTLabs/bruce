@@ -1,4 +1,6 @@
 KNOWN BUGS
 
-- indentation of list item content varies when list enumeration gets wide 
+- test_footer displays nothing
+- test_image and test_interpreter (first page) show resizing issues
+- indentation of list item content varies when list enumeration gets wide
 
