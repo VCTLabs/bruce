@@ -121,6 +121,11 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.height = int(self.height_spec * scale)
         self.dpi = int(scale * 96)
 
+        # update InlineElement attributes
+        self.ascent = self.height
+        self.descent = 0
+        self.advance = self.width
+
         # force re-layout
         self.layout.delete()
         self.layout = None

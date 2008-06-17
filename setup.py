@@ -9,16 +9,30 @@ from bruce import __version__
 setup(
     name = "bruce",
     version = __version__,
-    description = "Bruce the Presentation Tool",
-    long_description = '''Bruce the Presentation Tool is for
-people who are tired of fighting with presentation tools.
-Presentations are composed (edited) in plain text files. In its
-basic form it allows text, code, image, interative Python sessions
-and video. It uses pyglet to render in OpenGL.
+    description = "Bruce, the Presentation Tool",
+    long_description = '''
+Bruce, the Presentation Tool is for people who are tired of
+fighting with presentation tools. Presentations are composed
+(edited) in plain text files. It allows text, code, image,
+interative Python sessions and video. It uses pyglet to render
+in OpenGL.
+
+Changes in this release:
+
+- IMPORTANT: "decoration" is now called "layout"
+- mention docutils requirement
+- fixed page count / timer display
+- allow default style to affect footer style
+- display is now managed using Cocos
+- add page transitions
+- nicely handle resize when switching to fullscreen
+- fixed bullet symbol consistency
+- fixed sub-list first item indentation
+- better detection of mouse click vs. drag
 
 
-Bruce 3.0 Features (this being the first 3.0 release)
-=====================================================
+Bruce, the Presentation Tool version 3.0 Features
+=================================================
 
 - displays ReStructuredText content with one page per section or transition
 - handling of *most* of ReStructuredText, including:
@@ -40,6 +54,7 @@ Bruce 3.0 Features (this being the first 3.0 release)
   * videos (embedded just like images) with optional looping
   * stylesheet and layout changes on the fly (eg. multiple fonts
     per page)
+  * transitions between pages
 
 - timer and page count display for practicing
 - may specify which screen to open on in multihead
@@ -62,10 +77,40 @@ To install Bruce, run::
 
     # python setup.py install
 
+How to use Bruce, the Presentation Tool
+=======================================
+
+To invoke bruce, run::
+
+    % bruce <presentation source.txt>
+
+There's a number of command-line controls - use ``bruce -h`` to
+learn what they do.
 
 
-How to write presentations using Bruce the Presentation Tool
-============================================================
+Controls
+========
+
+left, right arrows; left, right mouse button; space bar (forward)
+  Move back and forward pages.
+page up, page down
+  Move back and forward 5 pages.
+mouse scroll wheel
+  Scroll large page content. You may also drag the contents up or down
+  by dragging a left mouse button press up and down the screen. If a
+  page has an embedded Python Interpreter you may use the scroll-wheel
+  to scroll its contents (when the mouse is over the interpreter).
+  Clicking and dragging always scrolls the whole page.
+control-F
+  Switch between fullscreen and windowed mode
+escape
+  Exit presentation
+home, end
+  Go to the first or last page
+
+
+How to write presentations using Bruce, the Presentation Tool
+=============================================================
 
 Bruce presentations are written as plain-text files in the
 ReStructuredText format with some extensions. See the examples
@@ -91,7 +136,7 @@ on a white background (using the "big-centered" style)::
     centered at the top by default.
 
 and so on. For more information see the HOWTO__ at the Bruce
-website.
+website and the examples directory.
 
 __ http://r1chardj0n3s.googlepages.com/howto
 ''',

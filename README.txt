@@ -2,15 +2,28 @@
 Bruce the Presentation Tool
 ---------------------------
 
-Bruce the Presentation Tool is for people who are tired of fighting
-with presentation tools. Presentations are composed (edited) in plain text
-files.
-In its basic form it allows text, code, image, interative Python sessions
-and video. It uses pyglet to render in OpenGL.
+Bruce, the Presentation Tool is for people who are tired of
+fighting with presentation tools. Presentations are composed
+(edited) in plain text files. It allows text, code, image,
+interative Python sessions and video. It uses pyglet to render
+in OpenGL.
+
+Changes in this release:
+
+- IMPORTANT: "decoration" is now called "layout"
+- mention docutils requirement
+- fixed page count / timer display
+- allow default style to affect footer style
+- display is now managed using Cocos
+- add page transitions
+- nicely handle resize when switching to fullscreen
+- fixed bullet symbol consistency
+- fixed sub-list first item indentation
+- better detection of mouse click vs. drag
 
 
-Bruce 3.0 Features (this being the first 3.0 release)
-=====================================================
+Bruce, the Presentation Tool version 3.0 Features
+=================================================
 
 - displays ReStructuredText content with one page per section or transition
 - handling of *most* of ReStructuredText, including:
@@ -22,7 +35,7 @@ Bruce 3.0 Features (this being the first 3.0 release)
   * images - inline and stand-alone, including scaling
   * page titles (section headings)
 
-- page decorations
+- page layout and decorations
 - scrolling of content larger than a screenful
 - sensible resource location (images, video, sound from the same directory
   as the presentation file)
@@ -30,13 +43,15 @@ Bruce 3.0 Features (this being the first 3.0 release)
 
   * embedded Python interative interpreter sessions
   * videos (embedded just like images) with optional looping
-  * stylesheet and decoration changes on the fly (eg. multiple fonts
+  * stylesheet and layout changes on the fly (eg. multiple fonts
     per page)
+  * transitions between pages
 
 - timer and page count display for practicing
 - may specify which screen to open on in multihead
 - runs fullscreen at native resolution
 - may switch to/from fullscreen quickly
+
 
 
 Installation
@@ -53,13 +68,15 @@ To install Bruce, run::
 
     # python setup.py install
 
+How to use Bruce, the Presentation Tool
+=======================================
 
-Usage
-=====
+To invoke bruce, run::
 
-Run Bruce using "bruce <arguments>". Use the -h switch to get usage help.
+    % bruce <presentation source.txt>
 
-See HOWTO.txt for the presentation file format.
+There's a number of command-line controls - use ``bruce -h`` to
+learn what they do.
 
 
 Controls
@@ -83,10 +100,36 @@ home, end
   Go to the first or last page
 
 
-Samples
-=======
+How to write presentations using Bruce, the Presentation Tool
+=============================================================
 
-See the examples directory.
+Bruce presentations are written as plain-text files in the
+ReStructuredText format with some extensions. See the examples
+folder \*.rst files for some samples, the simplest being
+"simple.rst" which displays plain text sentences centered
+on a white background (using the "big-centered" style)::
+
+    .. load-style:: big-centered
+
+    Text displayed centered on the default white background.
+
+    ----
+
+    A new page, separated from the previous using the four
+    dashes.
+
+    Ut enim ad minim veniam.
+
+    A Page Title
+    ------------
+
+    Pages may optionally have titles which are displayed
+    centered at the top by default.
+
+and so on. For more information see the HOWTO__ at the Bruce
+website and the examples directory.
+
+__ http://r1chardj0n3s.googlepages.com/howto
 
 
 License
@@ -105,7 +148,7 @@ modification, are permitted provided that the following conditions are met:
 3. The name of the author may not be used to endorse or promote products
    derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
 NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
