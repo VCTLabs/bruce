@@ -7,6 +7,8 @@ from docutils.parsers.rst import directives
 import pyglet
 from pyglet.gl import *
 
+from cocos.director import director
+
 #
 # Python Interpreter directive
 #
@@ -126,11 +128,12 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.descent = 0
         self.advance = self.width
 
-        # force re-layout
-        self.layout.delete()
-        self.layout = None
-        self.quad.delete()
-        self.caret.delete()
+        # force re-layout if we're laid out
+        if self.layout is not None:
+            self.layout.delete()
+            self.layout = None
+            self.quad.delete()
+            self.caret.delete()
 
     def on_enter(self, w, h):
         # format the code
@@ -141,6 +144,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             'color': (0, 0, 0, 255),
         })
         self.start_of_line = len(self.document.text)
+        director.window.push_handlers(self)
 
     layout = None
     def place(self, layout, x, y):
@@ -183,6 +187,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         pass
 
     def on_exit(self):
+        director.window.pop_handlers()
         self.document = None
         self.layout.delete()
         self.layout = None
@@ -280,6 +285,9 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             self.caret.position = len(self.document.text)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        if self.layout is None:
+            # not on-screen at all
+            return
         sx, sy, sw, sh = self.layout.get_screen_rect()
         if x < sx or x > sx + sw: return
         if y < sy or y > sy + sh: return

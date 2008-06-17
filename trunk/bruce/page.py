@@ -47,12 +47,7 @@ class Page(cocos.scene.Scene):
         sy = h / float(oh)
         return min(sx, sy)
 
-    _old_dimensions = None
     def on_resize(self, w, h):
-        if (w, h) == self._old_dimensions:
-            return
-        self._old_dimensions = (w, h)
-
         # figure the scaling factor
         scale = self.get_scale()
 
@@ -69,31 +64,17 @@ class PageContent(cocos.layer.Layer):
         self.elements = elements
         super(PageContent, self).__init__()
 
-    # XXX Cocos doesn't invoke a push_all_handlers for some reason
-    # so I do it manually in on_enter
-    def _push_all_handlers(self):
-#        director.window.push_handlers(self)
-        for element in self.elements:
-            director.window.push_handlers(element)
-
-    def _remove_all_handlers(self):
-        for element in self.elements:
-            director.window.pop_handlers()
-#        director.window.pop_handlers()
-
     def update(self, dt):
         '''Invoked periodically with the time since the last
         update()
         '''
         pass
 
-
     def on_enter(self):
         '''Invoked when the page is put up on the screen of the given
         dimensions.
         '''
         super(PageContent, self).on_enter()
-        self._push_all_handlers()
 
         x, y, vw, vh = self.parent.get_viewport()
 
@@ -101,14 +82,24 @@ class PageContent(cocos.layer.Layer):
             element.on_enter(vw, vh)
 
         self.batch = pyglet.graphics.Batch()
-        scale = self.parent.get_scale()
-        self.create_layout(x, y, vw, vh, int(scale*96))
+        self.create_layout(x, y, vw, vh, self.parent.get_scale())
 
-    def create_layout(self, x, y, vw, vh, dpi):
+    _current_dimensions = None
+    def create_layout(self, x, y, vw, vh, scale):
+        # remember these dimensions for later so we don't
+        # re-calc on a NOOP resize
+        self._current_dimensions = (x, y, vw, vh, scale)
+
+        # set scale factor on inline elements
+        for element in self.elements:
+            element.set_scale(scale)
+
         # render the text lines to our batch
         l = self.text_layout = pyglet.text.layout.IncrementalTextLayout(
-            self.document, vw, vh, dpi=dpi, multiline=True, batch=self.batch)
+            self.document, vw, vh, dpi=int(scale*96), multiline=True,
+            batch=self.batch)
 
+        # set dimensions & alignment in one go
         l.begin_update()
         valign = self.stylesheet['layout']['valign']
         if valign == 'center': l.y = y + vh//2
@@ -127,20 +118,27 @@ class PageContent(cocos.layer.Layer):
         # down when pyglet notices its size has increased
 
     def handle_resize(self, x, y, vw, vh, scale):
+        # detect no change
+        if self._current_dimensions == (x, y, vw, vh, scale):
+            return
+
+        # force re-layout
         self.text_layout.delete()
-        for element in self.elements:
-            element.set_scale(scale)
-        self.create_layout(x, y, vw, vh, int(96*scale))
+        self.create_layout(x, y, vw, vh, scale)
 
     def on_exit(self):
         '''Invoked when the page is removed from the screen.
         '''
-        self._remove_all_handlers()
+        # now do me (this will remove my event handlers)
         super(PageContent, self).on_exit()
+
+        # disable the mouse hiding
         if self._cb_hide_mouse_scheduled:
             self.cb_hide_mouse(0)
+
         for element in self.elements:
             element.on_exit()
+
         self.text_layout.delete()
         self.text_layout = None
         self.batch = None
