@@ -5,9 +5,11 @@
 - fixed page count / timer display
 - allow default style to affect footer style
 - display is now managed using Cocos
+- add page transitions
 - nicely handle resize when switching to fullscreen
 - fixed bullet symbol consistency
 - fixed sub-list first item indentation
+- better detection of mouse click vs. drag
 
 
 3.0beta1

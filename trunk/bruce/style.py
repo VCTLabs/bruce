@@ -30,9 +30,9 @@ def valignment(argument):
     return directives.choice(argument, ('top', 'center', 'bottom'))
 
 _transitions = dict(
+    # do not require VBO support
+    none=None,
     fade=transitions.FadeTransition,
-    roto_zoom=transitions.RotoZoomTransition,
-    jump_zoom=transitions.JumpZoomTransition,
     move_in_left=transitions.MoveInLTransition,
     move_in_right=transitions.MoveInRTransition,
     move_in_bottom=transitions.MoveInBTransition,
@@ -41,6 +41,11 @@ _transitions = dict(
     slide_in_right=transitions.SlideInRTransition,
     slide_in_bottom=transitions.SlideInBTransition,
     slide_in_top=transitions.SlideInTTransition,
+    roto_zoom=transitions.RotoZoomTransition,
+    jump_zoom=transitions.JumpZoomTransition,
+    shrink_grow=transitions.ShrinkGrowTransition,
+
+    # require VBO support
     flip_x=transitions.FlipX3DTransition,
     flip_y=transitions.FlipY3DTransition,
     flip_angle=transitions.FlipAngular3DTransition,
@@ -50,12 +55,10 @@ _transitions = dict(
     fade_bottom_left=transitions.FadeBLTransition,
     fade_up=transitions.FadeUpTransition,
     fade_down=transitions.FadeDownTransition,
-    shrink_grow=transitions.ShrinkGrowTransition,
     corner_move=transitions.CornerMoveTransition,
     envelope=transitions.EnvelopeTransition,
     split_rows=transitions.SplitRowsTransition,
     split_cols=transitions.SplitColsTransition,
-    none=None,
 )
 
 #

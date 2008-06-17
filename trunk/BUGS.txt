@@ -1,5 +1,4 @@
 KNOWN BUGS
 
-- indentation issue in first line of definition on definition lists second page
 - indentation of list item content varies when list enumeration gets wide 
 

@@ -32,14 +32,16 @@ class Presentation(pyglet.event.EventDispatcher):
         self.dispatch_event('on_page_changed', self.page, self.page_num)
         director.run(self.page)
 
-    def _enter_page(self, page):
+    def _enter_page(self, page, forward=True):
         # set up the initial page
         old_page = self.page
         self.page = page
         page.desired_size = self.desired_size
 
         # enter the page
-        if old_page.transition is not None:
+        if forward and page.transition is not None:
+            page.transition(page)
+        elif not forward and old_page.transition is not None:
             old_page.transition(page)
         else:
             director.replace(page)
@@ -59,7 +61,7 @@ class Presentation(pyglet.event.EventDispatcher):
         self.page_num = new
 
         # enter the new page
-        self._enter_page(self.pages[self.page_num])
+        self._enter_page(self.pages[self.page_num], dir>0)
 
     def __next(self):
         if not self.page.on_next():
@@ -92,16 +94,6 @@ class Presentation(pyglet.event.EventDispatcher):
         if pressed == key.SPACE:
             self.__next()
 
-        # switch fullscreen/windowed on ctrl-F
-        # XXX maybe keep this depending on how well Cocos' fullscreen switch works
-        if 0: #pressed == key.F and modifiers & key.MOD_CTRL:
-            if not self.window.fullscreen:
-                self.window._restore_size = (
-                    self.window.width, self.window.height)
-            self.window.set_fullscreen(not self.window.fullscreen)
-            if not self.window.fullscreen:
-                self.window.set_size(*self.window._restore_size)
-
     def on_text_motion(self, motion):
         if motion == key.MOTION_LEFT: self.__previous()
         elif motion == key.MOTION_RIGHT: self.__next()
@@ -115,21 +107,24 @@ class Presentation(pyglet.event.EventDispatcher):
     left_pressed = right_pressed = 0
     def on_mouse_press(self, x, y, button, modifiers):
         if button == mouse.LEFT:
-            self.left_pressed = time.time()
+            self.left_pressed = (time.time(), x, y)
             return pyglet.event.EVENT_HANDLED
         elif button == mouse.RIGHT:
-            self.right_pressed = time.time()
+            self.right_pressed = (time.time(), x, y)
             return pyglet.event.EVENT_HANDLED
         return pyglet.event.EVENT_UNHANDLED
 
     def on_mouse_release(self, x, y, button, modifiers):
-        # XXX need a better mouse click-or-drag detection method
-        if button == mouse.LEFT and time.time() - self.left_pressed < .2:
-            self.__next()
-            return pyglet.event.EVENT_HANDLED
-        elif button == mouse.RIGHT and time.time() - self.right_pressed < .2:
-            self.__previous()
-            return pyglet.event.EVENT_HANDLED
+        if button == mouse.LEFT:
+            st, sx, sy = self.left_pressed
+            if time.time() - st < .2 and (abs(sx-x) + abs(sy-y) < 2):
+                self.__next()
+                return pyglet.event.EVENT_HANDLED
+        elif button == mouse.RIGHT:
+            st, sx, sy = self.right_pressed
+            if time.time() - st < .2 and (abs(sx-x) + abs(sy-y) < 2):
+                self.__previous()
+                return pyglet.event.EVENT_HANDLED
         return pyglet.event.EVENT_UNHANDLED
 
 Presentation.register_event_type('on_page_changed')
