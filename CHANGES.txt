@@ -1,15 +1,14 @@
 3.0beta2
 
 - IMPORTANT: "decoration" is now called "layout"
+- integration of Cocos allowing page transitions
 - mention docutils requirement
-- fixed page count / timer display
 - allow default style to affect footer style
-- display is now managed using Cocos
-- add page transitions
 - nicely handle resize when switching to fullscreen
+- better detection of mouse click vs. drag
+- fixed page count / timer display
 - fixed bullet symbol consistency
 - fixed sub-list first item indentation
-- better detection of mouse click vs. drag
 
 
 3.0beta1
