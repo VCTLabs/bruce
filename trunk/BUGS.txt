@@ -1,6 +1,7 @@
 KNOWN BUGS
 
+- transitions mostly get confused when in fullscreen
+- VBO transitions display no text
 - test_footer displays nothing
-- test_image and test_interpreter (first page) show resizing issues
+- test_interpreter (first page) shows resizing issues
 - indentation of list item content varies when list enumeration gets wide
-
