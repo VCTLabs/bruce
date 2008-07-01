@@ -15,7 +15,7 @@ Changes in this release:
 - fixed page count / timer display
 - allow default style to affect footer style
 - display is now managed using Cocos
-- add page transitions
+- add page transitions (experimental)
 - nicely handle resize when switching to fullscreen
 - fixed bullet symbol consistency
 - fixed sub-list first item indentation
