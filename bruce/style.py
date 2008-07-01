@@ -65,6 +65,8 @@ _transitions = dict(
 # Style directive
 #
 class load_style(nodes.Special, nodes.Invisible, nodes.Element):
+    '''Document tree node representing a style loading directive.
+    '''
     def get_style(self):
         if self.rawsource in stylesheets:
             return stylesheets[self.rawsource]
@@ -78,6 +80,8 @@ load_style_directive.content = False
 directives.register_directive('load-style', load_style_directive)
 
 class style(nodes.Special, nodes.Invisible, nodes.Element):
+    '''Document tree node representing a style directive.
+    '''
     def get_style(self):
         return self.rawsource
 

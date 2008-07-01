@@ -13,6 +13,8 @@ from cocos.director import director
 # Python Interpreter directive
 #
 class interpreter(nodes.Special, nodes.Invisible, nodes.Element):
+    '''Document tree node representing Python interpreter a directive.
+    '''
     def get_interpreter(self):
         # XXX allow to fill the available layout dimensions
 
@@ -40,6 +42,10 @@ interpreter_directive.content = True
 directives.register_directive('interpreter', interpreter_directive)
 
 class MyScrollableTextLayoutGroup(pyglet.text.layout.ScrollableTextLayoutGroup):
+    '''Extend the base pyglet scrollable text layout group to handle being
+    embedded in (and thus scrolled by) another scrollable text layout. This
+    affects the scissor clipping region.
+    '''
     def set_state(self):
         glPushAttrib(GL_ENABLE_BIT | GL_SCISSOR_BIT | GL_CURRENT_BIT)
         glEnable(GL_BLEND)
@@ -57,6 +63,9 @@ class MyScrollableTextLayoutGroup(pyglet.text.layout.ScrollableTextLayoutGroup):
         glTranslatef(self.translate_x, self.translate_y, 0)
 
 class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
+    '''Override to alter the default Groups assigned to the Layout so we use
+    MyScrollableTextLayoutGroup.
+    '''
     def _init_groups(self, group):
         # override with our scrolledd scrollable ... er layout
         self.top_group = MyScrollableTextLayoutGroup(group)
@@ -66,6 +75,9 @@ class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
             pyglet.text.layout.TextLayoutForegroundDecorationGroup(2, self.top_group)
 
     def get_screen_rect(self):
+        '''Convenience function to determine the pixels being used on-screen
+        by this Layout.
+        '''
         tg = self.top_group
         parent_x = tg.parent_group.translate_x
         parent_y = tg.parent_group.translate_y
@@ -75,6 +87,8 @@ class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
                   tg._scissor_height)
 
 class Output:
+    '''Utility for capturing stdout from an interactive session.
+    '''
     def __init__(self, display, realstdout):
         self.out = display
         self.realstdout = realstdout
@@ -84,7 +98,11 @@ class Output:
         self.out(data)
 
 # XXX put this in a thread
+# XXX but how to supervise / terminate it?
 class MyInterpreter(code.InteractiveInterpreter):
+    '''Extend the base interpreter by capturing the output so we may display it
+    using OpenGL.
+    '''
     def __init__(self, locals, display):
         self.write = display
         code.InteractiveInterpreter.__init__(self, locals=locals)
@@ -101,7 +119,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     prompt = ">>> "
     prompt_more = "... "
 
-    def __init__(self, content, width=800, height=300, sysver=False):
+    def __init__(self, content, width=800, height=400, sysver=False):
         self.width_spec = self.width = width
         self.height_spec = self.height = height
         self.dpi = 96

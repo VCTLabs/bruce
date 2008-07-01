@@ -18,6 +18,8 @@ from bruce.color import parse_color
 # Layout directive
 #
 class layout(nodes.Special, nodes.Invisible, nodes.Element):
+    '''Document tree node representing a page layout directive.
+    '''
     def get_layout(self):
         return self.rawsource
 
@@ -88,6 +90,7 @@ class Layout(cocos.layer.Layer):
         vars = dict(w=ow, h=oh)
 
         if not self._parsed:
+            self.bgcolor = self.stylesheet['layout']['background_color']
             # set up the rendering for this layout by parsing its spec
             for line in self.content.splitlines():
                 directive, rest = line.split(':', 2)
@@ -106,9 +109,6 @@ class Layout(cocos.layer.Layer):
             vx = (w - vw)//2
         if vh < h:
             vy = (h - vh)//2
-
-        # set up defaults
-        self.bgcolor = self.stylesheet['layout']['background_color']
 
         # vars for the eval
         self.title_position = self.default_title_position
