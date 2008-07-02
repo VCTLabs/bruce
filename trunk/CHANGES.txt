@@ -1,3 +1,8 @@
+3.0
+
+- fix page number in window title
+
+
 3.0beta2
 
 - IMPORTANT: "decoration" is now called "layout"
