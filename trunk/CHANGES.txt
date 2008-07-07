@@ -1,6 +1,7 @@
 3.0
 
 - fix page number in window title
+- set the clear color to the layout bgcolor
 
 
 3.0beta2
