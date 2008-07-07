@@ -36,6 +36,9 @@ class Presentation(pyglet.event.EventDispatcher):
         # set up the initial page
         old_page = self.page
         self.page = page
+        bgcolor = page.content.stylesheet['layout']['background_color']
+        bgcolor = [c/255. for c in bgcolor]
+        pyglet.gl.glClearColor(*bgcolor)
         page.desired_size = self.desired_size
 
         # enter the page
