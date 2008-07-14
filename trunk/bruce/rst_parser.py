@@ -1,4 +1,5 @@
 import os
+import warnings
 
 import docutils.parsers.rst
 from docutils.core import publish_doctree
@@ -136,6 +137,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
         doctree.walkabout(DocutilsVisitor(doctree, self))
 
+    def visit_unknown(self, node):
+        warnings.warn('Unhandled document node %s'%node.__class__.__name__)
+
     def depart_unknown(self, node):
         pass
 
@@ -207,6 +211,9 @@ class DocumentGenerator(structured.StructuredTextDecoder):
                 child.walkabout(visitor)
         except nodes.SkipSiblings:
             pass
+
+    def visit_unknown(self, node):
+        warnings.warn('Unhandled document node %s'%node.__class__.__name__)
 
     def depart_unknown(self, node):
         pass
@@ -471,15 +478,15 @@ class DocutilsVisitor(nodes.NodeVisitor):
 
     def dispatch_visit(self, node):
         node_name = node.__class__.__name__
-        method = getattr(self.decoder, 'visit_%s' % node_name)
-        #, self.decoder.visit_unknown)
+        method = getattr(self.decoder, 'visit_%s' % node_name,
+             self.decoder.visit_unknown)
         method(node)
 
     def dispatch_departure(self, node):
         self.decoder.pop_style(node)
         node_name = node.__class__.__name__
         method = getattr(self.decoder, 'depart_%s' % node_name,
-                         self.decoder.depart_unknown)
+             self.decoder.depart_unknown)
         method(node)
 
 
