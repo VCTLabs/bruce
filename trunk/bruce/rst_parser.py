@@ -279,6 +279,13 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def depart_literal_block(self, node):
         self.in_literal = False
 
+    # XXX one day do some nice formatting
+    def visit_doctest_block(self, node):
+        self.visit_literal_block(node)
+
+    def depart_doctest_block(self, node):
+        self.depart_literal_block(node)
+
     # Line blocks have lines in them, we just have to add a hard-return to the
     # lines. Line blocks should only indent child blocks.
     line_block_count = 0
