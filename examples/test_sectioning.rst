@@ -1,5 +1,7 @@
 content1
 
+(you sould see contentN increment orderly)
+
 Section 1
 ---------
 
@@ -9,10 +11,14 @@ content2
 
 content3
 
+----
+
+content4
+
 Section 2
 ---------
 
-content4
+content5
 
 example::
 

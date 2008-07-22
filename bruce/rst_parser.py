@@ -82,8 +82,8 @@ class SectionContent(Transform):
 
                 # grab any transition-delimited pages from the section
                 move_from_section = False
+                new_section_content[:] = []
                 for n, child in enumerate(list(node.children)):
-                    new_section_content[:] = []
                     if isinstance(child, nodes.transition):
                         move_from_section = True
                         node.remove(child)
