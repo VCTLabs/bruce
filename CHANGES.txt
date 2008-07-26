@@ -1,5 +1,6 @@
 3.0
 
+- Bruce must be invoked using "python -m bruce.run" now
 - fix page number in window title
 - set the clear color to the layout bgcolor
 - generate warnings when unhandled docutils features are encountered

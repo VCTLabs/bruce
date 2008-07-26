@@ -2,11 +2,11 @@
 try:
     import pygments
     from pygments import token, lexers
+    from pygments.formatter import Formatter
     have_pygments = True
 except ImportError:
     have_pygments = False
-
-from pygments.formatter import Formatter
+    Formatter=object
 
 class BruceFormatter(Formatter):
     def __init__(self, generator):
