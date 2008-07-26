@@ -14,6 +14,7 @@ from bruce import layout
 from bruce import interpreter, video
 from bruce import resource
 from bruce.image import ImageElement
+from bruce import pygments_parser
 
 # the basic page
 from bruce.page import Page
@@ -279,9 +280,11 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def depart_literal_block(self, node):
         self.in_literal = False
 
-    # XXX one day do some nice formatting
     def visit_doctest_block(self, node):
         self.visit_literal_block(node)
+        if pygments_parser.have_pygments:
+            pygments_parser.handle_rst_node(self, node, 'pycon')
+            self.prune()
 
     def depart_doctest_block(self, node):
         self.depart_literal_block(node)

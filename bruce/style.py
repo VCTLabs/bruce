@@ -177,7 +177,37 @@ default_stylesheet = Stylesheet(
     transition = dict(
         name='none',
         duration=0.5,
-    )
+    ),
+
+    # Pygments styles for code highlighting
+    code_keyword = dict(
+        color = (0, 0x80, 0, 255),
+    ),
+    code_text = dict(
+    ),
+    code_generic = dict(
+    ),
+    code_name = dict(
+        bold=True,
+    ),
+    code_literal = dict(
+        color=(0xBA, 0x21, 0x21, 255),
+    ),
+    #code_string = dict(
+        #color=(0xBA, 0x21, 0x21, 255),
+    #),
+    #code_number = dict(
+        #color=(0x66, 0x66, 0x66, 255),
+    #),
+    code_punctuation = dict(
+    ),
+    code_operator = dict(
+        color=(0x66, 0x66, 0x66, 255),
+    ),
+    code_comment = dict(
+        italic=True,
+        color=(0x40, 0x80, 0x80, 255),
+    ),
 )
 
 big_centered = default_stylesheet.copy()
