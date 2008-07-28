@@ -55,10 +55,13 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 - definition lists
 - images - inline and stand-alone
 - page titles (section headings)
+- syntax highlighting of code if Pygments__ is installed
 - interactive Python interpreter sessions
 - styling
 - backgrounds
 - transitions between pages
+
+__ http://pygments.org/
 
 **titles**
     Bruce will not line-wrap title text (doing so messes with layout way too much),
@@ -72,6 +75,10 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 **video**
     Embedded in the same manner as images, and may be scaled in the same way.
     Additionally video may be asked to loop using the ``:loop:`` flag.
+
+**code**
+    Syntax-highlighting of code blocks if Pygments is installed. The range of
+    languages supported by Pygments is at http://pygments.org/docs/lexers/
 
 **interpreter**
     Embeds a Python interpreter in the page. The options available are ``:width:`` and

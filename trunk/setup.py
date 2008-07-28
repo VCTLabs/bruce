@@ -68,10 +68,21 @@ Installation
 
 Bruce REQUIRES:
 
-- Python 2.5
-- docutils 0.4.1 or later
-- pyglet 1.1 beta 2 or later
-- Cocos 0.3 rc0 or later
+- Python__ 2.5
+- docutils__ 0.4.1 or later
+- pyglet__ 1.1 beta 2 or later
+- Cocos__ 0.3 rc0 or later
+
+__ http://www.python.org/
+__ http://docutils.sf.net/
+__ http://pyglet.org/
+__ http://cocos2d.org/
+
+And you may also optionally install:
+
+- Pygments__ 0.10 or later
+
+__ http://pygments.org/
 
 To install Bruce, run::
 
