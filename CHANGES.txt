@@ -5,7 +5,8 @@
 - set the clear color to the layout bgcolor
 - generate warnings when unhandled docutils features are encountered
 - handle doctest
-- add support for Pygments for code colorisation
+- add support for Pygments code colorisation
+- add code block for displaying code blocks
 
 
 3.0beta2

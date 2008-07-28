@@ -12,6 +12,7 @@ from pyglet.text.formats import structured
 # these imports simply cause directives to be registered
 from bruce import layout
 from bruce import interpreter, video
+from bruce import code_block
 from bruce import resource
 from bruce.image import ImageElement
 from bruce import pygments_parser
@@ -280,10 +281,10 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def depart_literal_block(self, node):
         self.in_literal = False
 
-    def visit_doctest_block(self, node):
+    def visit_doctest_block(self, node, lexer_name='pycon'):
         self.visit_literal_block(node)
         if pygments_parser.have_pygments:
-            pygments_parser.handle_rst_node(self, node, 'pycon')
+            pygments_parser.handle_rst_node(self, node, lexer_name)
             self.prune()
 
     def depart_doctest_block(self, node):
@@ -318,6 +319,14 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         if node.has_key('height'):
             kw['height'] = int(node['height'])
         self.add_element(ImageElement(node['uri'].strip(), **kw))
+
+    def visit_code(self, node):
+        self.visit_literal_block(node)
+        if pygments_parser.have_pygments:
+            pygments_parser.handle_rst_node(self, node, node['lexer_name'])
+            self.prune()
+    def depart_code(self, node):
+        self.depart_literal_block(node)
 
     def visit_video(self, node):
         # if the parent is structural - document, section, etc then we need
