@@ -330,7 +330,6 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.visit_literal_block(node)
         if pygments_parser.have_pygments:
             pygments_parser.handle_rst_node(self, node, node['lexer_name'])
-            self.prune()
     def depart_code(self, node):
         self.depart_literal_block(node)
 
