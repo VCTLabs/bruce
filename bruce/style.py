@@ -148,10 +148,11 @@ default_stylesheet = Stylesheet(
     literal = dict(
         font_name='Courier New',
         font_size=20,
-        background_color=(220, 220, 220, 255),
     ),
     literal_block = dict(
         margin_left=20,
+        # XXX reinstate if we can bg the whole block
+        #background_color=(220, 220, 220, 255),
     ),
     line_block = dict(
         margin_left=40,
@@ -190,15 +191,17 @@ default_stylesheet = Stylesheet(
     code_name = dict(
         bold=True,
     ),
+    code_name_class = dict(
+        bold=True,
+        color=(0xBA, 0xBA, 0x21, 255),
+    ),
+    code_name_function = dict(
+        bold=True,
+        color=(0xBA, 0xBA, 0x21, 255),
+    ),
     code_literal = dict(
         color=(0xBA, 0x21, 0x21, 255),
     ),
-    #code_string = dict(
-        #color=(0xBA, 0x21, 0x21, 255),
-    #),
-    #code_number = dict(
-        #color=(0x66, 0x66, 0x66, 255),
-    #),
     code_punctuation = dict(
     ),
     code_operator = dict(
