@@ -13,6 +13,7 @@ from pyglet.text.formats import structured
 from bruce import layout
 from bruce import interpreter, video
 from bruce import code_block
+from bruce import blank
 from bruce import resource
 from bruce.image import ImageElement
 from bruce import pygments_parser
@@ -160,7 +161,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         self.layout.title = None
         g = DocumentGenerator(self.stylesheet, self.layout)
         d = g.decode(node)
-        if g.len_text:
+        if g.len_text or g.is_blank:
             p = Page(d, self.stylesheet.copy(), self.layout.copy(),
                 d.elements, node)
             self.pages.append(p)
@@ -186,6 +187,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.stylesheet = stylesheet
         self.layout = layout
         self.style_base_class = style_base_class
+        self.is_blank = False
 
     def decode_structured(self, doctree, location):
         # attach a reporter so docutil's walkabout doesn't get confused by us
@@ -319,6 +321,10 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         if node.has_key('height'):
             kw['height'] = int(node['height'])
         self.add_element(ImageElement(node['uri'].strip(), **kw))
+
+    def visit_blank(self, node):
+        self.is_blank = True
+        self.prune()
 
     def visit_code(self, node):
         self.visit_literal_block(node)
