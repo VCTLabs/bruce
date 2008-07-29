@@ -7,6 +7,7 @@
 - handle doctest
 - add support for Pygments code colorisation
 - add code block for displaying code blocks
+- add blank page marker
 
 
 3.0beta2

@@ -1,4 +1,4 @@
-Testing a code block with some shell CSS source in it:
+Testing code blocks with CSS:
 
 .. style::
    :literal.font_size: 16
@@ -6,11 +6,9 @@ Testing a code block with some shell CSS source in it:
 .. code:: css
 
     @import url(../styles/styles.css);
-
     /* Main Styles for HTML Elements */
     HTML, BODY
     {
-        margin: 0;
         padding: 0;
         font-family: Arial, Verdana, Geneva,
             "Bitstream Vera Sans", Helvetica, sans-serif;
@@ -18,7 +16,16 @@ Testing a code block with some shell CSS source in it:
         background-color: #FFF;
     }
 
+and Python:
 
+.. code::
+
+    def code_block_with_no_language(defined):
+       ''' Will hopefully come out using Python highlighting
+       '''
+       return maybe
+
+and C:
 
 .. code:: c
 

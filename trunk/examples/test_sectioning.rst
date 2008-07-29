@@ -1,24 +1,30 @@
-content1
+page 1
 
-(you sould see contentN increment orderly)
+(you sould see page number increment: have page numbering on to be confirm)
 
 Section 1
 ---------
 
-content2
+page 2
 
 ----
 
-content3
+page 3
+
+(the following page will be blank, and should be counted as page 4)
 
 ----
 
-content4
+.. blank::
+
+----
+
+page 5
 
 Section 2
 ---------
 
-content5
+page 6
 
 example::
 

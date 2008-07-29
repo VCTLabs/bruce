@@ -29,7 +29,8 @@ centered on a white background (using the "big-centered" style)::
     Pages may optionally have titles which are displayed
     centered at the top by default.
 
-and so on.
+and so on. Blank pages are possible using ``.. blank::`` in place
+of page content.
 
 There's a lot of examples in the examples/ directory, showing off
 most of Bruce's features.
@@ -60,6 +61,7 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 - styling
 - backgrounds
 - transitions between pages
+- blank pages
 
 __ http://pygments.org/
 
@@ -79,6 +81,20 @@ __ http://pygments.org/
 **code**
     Syntax-highlighting of code blocks if Pygments is installed. The range of
     languages supported by Pygments is at http://pygments.org/docs/lexers/
+
+**blank pages**
+    The ``.. blank::`` directive allows you to have blank pages in place of
+    page content, for example::
+
+       Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+
+       ----
+
+       .. blank::
+
+       ----
+
+       Donec auctor vestibulum risus. Vestibulum porttitor purus sed magna.
 
 **interpreter**
     Embeds a Python interpreter in the page. The options available are ``:width:`` and

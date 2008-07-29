@@ -1,7 +1,7 @@
 
 try:
     import pygments
-    from pygments import token, lexers
+    from pygments import token, lexers, util
     from pygments.formatter import Formatter
     have_pygments = True
 except ImportError:
@@ -30,11 +30,22 @@ class BruceFormatter(Formatter):
             generator.pop_style(marker)
 
 def handle_rst_node(generator, node, lexer_name=None):
+    text = node.astext()
     if lexer_name is None:
-        # get name from node
-        lexer_name = node.get('language', 'python')
+        if 'langauge' in node:
+            lexer_name = node['language']
+        else:
+            try:
+                lexer_name = lexers.guess_lexer(text)
+            except util.ClassNotFound:
+                # what the hell, it might be...
+                lexer_name = 'python'
+
+    # parse the text
     lexer = lexers.get_lexer_by_name(lexer_name)
     tokens = lexer.get_tokens(node.astext())
+
+    # format according to Bruce
     formatter = BruceFormatter(generator)
     formatter.format(tokens, None)
 
