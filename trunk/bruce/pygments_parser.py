@@ -16,7 +16,13 @@ class BruceFormatter(Formatter):
         generator = self.generator
         for ttype, value in tokensource:
             if not value: continue
-            style = generator.stylesheet['code_%s'%ttype[0].lower()]
+            style = ['code'] + [s.lower() for s in ttype]
+            while 1:
+                name = '_'.join(style)
+                if name in generator.stylesheet:
+                    style = generator.stylesheet[name]
+                    break
+                style.pop()
             marker = []
             generator.push_style(marker, style)
             value = value.replace('\n', u'\u2028')
