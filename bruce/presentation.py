@@ -107,7 +107,7 @@ class Presentation(pyglet.event.EventDispatcher):
         else: return pyglet.event.EVENT_UNHANDLED
         return pyglet.event.EVENT_HANDLED
 
-    left_pressed = right_pressed = 0
+    left_pressed = right_pressed = (0, 0, 0)
     def on_mouse_press(self, x, y, button, modifiers):
         if button == mouse.LEFT:
             self.left_pressed = (time.time(), x, y)
