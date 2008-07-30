@@ -8,6 +8,9 @@ The Title
    quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
    viewport:0,64,w,h-(64+48)
 
+.. footer::
+   a footer
+
 Salmony bar at top behind title.
 
 Silver background.
@@ -45,3 +48,33 @@ Nisi ut aliquip ex ea commodo consequat.
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 
 Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+
+Title right-aligned
+-------------------
+
+.. layout::
+   bgcolor: silver
+   title:w,h;right;top
+   footer:w,0;right;bottom
+   image:pyglet-trans-64.png;halign=right;valign=bottom
+   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
+   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
+   viewport:0,64,w,h-(64+48)
+
+Title right-aligned, footer right-aligned
+
+
+Title left-aligned
+-------------------
+
+.. layout::
+   bgcolor: silver
+   title:0,h;left;top
+   footer:0,0;left;bottom
+   image:pyglet-trans-64.png;halign=right;valign=bottom
+   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
+   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
+   viewport:0,64,w,h-(64+48)
+
+Title left-aligned, footer left-aligned

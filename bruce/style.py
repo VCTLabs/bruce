@@ -163,12 +163,10 @@ default_stylesheet = Stylesheet(
     ),
     title = dict(
         font_size=28,
-        align='center',
         bold=True,
     ),
     footer = dict(
         font_size=16,
-        align='center',
         italic=True,
     ),
     layout = dict(
