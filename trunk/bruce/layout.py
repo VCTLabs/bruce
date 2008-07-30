@@ -89,6 +89,10 @@ class Layout(cocos.layer.Layer):
         ow, oh = self.parent.desired_size
         vars = dict(w=ow, h=oh)
 
+        # defaults
+        self.title_position = self.default_title_position
+        self.footer_position = self.default_footer_position
+
         if not self._parsed:
             self.bgcolor = self.stylesheet['layout']['background_color']
             # set up the rendering for this layout by parsing its spec
@@ -109,10 +113,6 @@ class Layout(cocos.layer.Layer):
             vx = (w - vw)//2
         if vh < h:
             vy = (h - vh)//2
-
-        # vars for the eval
-        self.title_position = self.default_title_position
-        self.footer_position = self.default_footer_position
 
         if self.explicit_viewport:
             # scale / shift explicit viewport position and dimensions
@@ -175,11 +175,10 @@ class Layout(cocos.layer.Layer):
             italic = self.stylesheet.value('title', 'italic', False)
             bold = self.stylesheet.value('title', 'bold', False)
             color = self.stylesheet.value('title', 'color')
-            align = self.stylesheet.value('title', 'align', 'center')
 
             # and create label
             l = pyglet.text.Label(self.title, name, size, bold, italic, color,
-                x, y, anchor_x=halign, anchor_y=valign, halign=halign,
+                x, y, anchor_x=halign, anchor_y=valign,
                 dpi=int(scale*96), batch=self.batch)
             self.decorations.append(l)
 
@@ -199,6 +198,7 @@ class Layout(cocos.layer.Layer):
             l = pyglet.text.DocumentLabel(self.footer, x, y, vw,
                 anchor_x=halign, anchor_y=valign, multiline=True,
                 dpi=int(scale*96), batch=self.batch)
+            l.set_style('align', halign)
             self.decorations.append(l)
 
             # adjust automatic viewport restriction if the footer is at the bottom
@@ -253,15 +253,15 @@ class Layout(cocos.layer.Layer):
     def handle_bgcolor(self, color, vars):
         self.bgcolor = parse_color(color)
 
-    def handle_footer_align(self, align, vars):
-        self.footer_position = line.split(':')[1].split(';')
+    def handle_footer(self, align, vars):
+        self.footer_position = map(str, align.split(';'))
 
     def handle_viewport(self, viewport, vars):
         self.explicit_viewport = tuple(eval(e, {}, vars)
             for e in viewport.split(',') if '_' not in e)
 
     def handle_title(self, title, vars):
-        self.title_position = line.split(':')[1].split(';')
+        self.title_position = map(str, title.split(';'))
 
     def draw(self):
         self.batch.draw()

@@ -171,7 +171,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         pass
 
     def visit_footer(self, node):
-        # XXX stop footer from being coalesced into one element?
+        # XXX try to stop footer from being coalesced into one element?
         g = DocumentGenerator(self.stylesheet, None, style_base_class='footer')
         footer = g.decode(node)
         for p in self.pages:
