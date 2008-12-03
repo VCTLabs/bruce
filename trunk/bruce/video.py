@@ -79,8 +79,8 @@ class VideoElement(pyglet.text.document.InlineElement):
             scale = width / float(self.video_width)
             height = int(scale * self.video_height)
 
-        self.width = int((width or self.video_width)*scale)
-        self.height = int((height or self.video_height)*scale)
+        self.width = width or self.video_width
+        self.height = height or self.video_height
 
         # update InlineElement attributes
         self.ascent = self.height
