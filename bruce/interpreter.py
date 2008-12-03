@@ -56,10 +56,10 @@ class MyScrollableTextLayoutGroup(pyglet.text.layout.ScrollableTextLayoutGroup):
         # offset the scissor based on the parent layout's screen translation
         parent_x = self.parent_group.translate_x
         parent_y = self.parent_group.translate_y
-        glScissor(parent_x + self._scissor_x - 1,
-                  parent_y + self._scissor_y - self._scissor_height,
-                  self._scissor_width + 1,
-                  self._scissor_height)
+        glScissor(parent_x + self._clip_x - 1,
+                  parent_y + self._clip_y - self._clip_height,
+                  self._clip_width + 1,
+                  self._clip_height)
         glTranslatef(self.translate_x, self.translate_y, 0)
 
 class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
@@ -81,10 +81,10 @@ class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
         tg = self.top_group
         parent_x = tg.parent_group.translate_x
         parent_y = tg.parent_group.translate_y
-        return (parent_x + tg._scissor_x - 1,
-                  parent_y + tg._scissor_y - tg._scissor_height,
-                  tg._scissor_width + 1,
-                  tg._scissor_height)
+        return (parent_x + tg._clip_x - 1,
+                  parent_y + tg._clip_y - tg._clip_height,
+                  tg._clip_width + 1,
+                  tg._clip_height)
 
 class Output:
     '''Utility for capturing stdout from an interactive session.
@@ -158,7 +158,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.document = pyglet.text.document.FormattedDocument(self.content)
         self.document.set_style(0, len(self.document.text), {
             'font_name': 'Courier New',
-            'font_size': 20, 
+            'font_size': 18, 
             'color': (0, 0, 0, 255),
         })
         self.start_of_line = len(self.document.text)
@@ -290,7 +290,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def _write(self, s):
         self.document.insert_text(len(self.document.text), s, {
             'font_name': 'Courier New',
-            'font_size': 20,
+            'font_size': 18,
             'color': (0, 0, 0, 255),
         })
         self._scroll_to_bottom()
