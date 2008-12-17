@@ -2,6 +2,8 @@
 import pyglet
 from pyglet.text.formats import structured
 
+from cocos.director import director
+
 def calculate_dimensions(width, height, image):
     # handle width and height, retaining aspect if only one is specified
     if height is not None and width is None:
@@ -13,14 +15,20 @@ def calculate_dimensions(width, height, image):
     return width or image.width, height or image.height
 
 class ImageElement(structured.ImageElement):
-    def __init__(self, uri, width=None, height=None):
+    def __init__(self, uri, width=None, height=None, fit=False):
         self.uri = uri
         image = pyglet.resource.image(uri)
 
+        if fit:
+            # XXX actually use this somehow some day
+            # go for best fit
+            width, height = map(float, director.get_window_size())
+            scale = min(width / image.width, height / image.height)
+            width = int(image.width * scale)
+            height = int(image.height * scale)
+
         self.width_spec = width
         self.height_spec = height
-
-        # XXX allow image to fill the available layout dimensions
 
         width, height = calculate_dimensions(width, height, image)
 
