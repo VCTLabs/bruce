@@ -11,7 +11,7 @@ from pyglet.text.formats import structured
 
 # these imports simply cause directives to be registered
 from bruce import layout
-from bruce import interpreter, video
+from bruce import interpreter, video, plugin
 from bruce import code_block
 from bruce import blank
 from bruce import resource
@@ -348,6 +348,14 @@ class DocumentGenerator(structured.StructuredTextDecoder):
             self.break_paragraph()
 
         self.add_element(node.get_interpreter())
+
+    def visit_plugin(self, node):
+        # if the parent is structural - document, section, etc then we need
+        # to break the previous paragraphish
+        if not isinstance(node.parent, nodes.TextElement):
+            self.break_paragraph()
+
+        self.add_element(node.get_plugin())
 
     def visit_bullet_list(self, node):
         bullet = BULLETS[len(self.list_stack)%3]
