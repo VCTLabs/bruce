@@ -134,9 +134,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             doctree = publish_doctree(text)
 
         # transform to allow top-level transitions to create sections
-        #printtree(doctree)
         SectionContent(doctree).apply()
-        #printtree(doctree)
 
         doctree.walkabout(DocutilsVisitor(doctree, self))
 
@@ -348,6 +346,18 @@ class DocumentGenerator(structured.StructuredTextDecoder):
             self.break_paragraph()
 
         self.add_element(node.get_interpreter())
+
+    def visit_table(self, node):
+        # if the parent is structural - document, section, etc then we need
+        # to break the previous paragraphish
+        if not isinstance(node.parent, nodes.TextElement):
+            self.break_paragraph()
+
+        # avoid circular import
+        from bruce import table
+
+        self.add_element(table.TableElement(self.document, self.stylesheet, node))
+        self.prune()
 
     def visit_plugin(self, node):
         # if the parent is structural - document, section, etc then we need
