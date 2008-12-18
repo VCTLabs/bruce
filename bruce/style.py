@@ -224,5 +224,5 @@ stylesheets = {
     'big-centered': big_centered,
 }
 
-__all__ = ['default_stylesheet']
+__all__ = ['default_stylesheet', 'stylesheets']
 
