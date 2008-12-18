@@ -106,6 +106,55 @@ class SectionContent(Transform):
         if decoration is not None:
             self.document.append(decoration)
 
+class BulletSections(Transform):
+    """
+    Split up the top-level bullet list(s) found in section(s) and
+    a new section for each bullet point.
+
+    For example, transform this::
+
+        
+        <document>
+         <section>
+          <bullet_list>
+           <list_item>content1</list_item>
+           <list_item>content2</list_item>
+           <list_item>content3</list_item>
+           <list_item>content4</list_item>
+          </bullet_list>
+         </section>
+        </document>
+
+    into this::
+
+        <document>
+         <section>content1</section>
+         <section>content2</section>
+         <section>content3</section>
+         <section>content4</section>
+        </document>
+
+    Note: **only transforms the first section**
+    """
+    def apply(self):
+        for section in self.document:
+            if isinstance(section, nodes.section):
+                break
+        else:
+            # there is no section content - presentation is empty!
+            return
+
+        self.document.remove(section)
+
+        for node in section:
+            if isinstance(node, nodes.bullet_list):
+                for n, child in enumerate(node):
+                    new = nodes.section()
+                    new.children = list(child.children)
+                    self.document.insert(n, new)
+            else:
+                warnings.warn('Unexpected top-level %s'%node.__class__.__name__)
+
 def printtree(node, indent=''):
     if hasattr(node, 'children') and node.children:
         print indent + '<%s>'%node.__class__.__name__
@@ -117,14 +166,13 @@ def printtree(node, indent=''):
 
 
 class DocutilsDecoder(structured.StructuredTextDecoder):
-    def __init__(self, stylesheet=None):
+    def __init__(self, stylesheet, bullet_mode):
         super(DocutilsDecoder, self).__init__()
-        if not stylesheet:
-            stylesheet = default_stylesheet.copy()
         self.stylesheet = stylesheet
         self.layout = layout.Layout('', stylesheet)
         self.pages = []
         self.document = None
+        self.bullet_mode = bullet_mode
 
     def decode_structured(self, text, location):
         self.location = location
@@ -135,6 +183,12 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
         # transform to allow top-level transitions to create sections
         SectionContent(doctree).apply()
+
+        # split top-level bullet list into sections too?
+        if self.bullet_mode:
+            #printtree(doctree)
+            BulletSections(doctree).apply()
+            #printtree(doctree)
 
         doctree.walkabout(DocutilsVisitor(doctree, self))
 
@@ -532,13 +586,11 @@ class DocutilsVisitor(nodes.NodeVisitor):
         method(node)
 
 
-def parse(text, html=False):
-    assert not html, 'use rst2html for html!'
-
+def parse(text, stylesheet, bullet_mode):
     # everything is UTF-8, suckers
     text = text.decode('utf8')
 
-    d = DocutilsDecoder()
+    d = DocutilsDecoder(stylesheet, bullet_mode)
     d.decode(text)
     return d.pages
 

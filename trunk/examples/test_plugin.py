@@ -10,11 +10,18 @@ class Element(object):
 
     def resize(self, w, h):
         self.w, self.h = w, h
+        self.descent = 0
 
     def place(self, layout, x, y):
-        c = (255, 0, 0, 255) * 4
-        v = [x, y, x+self.w, y, x+self.w, y+self.h, x, y+self.h]
-        self.r = layout.batch.add(4, GL_QUADS, None, ('c4B', c), ('v2i', v))
+        print 'PLACE', x, y, self.w, self.h
+        x1 = int(x)
+        y1 = int(y + self.descent)
+        x2 = int(x + self.w)
+        y2 = int(y + self.h + self.descent)
+        self.r = layout.batch.add(4, GL_QUADS, None,
+            ('c3B', (255, 0, 0) * 4),
+            ('v2i', (x1, y1, x2, y1, x2, y2, x1, y2)),
+        )
 
     def tick(self, dt):
         pass

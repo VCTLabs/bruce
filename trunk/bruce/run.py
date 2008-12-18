@@ -10,10 +10,11 @@ from cocos.director import director
 from bruce import rst_parser
 from bruce import presentation
 from bruce import display_source
+from bruce import style
 
 def main():
     from optparse import OptionParser
-    p = OptionParser()
+    p = OptionParser(usage='usage: %prog [options] presentation')
     p.add_option("-f", "--fullscreen", dest="fullscreen",
                       action="store_true", default=False,
                       help="run in fullscreen mode")
@@ -26,9 +27,18 @@ def main():
     p.add_option("-s", "--startpage", dest="start_page",
                       default="1",
                       help="start at page N (1+, default 1)")
-    p.add_option("-S", "--screen", dest="screen",
+    p.add_option("", "--screen", dest="screen",
                       default="1",
                       help="display on screen (1+, default 1)")
+    p.add_option("-b", "--bullet-mode", dest="bullet_mode",
+                      action="store_true", default=False,
+                      help="run in bullet mode (page per bulet)")
+    p.add_option("", "--style", dest="style", default="not specified",
+                      help="specify style (name or filename)")
+    p.add_option("", "--list-styles", dest="list_styles",
+                      action="store_true", default=False,
+                      help="list available style names")
+
     #p.add_option("-n", "--notes", dest="notes",
     #                  action="store_true", default=False,
     #                  help="generate HTML notes (do not run presentation)")
@@ -57,8 +67,13 @@ def main():
         print __version__
         sys.exit(0)
 
+    elif options.list_styles:
+        print 'Available built-in style names:'
+        print '\n'.join(sorted(style.stylesheets.keys()))
+        sys.exit(0)
+
     elif not args:
-        print 'Error: argument required'
+        print 'Error: presentation filename required'
         print p.get_usage()
         sys.exit(1)
 
@@ -79,10 +94,12 @@ def main():
     height = min(height, screen.height)
     screen=int(options.screen)-1
 
+    # add the presentation's directory to resource locations
     directory = os.path.abspath(os.path.dirname(filename))
     pyglet.resource.path.append(directory)
     pyglet.resource.reindex()
 
+    # initialise the display
     display = pyglet.window.get_platform().get_default_display()
     screen = display.get_screens()[screen]
     if options.fullscreen:
@@ -92,8 +109,20 @@ def main():
         director.init(width=width, height=height,
             screen=screen, do_not_scale=True)
 
+    # grab the presentation content and parse into pages
     content = file(filename).read()
-    pres = presentation.Presentation(rst_parser.parse(content),
+    if options.style == 'not specified':
+        if options.bullet_mode:
+            stylesheet = style.stylesheets['big-centered'].copy()
+        else:
+            stylesheet = style.stylesheets['default'].copy()
+    else:
+        stylesheet = style.stylesheets[options.style].copy()
+    pages = rst_parser.parse(content, stylesheet=stylesheet,
+        bullet_mode=options.bullet_mode)
+
+    # run
+    pres = presentation.Presentation(pages, 
         show_timer=options.timer, show_count=options.page_count,
         start_page=int(options.start_page)-1,
         desired_size=(width, height))
