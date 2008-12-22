@@ -34,9 +34,6 @@ class ImageElement(structured.ImageElement):
 
         super(ImageElement, self).__init__(image, width, height)
 
-        # free up the image - we'll load it when we need it later
-        self.image = None
-
     def set_scale(self, scale):
         width, height = calculate_dimensions(self.width_spec, self.height_spec, self.image)
         self.width = int(width*scale)
@@ -46,10 +43,4 @@ class ImageElement(structured.ImageElement):
         self.ascent = self.height
         self.descent = 0
         self.advance = self.width
-
-    def on_enter(self, vw, wh):
-        self.image = pyglet.resource.image(self.uri)
-
-    def on_exit(self):
-        self.image = None
 
