@@ -94,6 +94,8 @@ style_directive.options = {
      'layout.background_color': color,
      'transition.name': stripped,
      'transition.duration': float,
+     'table.even_background_color': color,
+     'table.odd_background_color': color,
 }
 for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
         'footer.', 'block_quote.'):
@@ -208,6 +210,11 @@ default_stylesheet = Stylesheet(
     code_comment = dict(
         italic=True,
         color=(0x40, 0x80, 0x80, 255),
+    ),
+
+    table = dict(
+        even_background_color=(210, 210, 210, 255),
+        odd_background_color=(230, 230, 230, 255),
     ),
 )
 
