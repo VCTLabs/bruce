@@ -33,6 +33,7 @@ Bruce, the Presentation Tool version 3.0 Features
 
   * inline markup for emphasis, strong and literal
   * literal and line blocks
+  * tables
   * block quotes
   * definition, bullet and enumerated lists (including nesting)
   * images - inline and stand-alone, including scaling
@@ -84,6 +85,7 @@ __ http://pygments.org/
 To install Bruce, run::
 
     # python setup.py install
+
 
 How to use Bruce, the Presentation Tool
 =======================================
@@ -146,7 +148,8 @@ on a white background (using the "big-centered" style)::
     centered at the top by default.
 
 and so on. For more information see the HOWTO__ at the Bruce
-website and the examples directory.
+website (or bundled with the source) and the source examples
+directory.
 
 __ http://r1chardj0n3s.googlepages.com/howto
 
