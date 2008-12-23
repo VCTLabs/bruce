@@ -58,10 +58,10 @@ class PluginElement(pyglet.text.document.InlineElement):
         # XXX handle errors
         exec source in d
 
-        if 'Element' not in d:
+        if 'Plugin' not in d:
             raise ValueError('Element not found in %s'%name)
 
-        self.implementation = d['Element'](self.width, self.height)
+        self.implementation = d['Plugin'](self.width, self.height)
 
         super(PluginElement, self).__init__(self.height, 0, self.width)
 
@@ -76,16 +76,31 @@ class PluginElement(pyglet.text.document.InlineElement):
         self.descent = 0
         self.advance = self.width
 
-    def on_enter(self, w, h):
-        self.implementation.on_enter(w, h)
-
     def place(self, layout, x, y):
+        if self.implementation.needs_tick:
+            pyglet.clock.schedule(self.implementation.tick)
         self.implementation.place(layout, x, y)
 
     def remove(self, layout):
+        if self.implementation.needs_tick:
+            pyglet.clock.unschedule(self.implementation.tick)
         self.implementation.remove(layout)
 
-    def on_exit(self):
-        self.implementation.on_exit()
+class Plugin(object):
+    needs_tick = False
+    def __init__(self, w, h):
+        pass 
 
-    
+    # plugin API follows
+    def resize(self, w, h):
+        pass
+
+    def place(self, layout, x, y):
+        pass
+
+    def tick(self, dt):
+        pass
+
+    def remove(self, layout):
+        pass
+

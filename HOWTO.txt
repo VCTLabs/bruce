@@ -63,6 +63,7 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 - backgrounds
 - transitions between pages
 - blank pages
+- plugins
 
 __ http://pygments.org/
 
@@ -106,6 +107,10 @@ __ http://pygments.org/
     ``:height:`` (default 800 by 300). You may also have the optional flag ``:sysver:``
     which will cause the standard Python interactive intepreter greeting with the
     Python version to be displayed.
+
+**plugins**
+    Enables the author to compose a new inline element in Python code. See
+    the section below on `writing plugins`_.
 
 
 Style Changes
@@ -357,4 +362,60 @@ directive.
 To refer to the font later you'll need to know its name, which may differ
 from the filename. You may use the inspect_font.py tool in the pyglet
 source to do so.
+
+
+Writing Plugins
+---------------
+
+A plugin is used with the ``.. plugin::`` directive. For example::
+
+    .. plugin:: test_plugin
+       :width: 300
+       :height: 300
+
+The directive is referring to the plugin implemented in the file ``test_plugin.py``
+which is found using normal `resource discovery`_. That file must contain:
+
+1. a class called Plugin which derives from bruce.plugin.Plugin, and
+2. an implementation of any or all of the methods described below.
+
+If your plugin is animated you may request a regular tick from the clock by setting
+the property needs_tick either on your class or in your __init__ method.
+
+**__init__(self, width=800, height=400)__**
+    Invoked when the presentation is parsed.
+    Passed the width and height as specified in the presentation.
+
+**resize(self, width, height)**
+    Invoked when the page the element is on is scaled.
+
+**place(self, layout, x, y)**
+    Invoked when the page layout needs to position the element on screen. Passed a
+    pyglet.text.IncrementalTextLayout instance and the pixel position of the bottom
+    left of the element in that layout. This position almost always has a negative
+    y value.
+
+**remove(self, layout)**
+    Invoked when page layout removes the element from display.
+
+**tick(self, dt)**
+    Invoked if the element defines needs_tick **before enter is invoked**.
+    Will be called once per "clock tick" with dt being the time in seconds since
+    the last call.
+
+Plugin contents should be rendered using the pyglet.graphics API with the Batch
+instance on the layout passed into the place() method.
+
+Additionally any graphics elements added to the batch should use the group
+layout.top_group as the base group. This group defines positioning transformations
+without which your plugin content will most likely not be visible.
+
+Again note you'll almost always receive a negative y position in the place() call.
+The transforms in layout.top_group adjust for this (the top of the layout is typically
+at y=0).
+
+If you wish to alter the OpenGL context to turn on environment features such as
+texturing, or even just to perform additional transformations then you should
+define your own pyglet.graphics.Group. When you instantiate this group you should
+then pass it layout.top_group.
 

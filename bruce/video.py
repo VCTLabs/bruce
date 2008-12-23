@@ -87,7 +87,7 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.descent = 0
         self.advance = self.width
 
-    def on_enter(self, viewport_width, viewport_height):
+    def place(self, layout, x, y):
         self.video = pyglet.resource.media(self.video_filename)
 
         # create the player
@@ -99,14 +99,8 @@ class VideoElement(pyglet.text.document.InlineElement):
             self.player.eos_action = self.player.EOS_PAUSE
         self.player.play()
 
-    def on_exit(self):
-        self.player.next()
-        self.player = None
-        self.video = None
-        self.texture = None
-
-    def place(self, layout, x, y):
         texture = self.player.texture
+
         # set up rendering the player texture
         x1 = int(x)
         y1 = int(y + self.descent)
@@ -123,4 +117,9 @@ class VideoElement(pyglet.text.document.InlineElement):
         if layout in self.vertex_lists:
             self.vertex_lists[layout].delete()
             del self.vertex_lists[layout]
+
+        self.player.next()
+        self.player = None
+        self.video = None
+        self.texture = None
 

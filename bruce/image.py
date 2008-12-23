@@ -29,12 +29,16 @@ class ImageElement(structured.ImageElement):
 
         self.width_spec = width
         self.height_spec = height
+        self.scale = 1.0
 
-        width, height = calculate_dimensions(width, height, image)
+        self.width, self.height = calculate_dimensions(width, height, image)
 
-        super(ImageElement, self).__init__(image, width, height)
+        super(ImageElement, self).__init__(image, self.width, self.height)
 
     def set_scale(self, scale):
+        if self.scale == scale:
+            return
+
         width, height = calculate_dimensions(self.width_spec, self.height_spec, self.image)
         self.width = int(width*scale)
         self.height = int(height*scale)
@@ -44,8 +48,3 @@ class ImageElement(structured.ImageElement):
         self.descent = 0
         self.advance = self.width
 
-    def on_enter(self, viewport_width, viewport_height):
-        pass
-
-    def on_exit(self):
-        pass

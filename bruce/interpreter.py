@@ -153,7 +153,8 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             self.quad.delete()
             self.caret.delete()
 
-    def on_enter(self, w, h):
+    layout = None
+    def place(self, layout, x, y):
         # format the code
         self.document = pyglet.text.document.FormattedDocument(self.content)
         self.document.set_style(0, len(self.document.text), {
@@ -164,8 +165,6 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.start_of_line = len(self.document.text)
         director.window.push_handlers(self)
 
-    layout = None
-    def place(self, layout, x, y):
         # XXX allow myself to be added to multiple layouts for whatever that's worth
         if self.layout is not None:
             # just position
@@ -202,9 +201,6 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.caret.position = len(self.document.text)
 
     def remove(self, layout):
-        pass
-
-    def on_exit(self):
         director.window.pop_handlers()
         self.document = None
         self.layout.delete()

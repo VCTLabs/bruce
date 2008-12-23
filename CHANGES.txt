@@ -1,3 +1,8 @@
+3.1
+
+- add support for arbitrary display elements via ``.. plugin::``
+
+
 3.0 - 2008-12-23  (r173)
 
 - add rendering of tables
