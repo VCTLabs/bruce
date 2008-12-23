@@ -410,7 +410,12 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         # avoid circular import
         from bruce import table
 
-        self.add_element(table.TableElement(self.document, self.stylesheet, node))
+        # override default style with table cell style
+        stylesheet = self.stylesheet.copy()
+        # XXX any more here?
+        stylesheet['default']['align'] = stylesheet['table']['cell_align']
+
+        self.add_element(table.TableElement(self.document, stylesheet, node))
         self.prune()
 
     def visit_plugin(self, node):
