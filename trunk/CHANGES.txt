@@ -1,6 +1,9 @@
 3.0
 
-- Bruce must be invoked using "python -m bruce.run" now
+- Bruce which accepts command-line arguments or pops up a simple GUI in
+  their absence
+- render tables
+- add "bullet mode" for faster presentation styles
 - fix page number in window title
 - set the clear color to the layout bgcolor
 - generate warnings when unhandled docutils features are encountered

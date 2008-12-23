@@ -55,6 +55,7 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 - bullet and enumerated lists (including nesting)
 - definition lists
 - images - inline and stand-alone
+- tables (though no row / column spanning yet)
 - page titles (section headings)
 - syntax highlighting of code if Pygments__ is installed
 - interactive Python interpreter sessions
@@ -73,6 +74,10 @@ __ http://pygments.org/
     A ``:width:`` and/or ``:height:`` may be specified to scale the image when displayed.
     If only one is specified then the image's other dimension will be scaled
     to ensure the image aspect ration is retained.
+
+**tables**
+    No row or column spanning is implemented yet. Tables may have pretty much
+    any arbitrary content though.
 
 **video**
     Embedded in the same manner as images, and may be scaled in the same way.
@@ -182,6 +187,29 @@ The default stylesheet contains::
     footer.italic = yes
     layout.background_color = white
     layout.valign = top
+    transition.name = none
+    transition.duration = 0.5
+    table.heading_background_color = #d2d2d2
+    table.even_background_color = #f0f0f0
+    table.odd_background_color = #f0f0f0
+    table.cell_align = left
+    table.cell_valign = top
+    table.top_padding = 2
+    table.bottom_padding = 2
+    table.left_padding = 4
+    table.right_padding = 4
+    table.border = yes
+    table.border_color = black
+    code_keyword.color = #008000
+    code_name.bold = yes
+    code_name_class.bold = yes
+    code_name_class.color = #baba21
+    code_name_function.bold = yes
+    code_name_function.color = #baba21
+    code_literal.color = #ba2121
+    code_operator.color = #666666
+    code_comment.italic = yes
+    code_comment.color = #404080
 
 The "default" group is used as a fallback when a particular style is looked up and
 no explicit attribute is set. Thus all text is rendered in ``Arial`` by default, except
@@ -200,6 +228,12 @@ Style changes are specified using the style directive. To change the font to
 To change a single style element you may have the declaration on a single line::
 
    .. style:: :font_size: 64
+
+The ``code_*`` style names control the output of the Pygments rendering so if
+you've not got that installed you may ignore them. The complete set of names
+is (with the ``code_`` prefix removed): ``keyword``, ``text``, ``generic``,
+``name``, ``name_class``, ``name_function``, ``literal``, ``punctuation``,
+``operator`` and ``comment``.
 
 
 Transition Names
