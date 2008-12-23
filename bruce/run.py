@@ -13,6 +13,96 @@ from bruce import display_source
 from bruce import style
 
 def main():
+    '''Run either the command-line or gui interface depending on whether any
+    command-line arguments were provided.
+    '''
+    if len(sys.argv) > 1:
+        cmd_line()
+    else:
+        GUI().run()
+
+class GUI(object):
+    '''Run a simple tk-based gui to select the file to display and control
+    configuration options.
+    '''
+    def run(self):
+        import Tkinter
+        import tkFileDialog
+
+        # lay out the basic GUI
+        self.root = Tkinter.Tk()
+        frame = Tkinter.Frame(self.root)
+        frame.pack()
+
+        Tkinter.Label(frame, text='Bruce, the Presentation Tool!').pack()
+
+        self.fullscreen = Tkinter.IntVar()
+        Tkinter.Checkbutton(frame, text='Fullscreen?',
+            variable=self.fullscreen).pack()
+
+        # screen selection
+        display = pyglet.window.get_platform().get_default_display()
+        N = len(display.get_screens())
+        self.screen = Tkinter.IntVar(0)
+        if N > 1:
+            for n in range(N):
+                Tkinter.Radiobutton(frame, text="Display on screen %d"%(n+1),
+                    variable=self.screen, value=n).pack()
+
+        self.timer = Tkinter.IntVar()
+        Tkinter.Checkbutton(frame, text='Show Timer?',
+            variable=self.timer).pack()
+
+        self.page_count = Tkinter.IntVar()
+        Tkinter.Checkbutton(frame, text='Show Page Count?',
+            variable=self.page_count).pack()
+
+        self.bullet_mode = Tkinter.IntVar()
+        Tkinter.Checkbutton(frame, text='Run in Bullet Mode?',
+            variable=self.bullet_mode).pack()
+
+        self.source = Tkinter.IntVar()
+        Tkinter.Checkbutton(frame, text='Display source in console?',
+            variable=self.source).pack()
+
+        Tkinter.Button(frame, text='Play Presentation',
+            command=self.go).pack()
+
+        # determine which file we're displaying
+        self.filename = tkFileDialog.askopenfilename(parent=self.root,
+            filetypes=[('ReStructuredText Files', '.rst .txt'),
+                       ('All Files', '.*')],
+            title='Select your presentation file')
+        if not self.filename:
+            # no file selected, just exit
+            self.root.destroy()
+            return
+
+        # run Tk's mainloop to handle the above GUI
+        self.root.mainloop()
+
+    def go(self):
+        # close the Tk GUI
+        self.root.destroy()
+
+        # snarf off all the config information and run
+        class options:
+            fullscreen = self.fullscreen.get()
+            timer = self.timer.get()
+            page_count = self.page_count.get()
+            screen = self.screen.get()
+            bullet_mode = self.bullet_mode.get()
+            source = self.source.get()
+            # XXX options still to configure
+            start_page = 1
+            style = 'not specified'
+            window_size = '1024x768'
+        run(self.filename, options)
+
+def cmd_line():
+    '''Run a command-line interface to select the file to display and control
+    configuration options.
+    '''
     from optparse import OptionParser
     p = OptionParser(usage='usage: %prog [options] presentation')
     p.add_option("-f", "--fullscreen", dest="fullscreen",
@@ -77,10 +167,12 @@ def main():
         print p.get_usage()
         sys.exit(1)
 
-    filename = args[0]
-
     #elif options.notes:
     #    notes(args[0], options.out_file, int(options.columns))
+
+    run(args[0], options)
+
+def run(filename, options):
 
     display = pyglet.window.get_platform().get_default_display()
     screen = int(options.screen)-1
@@ -122,7 +214,7 @@ def main():
         bullet_mode=options.bullet_mode)
 
     # run
-    pres = presentation.Presentation(pages, 
+    pres = presentation.Presentation(pages,
         show_timer=options.timer, show_count=options.page_count,
         start_page=int(options.start_page)-1,
         desired_size=(width, height))
