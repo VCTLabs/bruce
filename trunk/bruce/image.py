@@ -44,3 +44,8 @@ class ImageElement(structured.ImageElement):
         self.descent = 0
         self.advance = self.width
 
+    def on_enter(self, viewport_width, viewport_height):
+        pass
+
+    def on_exit(self):
+        pass
