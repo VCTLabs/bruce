@@ -26,6 +26,7 @@ Bruce, the Presentation Tool version 3.0 Features
 =================================================
 
 - displays ReStructuredText content with one page per section or transition
+- has a "bullet mode" which displays one page per *bullet point*
 - handling of *most* of ReStructuredText, including:
 
   * inline markup for emphasis, strong and literal
@@ -72,6 +73,7 @@ __ http://cocos2d.org/
 And you may also optionally install:
 
 - Pygments__ 0.10 or later
+- Tkinter for the GUI interface (Tkinter is usually bundled with Python)
 
 __ http://pygments.org/
 
@@ -84,7 +86,9 @@ How to use Bruce, the Presentation Tool
 
 To invoke bruce, run::
 
-    % bruce <presentation source.txt>
+    % bruce [presentation source.txt]
+
+With no command-line arguments Bruce will pop up a simple GUI.
 
 There's a number of command-line controls - use ``bruce -h`` to
 learn what they do.
