@@ -1,4 +1,4 @@
-3.0
+3.0 - 2008-12-23  (r173)
 
 - add rendering of tables
 - add "bullet mode" for faster presentation styles
