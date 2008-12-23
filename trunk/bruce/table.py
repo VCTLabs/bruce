@@ -23,26 +23,24 @@ class TableElement(pyglet.text.document.InlineElement):
 
         self.table = TableGenerator(self)
         doctree_node.walkabout(TableVisitor(doctree_node, self.table))
+        self.scale = 1.0
         self.dpi = 96
         self.table.layout()
 
         super(TableElement, self).__init__(self.table.height, 0, self.table.width)
 
     def set_scale(self, scale):
-        # XXX relayout table
-        self.dpi = int(scale * 96)
+        if scale != self.scale:
+            return
 
-    def on_enter(self, w, h):
-        pass
+        self.dpi = int(scale * 96)
+        # XXX relayout table
 
     def place(self, layout, x, y):
         self.table.place(layout, x, y)
 
     def remove(self, layout):
         self.table.delete_layout(layout)
-
-    def on_exit(self):
-        pass
 
 
 class DummyReporter(object):

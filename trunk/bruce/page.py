@@ -78,8 +78,8 @@ class PageContent(cocos.layer.Layer):
 
         x, y, vw, vh = self.parent.get_viewport()
 
-        for element in self.elements:
-            element.on_enter(vw, vh)
+        # XXX remove me for element in self.elements:
+            # XXX remove me element.on_enter(vw, vh)
 
         self.batch = pyglet.graphics.Batch()
         self.create_layout(x, y, vw, vh, self.parent.get_scale())
@@ -136,8 +136,8 @@ class PageContent(cocos.layer.Layer):
         if self._cb_hide_mouse_scheduled:
             self.cb_hide_mouse(0)
 
-        for element in self.elements:
-            element.on_exit()
+        # XXX remove me for element in self.elements:
+            # XXX remove me element.on_exit()
 
         self.text_layout.delete()
         self.text_layout = None

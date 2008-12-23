@@ -43,21 +43,3 @@ Times New Roman bold italic
 .. style:: :font_size: 140
 
 140pt
-
-----
-
-.. style::
-   :color: red
-   :font_size: 100
-   :font_name: Arial
-
-RED
-
-.. style:: :color: green
-
-GREEN
-
-.. style:: :color: blue
-
-BLUE
-
