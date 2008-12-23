@@ -1,16 +1,15 @@
 3.0
 
-- Bruce which accepts command-line arguments or pops up a simple GUI in
-  their absence
-- render tables
+- add rendering of tables
 - add "bullet mode" for faster presentation styles
+- add support for Pygments code colorisation
+- add code block for displaying code blocks
+- add blank page marker
+- pop up a simple GUI when no command-line args given
 - fix page number in window title
 - set the clear color to the layout bgcolor
 - generate warnings when unhandled docutils features are encountered
 - handle doctest
-- add support for Pygments code colorisation
-- add code block for displaying code blocks
-- add blank page marker
 
 
 3.0beta2
