@@ -94,8 +94,15 @@ style_directive.options = {
      'layout.background_color': color,
      'transition.name': stripped,
      'transition.duration': float,
+     'table.heading_background_color': color,
      'table.even_background_color': color,
      'table.odd_background_color': color,
+     'table.top_padding': int,
+     'table.bottom_padding': int,
+     'table.left_padding': int,
+     'table.right_padding': int,
+     'table.border': boolean,
+     'table.border_color': color,
 }
 for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
         'footer.', 'block_quote.'):
@@ -213,8 +220,15 @@ default_stylesheet = Stylesheet(
     ),
 
     table = dict(
-        even_background_color=(210, 210, 210, 255),
-        odd_background_color=(230, 230, 230, 255),
+        heading_background_color=(210, 210, 210, 255),
+        even_background_color=(240, 240, 240, 255),
+        odd_background_color=(240, 240, 240, 255),
+        top_padding=2,
+        bottom_padding=2,
+        left_padding=4,
+        right_padding=4,
+        border=True,
+        border_color=(0, 0, 0, 255),
     ),
 )
 
