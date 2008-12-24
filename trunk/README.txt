@@ -81,18 +81,25 @@ To install Bruce, run::
 
     # python setup.py install
 
+You may also run Bruce without installing.
+
 
 How to use Bruce, the Presentation Tool
 =======================================
 
-To invoke bruce, run::
+On Windows you may just double-click the "run_bruce.py" file.
+
+On other platforms run::
 
     % bruce [presentation source.txt]
 
-With no command-line arguments Bruce will pop up a simple GUI.
+If you've not installed Bruce then you may run from the source::
+
+    % python run_bruce.py [presentation source.txt]
 
 There's a number of command-line controls - use ``bruce -h`` to
-learn what they do.
+learn what they do. With no command-line arguments Bruce will pop
+up a simple GUI.
 
 
 Controls
