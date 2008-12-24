@@ -20,9 +20,9 @@ Changes in this release:
 Bruce, the Presentation Tool Features
 =====================================
 
-- displays ReStructuredText content with one page per section or transition
+- displays reStructuredText content with one page per section or transition
 - has a "bullet mode" which displays one page per *bullet point*
-- handles of *most* of ReStructuredText, including:
+- handles of *most* of reStructuredText, including:
 
   * inline markup for emphasis, strong and literal
   * literal and line blocks
@@ -36,7 +36,7 @@ Bruce, the Presentation Tool Features
 - scrolling of content larger than a screenful
 - sensible resource location (images, video, sound from the same directory
   as the presentation file)
-- some extensions to ReStructuredText:
+- some extensions to reStructuredText:
 
   * embedded Python interative interpreter sessions
   * code blocks with syntax highlighting (requires optional Pygments install)
@@ -129,7 +129,7 @@ How to write presentations using Bruce, the Presentation Tool
 =============================================================
 
 Bruce presentations are written as plain-text files in the
-ReStructuredText format with some extensions. See the examples
+reStructuredText format with some extensions. See the examples
 folder \*.rst files for some samples, the simplest being
 "simple.rst" which displays plain text sentences centered
 on a white background (using the "big-centered" style)::

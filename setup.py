@@ -9,7 +9,7 @@ from bruce import __version__
 setup(
     name = "bruce",
     version = __version__,
-    description = "Bruce, the Presentation Tool, puts ReStructuredText in your projector",
+    description = "Bruce, the Presentation Tool, puts reStructuredText in your projector",
     long_description = ''.join(open('README.txt').readlines()[4:-28]),
     author = "Richard Jones",
     author_email = "richard@mechanicalcat.net",
