@@ -1,6 +1,7 @@
-3.1
+3.1 - 2008-12-24 (r177)
 
 - add support for arbitrary display elements via ``.. plugin::``
+- fixed display of code blocks in absence of Pygments
 
 
 3.0 - 2008-12-23  (r173)

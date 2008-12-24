@@ -9,8 +9,8 @@ from bruce import __version__
 setup(
     name = "bruce",
     version = __version__,
-    description = "Bruce, the Presentation Tool",
-    long_description = '\n'.join(open('README.txt').readlines()[4:-28]),
+    description = "Bruce, the Presentation Tool puts ReStructuredText in your projector",
+    long_description = ''.join(open('README.txt').readlines()[4:-28]),
     author = "Richard Jones",
     author_email = "richard@mechanicalcat.net",
     url = "http://r1chardj0n3s.googlepages.com/bruce",
