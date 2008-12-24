@@ -17,16 +17,16 @@ Changes in this release:
 - fixed display of code blocks in absence of Pygments
 
 
-Bruce, the Presentation Tool version 3.0 Features
-=================================================
+Bruce, the Presentation Tool Features
+=====================================
 
 - displays ReStructuredText content with one page per section or transition
 - has a "bullet mode" which displays one page per *bullet point*
-- handling of *most* of ReStructuredText, including:
+- handles of *most* of ReStructuredText, including:
 
   * inline markup for emphasis, strong and literal
   * literal and line blocks
-  * tables
+  * tables (no row or column spanning yet)
   * block quotes
   * definition, bullet and enumerated lists (including nesting)
   * images - inline and stand-alone, including scaling
@@ -36,9 +36,10 @@ Bruce, the Presentation Tool version 3.0 Features
 - scrolling of content larger than a screenful
 - sensible resource location (images, video, sound from the same directory
   as the presentation file)
-- and some extensions of ReST:
+- some extensions to ReStructuredText:
 
   * embedded Python interative interpreter sessions
+  * code blocks with syntax highlighting (requires optional Pygments install)
   * videos (embedded just like images) with optional looping
   * stylesheet and layout changes on the fly (eg. multiple fonts
     per page)
@@ -46,10 +47,9 @@ Bruce, the Presentation Tool version 3.0 Features
   * plugins to create your own inline elements
 
 - timer and page count display for practicing
-- may specify which screen to open on in multihead
-- runs fullscreen at native resolution
+- control which screen to open on in multihead
+- run fullscreen at native resolution
 - may switch to/from fullscreen quickly
-
 
 
 Installation
@@ -97,6 +97,8 @@ learn what they do.
 
 Controls
 ========
+
+When running a presentation the following controls are active:
 
 left, right arrows; left, right mouse button; space bar (forward)
   Move back and forward pages.
