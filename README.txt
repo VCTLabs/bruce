@@ -8,20 +8,13 @@ fighting with presentation tools. Presentations are composed
 interative Python sessions and video. It uses pyglet to render
 in OpenGL.
 
-Please REMOVE any previous installation of Bruce!
+Please REMOVE any previous installation of Bruce if you're upgrading
+from prior to version 3.0!
 
 Changes in this release:
 
-- add rendering of tables
-- add "bullet mode" for faster presentation styles
-- add support for Pygments code colorisation
-- add code block for displaying code blocks
-- add blank page marker
-- pop up a simple GUI when no command-line args given
-- fix page number in window title
-- set the clear color to the layout bgcolor
-- generate warnings when unhandled docutils features are encountered
-- handle doctest
+- add support for arbitrary display elements via ``.. plugin::``
+- fixed display of code blocks in absence of Pygments
 
 
 Bruce, the Presentation Tool version 3.0 Features
@@ -50,6 +43,7 @@ Bruce, the Presentation Tool version 3.0 Features
   * stylesheet and layout changes on the fly (eg. multiple fonts
     per page)
   * transitions between pages
+  * plugins to create your own inline elements
 
 - timer and page count display for practicing
 - may specify which screen to open on in multihead
@@ -61,7 +55,8 @@ Bruce, the Presentation Tool version 3.0 Features
 Installation
 ============
 
-Please REMOVE any previous installation of Bruce!
+Please REMOVE any previous installation of Bruce if you're upgrading
+from prior to version 3.0!
 
 Bruce REQUIRES:
 
