@@ -245,6 +245,12 @@ is (with the ``code_`` prefix removed): ``keyword``, ``text``, ``generic``,
 ``operator`` and ``comment``.
 
 
+Bruce Style Sheets (.bss)
+"""""""""""""""""""""""""
+
+XXX write this
+
+
 Transition Names
 """"""""""""""""
 

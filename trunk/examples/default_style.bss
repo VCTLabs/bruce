@@ -1,0 +1,71 @@
+# Bruce StyleSheet (BSS) version of the built-in default style
+
+[layout]
+# define the page layout
+title.position = w/2,h
+title.hanchor = center
+title.vanchor = top
+
+footer.position = w,0
+footer.hanchor = right
+footer.vanchor = bottom
+
+viewport.position = 0,0
+viewport.size = w, h
+
+
+[style]
+# default styles
+font_name = Arial
+font_size = 20
+margin_bottom = 12
+align = left
+color = black
+
+# special text styles
+emphasis.italic = yes
+strong.bold = yes
+literal.font_name = Courier New
+literal.font_size = 20
+literal_block.margin_left = 20
+line_block.margin_left = 40
+block_quote.italic = yes
+block_quote.bold = False
+
+# layout styles
+title.font_size = 28
+title.bold = yes
+footer.font_size = 16
+footer.italic = yes
+layout.valign = top
+layout.background_color = white
+
+# default transition
+transition.name = none
+transition.duration = 0.5
+
+# table styles
+table.heading_background_color = #d2d2d2
+table.even_background_color = #f0f0f0
+table.odd_background_color = #f0f0f0
+table.cell_align = left
+table.cell_valign = top
+table.top_padding = 2
+table.bottom_padding = 2
+table.left_padding = 4
+table.right_padding = 4
+table.border = yes
+table.border_color = black
+
+# Pygments styles for code highlighting
+code_keyword.color = #008000
+code_name.bold = yes
+code_name_class.bold = yes
+code_name_class.color = #BABA21
+code_name_function.bold = yes
+code_name_function.color = #BABA21
+code_literal.color = #BA2121
+code_operator.color = #666666
+code_comment.italic = yes
+code_comment.color = #408080
+
