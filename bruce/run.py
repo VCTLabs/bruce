@@ -209,7 +209,7 @@ def run(filename, options):
         else:
             stylesheet = style.stylesheets['default'].copy()
     else:
-        stylesheet = style.stylesheets[options.style].copy()
+        stylesheet = style.get(options.style)
     pages = rst_parser.parse(content, stylesheet=stylesheet,
         bullet_mode=options.bullet_mode)
 

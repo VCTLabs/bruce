@@ -7,6 +7,10 @@ Ideas:
 :reset:         -- reset back to the Bruce default style
 '''
 
+import ConfigParser
+
+import pyglet
+
 from docutils import nodes
 from docutils.transforms import references
 from docutils.parsers.rst import directives
@@ -126,6 +130,20 @@ directives.register_directive('style', style_directive)
 class Stylesheet(dict):
     def value(self, section, name, default=None):
         return self[section].get(name, self['default'].get(name, default))
+
+    def set(self, compound_name, value):
+        '''Handle setting a nested dict value using a potentially compound name.
+
+        Split the name on '.' - if there isn't one then the section is 'default'.
+        '''
+        if '.' in compound_name:
+            section, name = compound_name.split('.')
+        else:
+            section, name = 'default', compound_name
+        if section not in self:
+            self[section] = {name: value}
+        else:
+            self[section][name] = value
 
     def copy(self):
         new = Stylesheet()
@@ -247,5 +265,40 @@ stylesheets = {
     'big-centered': big_centered,
 }
 
-__all__ = ['default_stylesheet', 'stylesheets']
+def get(name):
+    if name in stylesheets:
+        return stylesheets[name].copy()
+    return load(name)
+
+def load(filename):
+    try:
+        f = pyglet.resource.file(filename)
+    except pyglet.resource.ResourceNotFoundException:
+        if filename.endswith('.bss'):
+            raise ValueError('stylesheet file %s not found'%filename)
+        try:
+            f = pyglet.resource.file(filename + '.bss')
+        except pyglet.resource.ResourceNotFoundException:
+            raise ValueError('stylesheet file %s not found'%filename)
+
+    # read the file in
+    c = ConfigParser.ConfigParser()
+    c.readfp(f)
+
+    # get the base sheet
+    if not c.has_section('style'):
+        sheet = default_stylesheet.copy()
+    elif c.has_option('style', 'inherit-styles'):
+        sheet = get(c.get('style', 'inherit-styles'))
+    else:
+        sheet = Stylesheet()
+
+    for k,v in style_directive.options.items():
+        if c.has_option('style', k):
+            sheet.set(k, v(c.get('style', k)))
+
+    # XXX do layout now
+    return sheet
+
+__all__ = ['get', 'stylesheets']
 
