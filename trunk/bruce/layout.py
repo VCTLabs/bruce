@@ -62,21 +62,40 @@ class Layout(cocos.layer.Layer):
     default_title_position = ('w//2,h', 'center', 'top')
     default_footer_position = ('w//2,0', 'center', 'bottom')
 
-    def __init__(self, content, stylesheet, title=None, footer=None):
-        self.content = content
+    # XXX make me an attribute of stylesheet and weakref back to it
+    def __init__(self, stylesheet, title=None, footer=None, bgcolor=None,
+            quads=[], images=[], title_position=None, footer_position=None,
+            viewport=None):
         self.stylesheet = stylesheet
+
+        # XXX modified directly as part of stylesheet
+        if bgcolor is not None:
+            self.bgcolor = bgcolor
+        else:
+            self.bgcolor = stylesheet['layout']['background_color']
+
         self.title = title
         self.footer = footer
-        self.explicit_viewport = None
-        self.quads = []
-        self.images = []
+        self.quads = list(quads)
+        self.images = list(images)
+        if title_position is None:
+            self.title_position = self.default_title_position
+        else:
+            self.title_position = title_position
+        if footer_position is None:
+            self.footer_position = self.default_footer_position
+        else:
+            self.footer_position = footer_position
+        self.viewport = viewport
+
         super(Layout, self).__init__()
 
     def copy(self):
         '''Make a copy of this layout, usually to keep for a given page.
         '''
-        return Layout(self.content, self.stylesheet, self.title,
-            self.footer)
+        return Layout(self.stylesheet, self.title, self.footer, self.bgcolor,
+            self.quads, self.images, self.title_position, self.footer_position,
+            self.viewport)
 
     def get_viewport(self):
         '''A layout may specify a smaller viewport than the total
@@ -84,22 +103,8 @@ class Layout(cocos.layer.Layer):
         '''
         return self.limited_viewport
 
-    _parsed = False
     def on_enter(self):
         ow, oh = self.parent.desired_size
-        vars = dict(w=ow, h=oh)
-
-        # defaults
-        self.title_position = self.default_title_position
-        self.footer_position = self.default_footer_position
-
-        if not self._parsed:
-            self.bgcolor = self.stylesheet['layout']['background_color']
-            # set up the rendering for this layout by parsing its spec
-            for line in self.content.splitlines():
-                directive, rest = line.split(':', 2)
-                getattr(self, 'handle_%s'%directive.strip())(rest.strip(), vars)
-            self._parsed = True
 
         # figure the offset we need to center the viewport
         vx = vy = 0
@@ -114,10 +119,10 @@ class Layout(cocos.layer.Layer):
         if vh < h:
             vy = (h - vh)//2
 
-        if self.explicit_viewport:
+        if self.viewport:
             # scale / shift explicit viewport position and dimensions
             self.limited_viewport = [int(n * scale)
-                for n in self.explicit_viewport]
+                for n in self.viewport]
             self.limited_viewport[0] += vx
             self.limited_viewport[1] += vy
         else:
@@ -183,7 +188,7 @@ class Layout(cocos.layer.Layer):
             self.decorations.append(l)
 
             # adjust automatic viewport restriction if the title is at the top
-            if not self.explicit_viewport and valign == 'top':
+            if not self.viewport and valign == 'top':
                 self.limited_viewport = (vx, vy, vw, vh - l.content_height)
 
         if self.footer is not None:
@@ -202,7 +207,7 @@ class Layout(cocos.layer.Layer):
             self.decorations.append(l)
 
             # adjust automatic viewport restriction if the footer is at the bottom
-            if not self.explicit_viewport and valign == 'bottom':
+            if not self.viewport and valign == 'bottom':
                 x, y, w, h = self.limited_viewport
                 footer_height = l.content_height + l.y
                 if y < footer_height:
@@ -221,7 +226,21 @@ class Layout(cocos.layer.Layer):
         self.on_exit()
         self.on_enter()
 
-    def handle_image(self, image, vars):
+    def draw(self):
+        self.batch.draw()
+
+class LayoutParser(object):
+    '''Parse a layout spec and modify an existing Layout instance in place.
+    '''
+    def __init__(self, layout):
+        self.layout = layout
+
+    def parse(self, content):
+        for line in content.splitlines():
+            directive, rest = line.split(':', 2)
+            getattr(self, 'handle_%s'%directive.strip())(rest.strip())
+
+    def handle_image(self, image):
         halign='left'
         valign='bottom'
         if ';' in image:
@@ -232,9 +251,11 @@ class Layout(cocos.layer.Layer):
                 elif k == 'valign': valign=v
         else:
             fname = image
-        self.images.append((fname, halign, valign))
+        self.layout.images.append((fname, halign, valign))
 
-    def handle_quad(self, quad, vars):
+    def handle_quad(self, quad):
+        w, h = cocos.director.director.window.get_size()
+        vars = dict(w=w, h=h)
         cur_color = None
         c = []
         v = []
@@ -248,21 +269,20 @@ class Layout(cocos.layer.Layer):
                 c.extend(cur_color)
                 v.extend([eval(e, {}, vars) for e in entry[1:].split(',')
                     if '_' not in e])
-        self.quads.append((c, v))
+        self.layout.quads.append((c, v))
 
-    def handle_bgcolor(self, color, vars):
-        self.bgcolor = parse_color(color)
+    def handle_bgcolor(self, color):
+        self.layout.bgcolor = parse_color(color)
 
-    def handle_footer(self, align, vars):
-        self.footer_position = map(str, align.split(';'))
+    def handle_footer(self, align):
+        self.layout.footer_position = map(str, align.split(';'))
 
-    def handle_viewport(self, viewport, vars):
-        self.explicit_viewport = tuple(eval(e, {}, vars)
+    def handle_viewport(self, viewport):
+        w, h = cocos.director.director.window.get_size()
+        vars = dict(w=w, h=h)
+        self.layout.viewport = tuple(eval(e, {}, vars)
             for e in viewport.split(',') if '_' not in e)
 
-    def handle_title(self, title, vars):
-        self.title_position = map(str, title.split(';'))
-
-    def draw(self):
-        self.batch.draw()
+    def handle_title(self, title):
+        self.layout.title_position = map(str, title.split(';'))
 

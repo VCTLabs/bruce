@@ -297,7 +297,8 @@ def load(filename):
         if c.has_option('style', k):
             sheet.set(k, v(c.get('style', k)))
 
-    # XXX do layout now
+    # XXX how to handle layout?
+
     return sheet
 
 __all__ = ['get', 'stylesheets']
