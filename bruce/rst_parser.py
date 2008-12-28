@@ -169,7 +169,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def __init__(self, stylesheet, bullet_mode):
         super(DocutilsDecoder, self).__init__()
         self.stylesheet = stylesheet
-        self.layout = layout.Layout('', stylesheet)
+        self.layout = layout.Layout(stylesheet)
         self.pages = []
         self.document = None
         self.bullet_mode = bullet_mode
@@ -552,7 +552,8 @@ class DocumentGenerator(structured.StructuredTextDecoder):
             self.stylesheet[group][key] = value
 
     def visit_layout(self, node):
-        self.layout.content = node.get_layout()
+        # update the current layout using the node contents
+        layout.LayoutParser(self.layout).parse(node.get_layout())
 
     #
     # Resource location

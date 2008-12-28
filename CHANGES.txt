@@ -1,3 +1,9 @@
+3.2
+
+- add Bruce Style Sheets (BSS)
+- fix layout losing footer alignment when going backwards
+
+
 3.1 - 2008-12-24 (r177)
 
 - add support for arbitrary display elements via ``.. plugin::``
