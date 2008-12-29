@@ -32,7 +32,7 @@ centered on a white background (using the "big-centered" style)::
 and so on. Blank pages are possible using ``.. blank::`` in place
 of page content.
 
-There's a lot of examples in the examples/ directory, showing off
+There's a lot of examples in the "examples/" directory, showing off
 most of Bruce's features.
 
 
@@ -50,7 +50,8 @@ There is also a "bullet mode" which treats each bullet point in a
 top-level bullet list as a single page. See "examples/test_bullet_mode.rst"
 for a file that uses this mode.
 
-Bruce supports a large amount of ReStructuredText and some additional features:
+Bruce supports a large amount of ReStructuredText and some additional
+features:
 
 - inline markup for emphasis, strong, superscript, subscript and literal
 - literal blocks
@@ -63,7 +64,7 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 - page titles (section headings)
 - syntax highlighting of code if Pygments__ is installed
 - interactive Python interpreter sessions
-- styling
+- styling including separate style sheets
 - backgrounds
 - transitions between pages
 - blank pages
@@ -72,13 +73,15 @@ Bruce supports a large amount of ReStructuredText and some additional features:
 __ http://pygments.org/
 
 **titles**
-    Bruce will not line-wrap title text (doing so messes with layout way too much),
-    so make sure your title fits in one line!
+    Bruce will not line-wrap title text (doing so messes with layout way
+	too much), so make sure your title fits in one line!
 
 **images**
-    A ``:width:`` and/or ``:height:`` may be specified to scale the image when displayed.
-    If only one is specified then the image's other dimension will be scaled
-    to ensure the image aspect ration is retained.
+    A ``:width:`` and/or ``:height:`` may be specified to scale the image
+	when displayed. If only one is specified then the image's other dimension
+	will be scaled to ensure the image aspect ration is retained. Images
+	(and video, stylesheets, etc) are located using `resource discovery`_
+	described later.
 
 **tables**
     No row or column spanning is implemented yet. Tables may have pretty much
@@ -107,14 +110,19 @@ __ http://pygments.org/
        Donec auctor vestibulum risus. Vestibulum porttitor purus sed magna.
 
 **interpreter**
-    Embeds a Python interpreter in the page. The options available are ``:width:`` and
-    ``:height:`` (default 800 by 300). You may also have the optional flag ``:sysver:``
-    which will cause the standard Python interactive intepreter greeting with the
-    Python version to be displayed.
+    Embeds a Python interpreter in the page. The options available are
+	``:width:`` and ``:height:`` (default 800 by 300). You may also have
+	the optional flag ``:sysver:`` which will cause the standard Python
+	interactive intepreter greeting with the Python version to be displayed.
 
 **plugins**
     Enables the author to compose a new inline element in Python code. See
-    the section below on `writing plugins`_.
+    the section on `writing plugins`_.
+
+**style sheets**
+    `Bruce Style Sheets (.bss)`_ may be specified on the command-line or
+	in the presentation itself using the ``.. load-style::`` directive
+	which takes either a built-in style name or a ".bss" filename.
 
 
 Style Changes
@@ -143,9 +151,9 @@ The transition section specifies the name of the page transition and time
 to run it for.
 
 **color**
-    Specified as an HTML-like RGB or RGBA hex value, eg. ``#ff00ff`` for red=255,
-    green=0 and blue=255, ie. purple. May also use the common HTML color names
-    like ``red``, ``white``, ``gray`` etc.
+    Specified as an HTML-like RGB or RGBA hex value, eg. ``#ff00ff`` for
+	red=255, green=0 and blue=255, ie. purple. May also use the common HTML
+	color names like ``red``, ``white``, ``gray`` etc.
 **background_color**
     Specified as per color above, indicates the color to place behind the text.
 **font_size**
@@ -166,6 +174,19 @@ to run it for.
 **valign**
     Only valid in the **layout** section; one of ``top`` (default), ``center``
     or ``bottom``.
+**position**, **hanchor**, **vanchor**
+    Used for title and footer these specify how to place the text. See `title
+    and footer positioning`_.
+**viewport**
+    As seen in the **layout** section. This defines the restricted size to be
+    used by page contents (not including title and footer). By default some
+    space is allocated so the page contents don't overwrite the page title and
+    footer, if they are present and positioned in the usual top and bottom
+    places. The viewport is specified as::
+
+        viewport:x,y,width,height
+
+   Giving the bottom-left corner x,y position and the width and height.
 **name**
     Only valid in the **transition** section; one of the `transition names`_
     listed below. Default is ``none``.
@@ -173,58 +194,14 @@ to run it for.
     Only valid in the **transition** section; gives the duration in seconds
     to run the current transition for. Default is ``0.5``.
 
-The default stylesheet contains::
+The default builtin stylesheet may be seen in ``examples/default_style.bss``.
 
-    default.font_name = Arial
-    default.font_size = 20
-    default.margin_bottom = 12
-    default.align = left
-    default.color = black
-    emphasis.italic = yes
-    strong.bold = yes
-    literal.font_name = Courier New
-    literal.font_size = 20
-    literal.background_color = #e0e0e0
-    literal_block.margin_left = 20
-    line_block.margin_left = 40
-    block_quote.italic
-    title.font_size = 28
-    title.align = center
-    title.bold = yes
-    footer.font_size = 16
-    footer.align = center
-    footer.italic = yes
-    layout.background_color = white
-    layout.valign = top
-    transition.name = none
-    transition.duration = 0.5
-    table.heading_background_color = #d2d2d2
-    table.even_background_color = #f0f0f0
-    table.odd_background_color = #f0f0f0
-    table.cell_align = left
-    table.cell_valign = top
-    table.top_padding = 2
-    table.bottom_padding = 2
-    table.left_padding = 4
-    table.right_padding = 4
-    table.border = yes
-    table.border_color = black
-    code_keyword.color = #008000
-    code_name.bold = yes
-    code_name_class.bold = yes
-    code_name_class.color = #baba21
-    code_name_function.bold = yes
-    code_name_function.color = #baba21
-    code_literal.color = #ba2121
-    code_operator.color = #666666
-    code_comment.italic = yes
-    code_comment.color = #404080
-
-The "default" group is used as a fallback when a particular style is looked up and
-no explicit attribute is set. Thus all text is rendered in ``Arial`` by default, except
-in literal text where ``Courier New`` is used. You may set ``title.font_name`` to override
-the font used in the title or ``default.font_name`` to override the font used everywhere
-(except literal text). You may refer to defaults using bare style attributes, so
+The "default" group is used as a fallback when a particular style is looked
+up and no explicit attribute is set. Thus all text is rendered in ``Arial``
+by default, except in literal text where ``Courier New`` is used. You may
+set ``title.font_name`` to override the font used in the title or
+``default.font_name`` to override the font used everywhere (except literal
+text). You may refer to defaults using bare style attributes, so
 ``default.font_name`` and ``font_name`` are both equivalent.
 
 Style changes are specified using the style directive. To change the font to
@@ -234,7 +211,8 @@ Style changes are specified using the style directive. To change the font to
       :font_size: 64
       :bold: yes
 
-To change a single style element you may have the declaration on a single line::
+To change a single style element you may have the declaration on a single
+line::
 
    .. style:: :font_size: 64
 
@@ -244,11 +222,74 @@ is (with the ``code_`` prefix removed): ``keyword``, ``text``, ``generic``,
 ``name``, ``name_class``, ``name_function``, ``literal``, ``punctuation``,
 ``operator`` and ``comment``.
 
+Title and Footer Positioning
+""""""""""""""""""""""""""""
+
+**title positioning**
+   The position of the title is controlled by the stylesheet. The
+   default ``title`` styles are::
+
+        title.position = w/2,h
+        title.hanchor = center
+        title.vanchor = top
+
+   Which positions the title at the top-center of the viewport, anchored
+   in the center/top of the text.
+
+**footer positioning**
+   The position of the footer is controlled by the stylesheet. The
+   default ``footer`` styles are::
+
+        footer.position = w,0
+        footer.hanchor = right
+        footer.vanchor = bottom
+
+   Which positions the foorer at the bottom-right of the viewport, anchored
+   in the right/bottom of the text.
+
+All positions may be Python expressions which will be evaluated. The
+expressions have the variables "w" and "h" available which are the
+width and height of the presentation viewport. To center the title,
+for example, the width could be specified as ``w//2``. This will divide
+the width by two producing an integer (always try to produce an integer
+as it will result in more pleasing rendering).
+
 
 Bruce Style Sheets (.bss)
 """""""""""""""""""""""""
 
-XXX write this
+If you wish to change the style of your presentation significantly from the
+built-in styles you may define your own Bruce Style Sheet. This allows you
+to alter any of the style properties described above and also change the `page
+layout`_ described below. The file may have two sections:
+
+**[layout]**
+  The contents of this section are parsed *exactly* the same as described
+  in the `page layout`_ section below. This allows you to alter the
+  page background decorations.
+
+**[style]**
+  This section contains style properties. The syntax for the properties is
+  simple::
+
+     property = value
+
+  for example::
+
+     color = white
+     bold = yes
+     italic = no
+     table.border_color = #ff0000
+     layout.background_color = black
+
+  By default your stylesheet will use the properties defined in the "default"
+  stylesheet where you don't specify anything. You may use an ``inherit-style``
+  definition in your sheet to to specify another stylesheet (either built
+  in or another .bss file), for example::
+
+     inherit-style = big-centered
+
+  you may only inherit from *one* other stylesheet though.
 
 
 Transition Names
@@ -284,58 +325,28 @@ Page Layout
 -----------
 
 The page layout may also be defined on the fly. Unlike the stylesheet
-which may be modified, the page layout must be specified entirely with
-each directive. The layout directive applies to the current and subsequent
-pages. The layout also controls the placement of the page title.
+which may be modified in-place, the page layout must be specified entirely
+with each directive. The layout directive applies to the current and
+subsequent pages.
 
-A blank layout directive ``.. layout::`` will result in
-the default layout having a white layout and the page title centered
-at the top of the page.
+A blank layout directive ``.. layout::`` will result in the default
+white background and no other decoration.
 
-Layout controls a few elements of display:
+**image-based decoration**
+   You may draw images on the page which will appear under any content. The
+   syntax for specifying an image is::
 
-**title positioning**
-   The position of the title is controlled here. The style of the title is controlled
-   by the stylesheet. The title is specified as::
+       :image:<filename>;halign=left;valign=bottom
 
-        title:x,y;hanchor;vanchor
-
-   The default ``title`` is::
-
-        title:w//2,h;center;top
-
-   Which positions the title at the top-center of the viewport, anchored
-   in the center/top of the text.
-
-**footer positioning**
-   The position of the footer is controlled here. The style of the footer is controlled
-   by the stylesheet. The footer is specified as::
-
-        footer:x,y;hanchor;vanchor
-
-   The default ``footer`` is::
-
-        footer:w,0;right;bottom
-
-   Which positions the foorer at the bottom-right of the viewport, anchored
-   in the right/bottom of the text.
-
-**viewport**
-   You may restrict the size of the display usable by pages. By default some space
-   is allocated so the page contents don't overwrite the page title and footer, if they
-   are present and positioned in the usual top and bottom places. The viewport is
-   specified as::
-
-        viewport:x,y,width,height
-
-   Giving the bottom-left corner x,y position and the width and height.
+   This will place the indicated image flush against the bottom-left of
+   the page.
 
 **quad-based decoration**
-   You may draw quads on the page which will appear under any content. The quads may
-   have gradients by specifying different colors for each corner. The syntax for
-   specifying a quad is::
+   You may draw quads on the page which will appear under any content. The
+   quads may have color gradients by specifying different colors for each
+   corner. The syntax for specifying a quad is::
 
-        quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
+       :quad:C<color spec>;Vx1,y1;Vx2,y2;Vx3,y3;Vx4,y4
 
    Quad vertex color carries over if it's not specified for each vertex,
    allowing either solid color or blending.
@@ -343,13 +354,10 @@ Layout controls a few elements of display:
    Colors are specified in HTML format with either three or four channels
    (if three then the fourth, alpha channel is set to 255).
 
-All positions (quad vertexes, title position, etc) may be Python expressions which will
-be evaluated. The expressions have the variables "w" and "h" available which are
-the width and height of the presentation viewport. To center the title, for example,
-the width could be specified as ``w//2``.
-
-Which will divide the width by two producing an integer (always try to produce an
-integer as it will result in more pleasing rendering).
+All positions (quad vertexes, title position, etc) may be Python expressions
+which will be evaluated. The expressions have the variables "w" and "h"
+available which are the width and height of the presentation viewport. To
+center the title, for example, the width could be specified as ``w/2``.
 
 
 Resource Discovery
@@ -357,7 +365,7 @@ Resource Discovery
 
 Bruce can display images and video found in the same directory as the
 presentation source. You may enable Bruce to search additional paths
-to find images and video. Additionally you may load new fonts for display 
+to find images and video. Additionally you may load new fonts for display
 by referring to TrueType Font files. You do so using the ``.. resource::``
 directive.
 
@@ -383,14 +391,16 @@ A plugin is used with the ``.. plugin::`` directive. For example::
        :width: 300
        :height: 300
 
-The directive is referring to the plugin implemented in the file ``test_plugin.py``
-which is found using normal `resource discovery`_. That file must contain:
+The directive is referring to the plugin implemented in the file
+``test_plugin.py`` which is found using normal `resource discovery`_. That
+file must contain:
 
 1. a class called Plugin which derives from bruce.plugin.Plugin, and
 2. an implementation of any or all of the methods described below.
 
-If your plugin is animated you may request a regular tick from the clock by setting
-the property needs_tick either on your class or in your __init__ method.
+If your plugin is animated you may request a regular tick from the clock
+by setting the property needs_tick either on your class or in your
+``__init__`` method.
 
 **__init__(self, width=800, height=400)__**
     Invoked when the presentation is parsed.
@@ -400,36 +410,38 @@ the property needs_tick either on your class or in your __init__ method.
     Invoked when the page the element is on is scaled.
 
 **place(self, layout, x, y)**
-    Invoked when the page layout needs to position the element on screen. Passed a
-    pyglet.text.IncrementalTextLayout instance and the pixel position of the bottom
-    left of the element in that layout. This position almost always has a negative
-    y value.
+    Invoked when the page layout needs to position the element on screen.
+	Passed a pyglet.text.IncrementalTextLayout instance and the pixel
+	position of the bottom left of the element in that layout. This
+	position almost always has a negative y value.
 
 **remove(self, layout)**
     Invoked when page layout removes the element from display.
 
 **tick(self, dt)**
     Invoked if the element defines needs_tick **before enter is invoked**.
-    Will be called once per "clock tick" with dt being the time in seconds since
-    the last call.
+    Will be called once per "clock tick" with dt being the time in
+	seconds since the last call.
 
-Plugin contents should be rendered using the pyglet.graphics API with the Batch
-instance on the layout passed into the place() method.
+Plugin contents should be rendered using the pyglet.graphics API with the
+Batch instance on the layout passed into the place() method.
 
 Additionally any graphics elements added to the batch should use the group
-layout.top_group as the base group. This group defines positioning transformations
-without which your plugin content will most likely not be visible.
+layout.top_group as the base group. This group defines positioning
+transformations without which your plugin content will most likely not
+be visible.
 
-Again note you'll almost always receive a negative y position in the place() call.
-The transforms in layout.top_group adjust for this (the top of the layout is typically
-at y=0).
+Again note you'll almost always receive a negative y position in the
+``place()`` call. The transforms in ``layout.top_group`` adjust for this
+(the top of the layout is typically at y=0).
 
-If you wish to alter the OpenGL context to turn on environment features such as
-texturing, or even just to perform additional transformations then you should
-define your own pyglet.graphics.Group. When you instantiate this group you should
-then pass it layout.top_group.
+If you wish to alter the OpenGL context to turn on environment features
+such as texturing, or even just to perform additional transformations then
+you should define your own pyglet.graphics.Group. When you instantiate
+this group you should then pass it layout.top_group.
 
-The following is an example plugin file used in test_plugin.rst in Bruce's source::
+The following is an example plugin file used in "examples/test_plugin.rst"
+in Bruce's source::
 
     import pyglet
     from pyglet.gl import *

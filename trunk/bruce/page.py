@@ -3,13 +3,20 @@ import cocos
 from cocos.director import director
 
 class Page(cocos.scene.Scene):
-    def __init__(self, document, stylesheet, layout, elements, docnode):
+    def __init__(self, document, stylesheet, elements, docnode):
         cocos.scene.Scene.__init__(self)
         pyglet.event.EventDispatcher.__init__(self)
-        self.layout = layout
+
+        self.stylesheet = stylesheet
+
+        # background decoration / title / footer
+        self.layout = stylesheet['layout'].layer(stylesheet)
         self.add(self.layout, z=-.5)
+
+        # actual page content
         self.content = PageContent(document, stylesheet, elements)
         self.add(self.content, z=0)
+
         self.docnode = docnode
         self.transition = stylesheet.get_transition()
 
