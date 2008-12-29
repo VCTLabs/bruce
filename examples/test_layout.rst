@@ -1,12 +1,14 @@
-The Title
----------
+The Title, Centered
+-------------------
+
+.. style::
+   :layout.background_color: silver
+   :layout.viewport: 0,64,w,h-(64+48)
 
 .. layout::
-   bgcolor: silver
-   image:pyglet-trans-64.png;halign=right;valign=bottom
-   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
-   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
-   viewport:0,64,w,h-(64+48)
+   :image: pyglet-trans-64.png;halign=right;valign=bottom
+   :quad: C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
+   :quad: C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
 
 .. footer::
    a footer
@@ -53,14 +55,14 @@ Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 Title right-aligned
 -------------------
 
-.. layout::
-   bgcolor: silver
-   title:w,h;right;top
-   footer:w,0;right;bottom
-   image:pyglet-trans-64.png;halign=right;valign=bottom
-   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
-   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
-   viewport:0,64,w,h-(64+48)
+.. style::
+   :title.position: w,h
+   :title.hanchor: right
+   :title.vanchor: top
+   :footer.position: w,0
+   :footer.hanchor: right
+   :footer.vanchor: bottom
+   :footer.color: white
 
 Title right-aligned, footer right-aligned
 
@@ -68,13 +70,13 @@ Title right-aligned, footer right-aligned
 Title left-aligned
 -------------------
 
-.. layout::
-   bgcolor: silver
-   title:0,h;left;top
-   footer:0,0;left;bottom
-   image:pyglet-trans-64.png;halign=right;valign=bottom
-   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
-   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
-   viewport:0,64,w,h-(64+48)
+.. style::
+   :title.position: 0,h
+   :title.hanchor: left
+   :title.vanchor: top
+   :footer.position: 0,0
+   :footer.hanchor: left
+   :footer.vanchor: bottom
+   :footer.color: black
 
 Title left-aligned, footer left-aligned

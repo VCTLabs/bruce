@@ -1,18 +1,7 @@
 # Bruce StyleSheet (BSS) version of the built-in default style
 
 [layout]
-# define the page layout
-title.position = w/2,h
-title.hanchor = center
-title.vanchor = top
-
-footer.position = w,0
-footer.hanchor = right
-footer.vanchor = bottom
-
-viewport.position = 0,0
-viewport.size = w, h
-
+# intentionally empty
 
 [style]
 # default styles
@@ -35,8 +24,15 @@ block_quote.bold = False
 # layout styles
 title.font_size = 28
 title.bold = yes
+title.position = w//2, h
+title.hanchor = center
+title.vanchor = top
 footer.font_size = 16
 footer.italic = yes
+footer.position = w//2, 0
+footer.hanchor = center
+footer.vanchor = bottom
+layout.viewport = 0,0,w,h
 layout.valign = top
 layout.background_color = white
 

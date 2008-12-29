@@ -1,10 +1,7 @@
-# Bruce StyleSheet (BSS) version of the built-in default style
-
-[layout]
-inherit-layout = default
+# Bruce StyleSheet (BSS) version of the built-in white-on-black style
 
 [style]
-inherit-styles = default
+inherit-style = default
 
 color = white
 layout.background_color = black
@@ -17,13 +14,9 @@ table.border_color = white
 
 # Pygments styles for code highlighting
 code_keyword.color = #008000
-code_name.bold = yes
-code_name_class.bold = yes
 code_name_class.color = #BABA21
-code_name_function.bold = yes
 code_name_function.color = #BABA21
 code_literal.color = #BA2121
 code_operator.color = #666666
-code_comment.italic = yes
 code_comment.color = #408080
 

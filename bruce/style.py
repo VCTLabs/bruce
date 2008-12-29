@@ -16,6 +16,7 @@ from docutils.transforms import references
 from docutils.parsers.rst import directives
 
 from bruce.color import parse_color
+from bruce import layout
 
 from cocos.scenes import transitions
 from cocos.director import director
@@ -32,6 +33,8 @@ def halignment(argument):
     return directives.choice(argument, ('left', 'center', 'right'))
 def valignment(argument):
     return directives.choice(argument, ('top', 'center', 'bottom'))
+def coordinates(argument):
+    return [a.strip() for a in argument.split(',')]
 
 _transitions = dict(
     # do not require VBO support
@@ -72,10 +75,8 @@ class load_style(nodes.Special, nodes.Invisible, nodes.Element):
     '''Document tree node representing a style loading directive.
     '''
     def get_style(self):
-        if self.rawsource in stylesheets:
-            return stylesheets[self.rawsource]
-        else:
-            raise NotImplementedError('loading of stylesheets not implemented')
+        return get(self.rawsource)
+
 def load_style_directive(name, arguments, options, content, lineno,
                           content_offset, block_text, state, state_machine):
     return [ load_style(arguments[0]) ]
@@ -94,10 +95,21 @@ def style_directive(name, arguments, options, content, lineno,
     return [ style('', **options) ]
 style_directive.arguments = (0, 0, 0)
 style_directive.options = {
-     'layout.valign': valignment,
-     'layout.background_color': color,
      'transition.name': stripped,
      'transition.duration': float,
+
+     'layout.valign': valignment,
+     'layout.background_color': color,
+     'layout.viewport': coordinates,
+
+     'title.position': coordinates,
+     'title.hanchor': halignment,
+     'title.vanchor': valignment,
+
+     'footer.position': coordinates,
+     'footer.hanchor': halignment,
+     'footer.vanchor': valignment,
+
      'table.heading_background_color': color,
      'table.even_background_color': color,
      'table.odd_background_color': color,
@@ -105,11 +117,17 @@ style_directive.options = {
      'table.bottom_padding': int,
      'table.left_padding': int,
      'table.right_padding': int,
+     'table.cell_align': halignment,
+     'table.cell_valign': valignment,
      'table.border': boolean,
      'table.border_color': color,
 }
 for group in ('', 'default.', 'literal.', 'emphasis.', 'strong.', 'title.',
-        'footer.', 'block_quote.'):
+        'footer.', 'block_quote.',
+        'code_keyword.', 'code_text.', 'code_generic.', 'code_name.',
+        'code_name_class.', 'code_name_function.', 'code_literal.',
+        'code_punctuation.', 'code_operator.', 'code_comment.',
+        ):
     style_directive.options[group + 'color'] = color
     style_directive.options[group + 'background_color'] = color
     style_directive.options[group + 'font_size'] = directives.positive_int
@@ -128,6 +146,19 @@ style_directive.content = False
 directives.register_directive('style', style_directive)
 
 class Stylesheet(dict):
+    '''Container for the styles used in rendering Bruce pages.
+
+    Each page will have an instance of this class attached to it. Each
+    modification to the stylesheet is done on a .copy() of the previous style.
+    '''
+    def __init__(self, **kw):
+        if 'layout' not in kw:
+            kw['layout'] = layout.Layout(
+                valign='top',
+                background_color=(255, 255, 255, 255),
+                # default viewport=('0', '0', 'w', 'h'),
+            )
+        super(Stylesheet, self).__init__(**kw)
     def value(self, section, name, default=None):
         return self[section].get(name, self['default'].get(name, default))
 
@@ -158,6 +189,7 @@ class Stylesheet(dict):
             director.replace(klass(new_scene, duration=duration))
         return _transition
 
+# set up the default style
 default_stylesheet = Stylesheet(
     default = dict(
         font_name='Arial',
@@ -188,17 +220,24 @@ default_stylesheet = Stylesheet(
         italic=True,
         bold=False,
     ),
+    layout = layout.Layout(
+        valign='top',
+        background_color=(255, 255, 255, 255),
+        # default viewport=('0', '0', 'w', 'h'),
+    ),
     title = dict(
         font_size=28,
         bold=True,
+        position=('w//2', 'h'),
+        hanchor='center',
+        vanchor='top',
     ),
     footer = dict(
         font_size=16,
         italic=True,
-    ),
-    layout = dict(
-        valign='top',
-        background_color=(255, 255, 255, 255),
+        position=('w//2', '0'),
+        hanchor='center',
+        vanchor='bottom',
     ),
     transition = dict(
         name='none',
@@ -260,9 +299,32 @@ big_centered['literal']['font_size'] = 64
 big_centered['title']['font_size'] = 84
 big_centered['layout']['valign'] = 'center'
 
+white_on_black = default_stylesheet.copy()
+big_centered_wob = big_centered.copy()
+for d in (white_on_black, big_centered_wob):
+    d['default']['color'] = (0xff, 0xff, 0xff, 0xff)
+    d['layout']['background_color'] = (0, 0, 0, 255)
+
+    # table styles
+    d['table']['heading_background_color'] = (0x32, 0x32, 0x32, 0xff)
+    d['table']['even_background_color'] = (0x10, 0x10, 0x10, 0xff)
+    d['table']['odd_background_color'] = (0x10, 0x10, 0x10, 0xff)
+    d['table']['border_color'] = (0xff, 0xff, 0xff, 0xff)
+
+    # Pygments styles for code highlighting
+    d['code_keyword']['color'] = (0x00, 0x80, 0x00, 0xff)
+    d['code_name_class']['color'] = (0xBA, 0xBA, 0x21, 0xff)
+    d['code_name_function']['color'] = (0xBA, 0xBA, 0x21, 0xff)
+    d['code_literal.color'] = (0xBA, 0x21, 0x21, 0xff)
+    d['code_operator']['color'] = (0x66, 0x66, 0x66, 0xff)
+    d['code_comment']['color'] = (0x40, 0x80, 0x80, 0xff)
+
+
 stylesheets = {
     'default': default_stylesheet,
     'big-centered': big_centered,
+    'white-on-black': white_on_black,
+    'big-centered-wob': big_centered_wob,
 }
 
 def get(name):
@@ -271,6 +333,8 @@ def get(name):
     return load(name)
 
 def load(filename):
+    '''Locate and load the Bruce Style Sheet file indicated.
+    '''
     try:
         f = pyglet.resource.file(filename)
     except pyglet.resource.ResourceNotFoundException:
@@ -281,25 +345,72 @@ def load(filename):
         except pyglet.resource.ResourceNotFoundException:
             raise ValueError('stylesheet file %s not found'%filename)
 
-    # read the file in
-    c = ConfigParser.ConfigParser()
-    c.readfp(f)
+    directives = parse_directives(f)
 
     # get the base sheet
-    if not c.has_section('style'):
-        sheet = default_stylesheet.copy()
-    elif c.has_option('style', 'inherit-styles'):
-        sheet = get(c.get('style', 'inherit-styles'))
+    if 'inherit-style' in directives:
+        sheet = get(directives['inherit-style'])
     else:
-        sheet = Stylesheet()
+        # default for sanity
+        sheet = default_stylesheet.copy()
 
-    for k,v in style_directive.options.items():
-        if c.has_option('style', k):
-            sheet.set(k, v(c.get('style', k)))
-
-    # XXX how to handle layout?
+    styles = directives['style']
+    for k in styles:
+        sheet.set(k, styles[k])
+ 
+    if directives['layout']:
+        layout.LayoutParser(sheet['layout']).parse('\n'.join(directives['layout']))
 
     return sheet
+
+class ParseError(Exception):
+    pass
+
+def parse_directives(f):
+    '''Parse a Bruce Style Sheet file's directives.
+    '''
+    sections = dict(layout=[], style={})
+    section = None
+
+    for line in f:
+        # Skip over Python-style single line comments #
+        # NOTE: line-end comments are NOT supported
+        l = line.strip()
+        if not l:
+            continue
+        if l[0] == '#':
+            continue
+
+        # handle section heading
+        if l[0] == '[' and l[-1] == ']':
+            section = l[1:-1]
+            continue
+
+        if section is None:
+            raise ParseError('content reached with no [section] heading')
+        
+        if section == 'layout':
+            sections[section].append(l)
+            continue
+
+        # [style] section
+        key, value = [s.strip() for s in l.split('=')]
+
+        if key == 'inherit-style':
+            sections['inherit-style'] = value
+            continue
+
+        if not style_directive.options.has_key(key):
+            from warnings import warn
+            warn('unknown style directive : %s' % key)
+            continue
+
+        if '.' not in key:
+            key = 'default.' + key
+        sections['style'][key] = style_directive.options[key](value)
+        
+    return sections
+
 
 __all__ = ['get', 'stylesheets']
 

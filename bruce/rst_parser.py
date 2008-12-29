@@ -169,7 +169,6 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def __init__(self, stylesheet, bullet_mode):
         super(DocutilsDecoder, self).__init__()
         self.stylesheet = stylesheet
-        self.layout = layout.Layout(stylesheet)
         self.pages = []
         self.document = None
         self.bullet_mode = bullet_mode
@@ -210,12 +209,11 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
     def visit_section(self, node):
         '''Add a page
         '''
-        self.layout.title = None
-        g = DocumentGenerator(self.stylesheet, self.layout)
+        self.stylesheet['layout'].title = None
+        g = DocumentGenerator(self.stylesheet)
         d = g.decode(node)
         if g.len_text or g.is_blank:
-            p = Page(d, self.stylesheet.copy(), self.layout.copy(),
-                d.elements, node)
+            p = Page(d, self.stylesheet.copy(), d.elements, node)
             self.pages.append(p)
         raise docutils.nodes.SkipNode
 
@@ -224,20 +222,19 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
 
     def visit_footer(self, node):
         # XXX try to stop footer from being coalesced into one element?
-        g = DocumentGenerator(self.stylesheet, None, style_base_class='footer')
+        g = DocumentGenerator(self.stylesheet, style_base_class='footer')
         footer = g.decode(node)
         for p in self.pages:
-            p.layout.footer = footer
+            p.stylesheet['layout'].footer = footer
         raise docutils.nodes.SkipNode
 
 class DummyReporter(object):
     debug = lambda *args: None
 
 class DocumentGenerator(structured.StructuredTextDecoder):
-    def __init__(self, stylesheet, layout, style_base_class='default'):
+    def __init__(self, stylesheet, style_base_class='default'):
         super(DocumentGenerator, self).__init__()
         self.stylesheet = stylesheet
-        self.layout = layout
         self.style_base_class = style_base_class
         self.is_blank = False
 
@@ -283,7 +280,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def visit_title(self, node):
         # title is handled separately so it may be placed nicely
-        self.layout.title = node.children[0].astext().replace('\n', ' ')
+        self.stylesheet['layout'].title = node.children[0].astext().replace('\n', ' ')
         self.prune()
 
     def visit_substitution_definition(self, node):
@@ -553,7 +550,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def visit_layout(self, node):
         # update the current layout using the node contents
-        layout.LayoutParser(self.layout).parse(node.get_layout())
+        layout.LayoutParser(self.stylesheet['layout']).parse(node.get_layout())
 
     #
     # Resource location

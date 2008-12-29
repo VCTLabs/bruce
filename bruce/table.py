@@ -268,7 +268,7 @@ class TableGenerator(object):
 
     def visit_entry(self, node):
         # XXX assert no col/row spanning etc
-        g = rst_parser.DocumentGenerator(self.element.stylesheet, None)
+        g = rst_parser.DocumentGenerator(self.element.stylesheet)
         self.cells[self.num_rows, self.num_columns] = g.decode(node)
         self.num_columns += 1
         raise nodes.SkipNode
