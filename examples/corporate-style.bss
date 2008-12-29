@@ -1,0 +1,10 @@
+# stupid "corporate" style example
+
+[layout]
+:image: sample-image.png;halign=right;valign=bottom
+:quad: C#ffffff;V0,h;C#c0c0ff;Vw,h;C#8080ff;Vw,0;C#c0c0ff;V0,0
+:quad: C#c0c0ff;V0,h;V0,h-48;Vw,h-48;Vw,h
+
+[style]
+font_name = Times New Roman
+layout.viewport = 0,64,w,h-(64+48)

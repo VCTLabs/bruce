@@ -1,10 +1,6 @@
 # Bruce StyleSheet (BSS) version of the built-in "big-centered" style
 
 [style]
-# inherit the stylesheet called "default"
-inherit-style = default
-
-# overrides
 font_size = 64
 margin_bottom = 32
 align = center

@@ -1,8 +1,6 @@
 # Bruce StyleSheet (BSS) version of the built-in white-on-black style
 
 [style]
-inherit-style = default
-
 color = white
 layout.background_color = black
 

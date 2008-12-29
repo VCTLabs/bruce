@@ -291,6 +291,8 @@ layout`_ described below. The file may have two sections:
 
   you may only inherit from *one* other stylesheet though.
 
+There are example .bss stylesheets in the "examples/" directory.
+
 
 Transition Names
 """"""""""""""""
