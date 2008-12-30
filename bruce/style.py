@@ -189,8 +189,15 @@ class Stylesheet(dict):
     def get_transition(self):
         klass = _transitions[self['transition']['name']]
         if klass is None: return None
-        def _transition(new_scene, klass=klass, duration=self['transition']['duration']):
-            director.replace(klass(new_scene, duration=duration))
+
+        kwargs = dict(duration=self['transition']['duration'])
+
+        if klass is transitions.FadeTransition:
+            kwargs['color'] = self['layout']['background_color'][:3]
+
+        def _transition(new_scene, klass=klass, kwargs=kwargs):
+            director.replace(klass(new_scene, **kwargs))
+
         return _transition
 
 # set up the default style
@@ -247,7 +254,7 @@ default_stylesheet = Stylesheet(
         vanchor='bottom',
     ),
     transition = dict(
-        name='none',
+        name='fade',
         duration=0.5,
     ),
 
