@@ -3,10 +3,11 @@ import cocos
 from cocos.director import director
 
 class Page(cocos.scene.Scene):
-    def __init__(self, document, stylesheet, elements, docnode):
+    def __init__(self, document, stylesheet, elements, docnode, top_level_bullets):
         cocos.scene.Scene.__init__(self)
         pyglet.event.EventDispatcher.__init__(self)
 
+        self.document = document
         self.stylesheet = stylesheet
 
         # background decoration / title / footer
@@ -20,6 +21,8 @@ class Page(cocos.scene.Scene):
         self.docnode = docnode
         self.transition = stylesheet.get_transition()
 
+        self.top_level_bullets = top_level_bullets
+
         viewport_width, viewport_height = director.get_window_size()
 
     def on_next(self):
@@ -27,14 +30,26 @@ class Page(cocos.scene.Scene):
         button). If the handler returns event.EVENT_HANDLED then
         the presentation does not leave this page.
         '''
-        pass
+        for bullet in self.top_level_bullets:
+            s, e, on = bullet
+            if not on:
+                bullet[-1] = True
+                color = self.stylesheet.value('default', 'color')
+                self.document.set_style(s, e, dict(color=color))
+                return pyglet.event.EVENT_HANDLED
 
     def on_previous(self):
         '''Invoked on the "previous" event (cursor left or right mouse
         button). If the handler returns event.EVENT_HANDLED then
         the presentation does not leave this page.
         '''
-        pass
+        for bullet in reversed(self.top_level_bullets):
+            s, e, on = bullet
+            if on:
+                bullet[-1] = False
+                color = self.stylesheet.value('default', 'color')[:3] + (0,)
+                self.document.set_style(s, e, dict(color=color))
+                return pyglet.event.EVENT_HANDLED
 
     def print_source(self):
         for child in self.docnode.children:

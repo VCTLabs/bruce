@@ -157,6 +157,8 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def place(self, layout, x, y):
         # format the code
         self.document = pyglet.text.document.FormattedDocument(self.content)
+
+        # XXX stylesheet here, please...
         self.document.set_style(0, len(self.document.text), {
             'font_name': 'Courier New',
             'font_size': 18, 
