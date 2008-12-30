@@ -33,6 +33,8 @@ def halignment(argument):
     return directives.choice(argument, ('left', 'center', 'right'))
 def valignment(argument):
     return directives.choice(argument, ('top', 'center', 'bottom'))
+def expose_options(argument):
+    return directives.choice(argument, ('show', 'expose'))
 def coordinates(argument):
     return [a.strip() for a in argument.split(',')]
 
@@ -97,6 +99,8 @@ style_directive.arguments = (0, 0, 0)
 style_directive.options = {
      'transition.name': stripped,
      'transition.duration': float,
+
+     'list.expose': expose_options,
 
      'layout.valign': valignment,
      'layout.background_color': color,
@@ -203,6 +207,9 @@ default_stylesheet = Stylesheet(
     ),
     strong = dict(
         bold=True,
+    ),
+    list = dict(
+        expose='show',
     ),
     literal = dict(
         font_name='Courier New',

@@ -10,6 +10,7 @@ import pyglet
 from pyglet.text.formats import structured
 
 # these imports simply cause directives to be registered
+from bruce import page
 from bruce import layout
 from bruce import interpreter, video, plugin
 from bruce import code_block
@@ -17,9 +18,6 @@ from bruce import blank
 from bruce import resource
 from bruce.image import ImageElement
 from bruce import pygments_parser
-
-# the basic page
-from bruce.page import Page
 
 from bruce.style import *
 
@@ -213,7 +211,8 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         g = DocumentGenerator(self.stylesheet)
         d = g.decode(node)
         if g.len_text or g.is_blank:
-            p = Page(d, self.stylesheet.copy(), d.elements, node)
+            p = page.Page(d, self.stylesheet.copy(), d.elements, node,
+                g.top_level_bullets)
             self.pages.append(p)
         raise docutils.nodes.SkipNode
 
@@ -237,6 +236,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.stylesheet = stylesheet
         self.style_base_class = style_base_class
         self.is_blank = False
+        self.top_level_bullets = []
 
     def decode_structured(self, doctree, location):
         # attach a reporter so docutil's walkabout doesn't get confused by us
@@ -456,14 +456,28 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.list_stack.pop()
 
     in_item = False
+    item_depth = 0
     def visit_list_item(self, node):
         self.break_paragraph()
         self.list_stack[-1].item(self, {})
         self.paragraph_suppress_newline = True
         # indicate that new paragraphs need to be indented
         self.in_item = True
+        self.item_depth += 1
+
+        # if we're to expose list items then modify them to be initially transparent
+        if self.item_depth == 1 and self.stylesheet.value('list', 'expose') == 'expose':
+            # XXX track all style changes within the list item
+            # XXX to control all colors ... also track images, video, plugins, ...
+            color = self.stylesheet.value('default', 'color')[:3] + (0,)
+            self.push_style(node, dict(color=color))
+            self.top_level_bullets.append([self.len_text, None, False])
+
     def depart_list_item(self, node):
         self.in_item = False
+        if self.item_depth == 1 and self.top_level_bullets:
+            self.top_level_bullets[-1][1] = self.len_text
+        self.item_depth -= 1
 
     def visit_definition_list(self, node):
         pass

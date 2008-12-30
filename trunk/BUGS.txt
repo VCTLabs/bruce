@@ -4,3 +4,4 @@ KNOWN BUGS
 - test_interpreter (first page) shows resizing issues
 - indentation of list item content varies when list enumeration gets wide
 - footer doesn't handle color changes
+- interpreter style is hard-coded
