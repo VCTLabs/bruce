@@ -152,8 +152,8 @@ on a white background (using the "big-centered" style)::
     centered at the top by default.
 
 and so on. For more information see the HOWTO__ at the Bruce
-website (or bundled with the source) and the source examples
-directory.
+website (or bundled with the source in the doc/ directory)
+ and the source examples/ directory.
 
 __ http://r1chardj0n3s.googlepages.com/howto
 
@@ -161,7 +161,7 @@ __ http://r1chardj0n3s.googlepages.com/howto
 License
 =======
 
-Copyright (c) 2005-2008 Richard Jones <richard@mechanicalcat.net>
+Copyright (c) 2005-2009 Richard Jones <richard@mechanicalcat.net>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
