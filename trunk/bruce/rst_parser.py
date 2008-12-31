@@ -111,7 +111,7 @@ class BulletSections(Transform):
 
     For example, transform this::
 
-        
+
         <document>
          <section>
           <bullet_list>

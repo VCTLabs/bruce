@@ -80,3 +80,21 @@ Title left-aligned
    :footer.color: black
 
 Title left-aligned, footer left-aligned
+
+
+red to blue down
+----------------
+
+.. layout::
+   :vgradient: red;blue
+
+Content
+
+red to blue across
+------------------
+
+.. layout::
+   :hgradient: red;blue
+
+Content
+
