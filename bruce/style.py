@@ -28,7 +28,7 @@ def stripped(argument):
 def color(argument):
     if not argument:
         return None
-    return parse_color(argument)
+    return tuple(parse_color(argument))
 def halignment(argument):
     return directives.choice(argument, ('left', 'center', 'right'))
 def valignment(argument):
@@ -371,7 +371,7 @@ def load(filename):
     styles = directives['style']
     for k in styles:
         sheet.set(k, styles[k])
- 
+
     if directives['layout']:
         layout.LayoutParser(sheet['layout']).parse('\n'.join(directives['layout']))
 
@@ -402,7 +402,7 @@ def parse_directives(f):
 
         if section is None:
             raise ParseError('content reached with no [section] heading')
-        
+
         if section == 'layout':
             sections[section].append(l)
             continue
@@ -422,7 +422,7 @@ def parse_directives(f):
         if '.' not in key:
             key = 'default.' + key
         sections['style'][key] = style_directive.options[key](value)
-        
+
     return sections
 
 

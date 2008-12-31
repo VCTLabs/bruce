@@ -137,7 +137,7 @@ class LayoutLayer(cocos.layer.Layer):
         self.batch = pyglet.graphics.Batch()
         self.decorations = []
 
-        # background 
+        # background
         c = tuple(self.stylesheet.value('layout', 'background_color')) * 4
         v = [vx, vy, vx+vw, vy, vx+vw, vy+vh, vx, vy+vh]
         q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
@@ -246,6 +246,8 @@ class LayoutParser(object):
         self.layout = layout
 
     def parse(self, content):
+        self.layout.quads = []
+        self.layout.images = []
         for line in content.splitlines():
             if line[0] == ':': line = line[1:]
             directive, rest = line.split(':', 2)
@@ -263,6 +265,20 @@ class LayoutParser(object):
         else:
             fname = image
         self.layout.images.append((fname, halign, valign))
+
+    def handle_vgradient(self, gradient):
+        w, h = cocos.director.director.window.get_size()
+        s, e = [parse_color(color) for color in gradient.split(';')]
+        c = s + e + e + s
+        v = [0, h, 0, 0, w, 0, w, h]
+        self.layout.quads.append((c, v))
+
+    def handle_hgradient(self, gradient):
+        w, h = cocos.director.director.window.get_size()
+        s, e = [parse_color(color) for color in gradient.split(';')]
+        c = s + e + e + s
+        v = [0, h, w, h, w, 0, 0, 0]
+        self.layout.quads.append((c, v))
 
     def handle_quad(self, quad):
         w, h = cocos.director.director.window.get_size()

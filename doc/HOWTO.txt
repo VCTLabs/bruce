@@ -54,18 +54,16 @@ Bruce supports a large amount of ReStructuredText and some additional
 features:
 
 - inline markup for emphasis, strong, superscript, subscript and literal
-- literal blocks
-- line blocks
+- literal and line blocks
 - block quotes
-- bullet and enumerated lists (including nesting)
-- definition lists
-- images - inline and stand-alone
-- tables (though no row / column spanning yet)
+- bullet, enumerated and definiton lists (including nesting)
+- images (inline and stand-alone)
+- tables (no row / column spanning yet)
 - page titles (section headings)
 - syntax highlighting of code if Pygments__ is installed
 - interactive Python interpreter sessions
 - styling including separate style sheets
-- backgrounds
+- backgrounds using images or gradients
 - transitions between pages
 - blank pages
 - plugins to create your own inline elements
@@ -342,6 +340,13 @@ white background and no other decoration.
 
    This will place the indicated image flush against the bottom-left of
    the page.
+
+**background gradients**
+   You may specify a vertical or horizontal color gradient for the page
+   background. This may be vertical or horizontal::
+
+       :vgradient:<top color>;<bottom color>
+       :hgradient:<left color>;<right color>
 
 **quad-based decoration**
    You may draw quads on the page which will appear under any content. The
