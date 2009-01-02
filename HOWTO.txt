@@ -2,6 +2,9 @@
 How to write presentations using Bruce the Presentation Tool
 ============================================================
 
+Some of this document refers to the optional "examples" download
+from <http://pypi.python.org/pypi/bruce>.
+
 Bruce presentations are written as plain-text files in the
 ReStructuredText format with some extensions. If you have
 access to this HOWTO file in its original text format you
@@ -32,8 +35,9 @@ centered on a white background (using the "big-centered" style)::
 and so on. Blank pages are possible using ``.. blank::`` in place
 of page content.
 
-There's a lot of examples in the "examples/" directory, showing off
-most of Bruce's features.
+There's a lot of examples in the examples download, showing off
+most of Bruce's features. Get the examples from
+<http://pypi.python.org/pypi/bruce>.
 
 
 More Detail
@@ -72,14 +76,14 @@ __ http://pygments.org/
 
 **titles**
     Bruce will not line-wrap title text (doing so messes with layout way
-	too much), so make sure your title fits in one line!
+    too much), so make sure your title fits in one line!
 
 **images**
     A ``:width:`` and/or ``:height:`` may be specified to scale the image
-	when displayed. If only one is specified then the image's other dimension
-	will be scaled to ensure the image aspect ration is retained. Images
-	(and video, stylesheets, etc) are located using `resource discovery`_
-	described later.
+    when displayed. If only one is specified then the image's other dimension
+    will be scaled to ensure the image aspect ration is retained. Images
+    (and video, stylesheets, etc) are located using `resource discovery`_
+    described later.
 
 **tables**
     No row or column spanning is implemented yet. Tables may have pretty much
@@ -109,9 +113,9 @@ __ http://pygments.org/
 
 **interpreter**
     Embeds a Python interpreter in the page. The options available are
-	``:width:`` and ``:height:`` (default 800 by 300). You may also have
-	the optional flag ``:sysver:`` which will cause the standard Python
-	interactive intepreter greeting with the Python version to be displayed.
+    ``:width:`` and ``:height:`` (default 800 by 300). You may also have
+    the optional flag ``:sysver:`` which will cause the standard Python
+    interactive intepreter greeting with the Python version to be displayed.
 
 **plugins**
     Enables the author to compose a new inline element in Python code. See
@@ -119,8 +123,8 @@ __ http://pygments.org/
 
 **style sheets**
     `Bruce Style Sheets (.bss)`_ may be specified on the command-line or
-	in the presentation itself using the ``.. load-style::`` directive
-	which takes either a built-in style name or a ".bss" filename.
+    in the presentation itself using the ``.. load-style::`` directive
+    which takes either a built-in style name or a ".bss" filename.
 
 
 Style Changes
@@ -150,8 +154,8 @@ to run it for.
 
 **color**
     Specified as an HTML-like RGB or RGBA hex value, eg. ``#ff00ff`` for
-	red=255, green=0 and blue=255, ie. purple. May also use the common HTML
-	color names like ``red``, ``white``, ``gray`` etc.
+    red=255, green=0 and blue=255, ie. purple. May also use the common HTML
+    color names like ``red``, ``white``, ``gray`` etc.
 **background_color**
     Specified as per color above, indicates the color to place behind the text.
 **font_size**
@@ -192,7 +196,7 @@ to run it for.
     Only valid in the **transition** section; gives the duration in seconds
     to run the current transition for. Default is ``0.5``.
 
-The default builtin stylesheet may be seen in ``examples/default_style.bss``.
+The default builtin stylesheet may be seen in "examples/default_style.bss".
 
 The "default" group is used as a fallback when a particular style is looked
 up and no explicit attribute is set. Thus all text is rendered in ``Arial``
@@ -289,7 +293,7 @@ layout`_ described below. The file may have two sections:
 
   you may only inherit from *one* other stylesheet though.
 
-There are example .bss stylesheets in the "examples/" directory.
+There are example .bss stylesheets in the "examples" download.
 
 
 Transition Names
@@ -418,9 +422,9 @@ by setting the property needs_tick either on your class or in your
 
 **place(self, layout, x, y)**
     Invoked when the page layout needs to position the element on screen.
-	Passed a pyglet.text.IncrementalTextLayout instance and the pixel
-	position of the bottom left of the element in that layout. This
-	position almost always has a negative y value.
+    Passed a pyglet.text.IncrementalTextLayout instance and the pixel
+    position of the bottom left of the element in that layout. This
+    position almost always has a negative y value.
 
 **remove(self, layout)**
     Invoked when page layout removes the element from display.
@@ -428,7 +432,7 @@ by setting the property needs_tick either on your class or in your
 **tick(self, dt)**
     Invoked if the element defines needs_tick **before enter is invoked**.
     Will be called once per "clock tick" with dt being the time in
-	seconds since the last call.
+    seconds since the last call.
 
 Plugin contents should be rendered using the pyglet.graphics API with the
 Batch instance on the layout passed into the place() method.
@@ -447,8 +451,7 @@ such as texturing, or even just to perform additional transformations then
 you should define your own pyglet.graphics.Group. When you instantiate
 this group you should then pass it layout.top_group.
 
-The following is an example plugin file used in "examples/test_plugin.rst"
-in Bruce's source::
+The following is an example plugin file used in "examples/test_plugin.rst"::
 
     import pyglet
     from pyglet.gl import *

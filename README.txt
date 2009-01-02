@@ -55,33 +55,29 @@ Bruce, the Presentation Tool Features
 Installation
 ============
 
-Please REMOVE any previous installation of Bruce if you're upgrading
-from prior to version 3.0!
+Bruce requires Python 2.5 or later to be installed on your system. Obtain
+it from <http://www.python.org/>.
 
-Bruce REQUIRES:
+Please download the Bruce version for your operating system from
+<http://pypi.python.org/pypi/bruce>:
 
-- Python__ 2.5
-- docutils__ 0.4.1 or later
-- pyglet__ 1.1 beta 2 or later
-- Cocos__ 0.3 rc0 or later
+- Linux "bruce-<version>-linux.zip" (eg. "bruce-3.1-linux.zip")
+- Windows "bruce-<version>-windows.zip" (eg. "bruce-3.1-windows.zip")
+- OS X "bruce-<version>-osx.zip" (eg. "bruce-3.1-osx.zip")
 
-__ http://www.python.org/
-__ http://docutils.sf.net/
-__ http://pyglet.org/
-__ http://cocos2d.org/
+Unzip the application and double-click the "bruce" program in the created
+folder. The program may be shown with a ".sh" or ".pyw" extension. Linux
+users may choose to run the program in a terminal.
 
-And you may also optionally install:
+If the application does not work and you're on Linux you may need to
+install an optional python tkinter package. This is usually achieved
+by invoking something like::
 
-- Pygments__ 0.10 or later
-- Tkinter for the GUI interface (Tkinter is usually bundled with Python)
+   sudo apt-get install python-tk
 
-__ http://pygments.org/
-
-To install Bruce, run::
-
-    # python setup.py install
-
-You may also run Bruce without installing.
+If you are a *system package maintainer* then please read the INSTALL.txt
+contained in the *source* distribution "bruce-<version>.tar.gz" or the
+Subversion repository at <http://bruce-tpt.googlecode.com/svn/trunk>
 
 
 How to use Bruce, the Presentation Tool
@@ -151,9 +147,9 @@ on a white background (using the "big-centered" style)::
     Pages may optionally have titles which are displayed
     centered at the top by default.
 
-and so on. For more information see the HOWTO__ at the Bruce
-website (or bundled with the source in the doc/ directory)
- and the source examples/ directory.
+and so on. For more information see the HOWTO__ (also available
+online at the Bruce website) and the optional extra examples
+download from <http://pypi.python.org/pypi/bruce>.
 
 __ http://r1chardj0n3s.googlepages.com/howto
 

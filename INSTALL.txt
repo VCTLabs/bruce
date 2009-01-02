@@ -1,0 +1,37 @@
+If you're just a user of Bruce then you should not be using these instructions.
+Please download the application version for your operating system from
+<http://pypi.python.org/pypi/bruce>:
+
+- Linux "bruce-<version>-linux.zip" (eg. "bruce-3.1-linux.zip")
+- Windows "bruce-<version>-windows.zip" (eg. "bruce-3.1-windows.zip")
+- OS X "bruce-<version>-osx.zip" (eg. "bruce-3.1-osx.zip")
+  
+
+If you MUST install Bruce (ie. you're a system package mantainer) then these
+instructions are for you.
+
+Bruce REQUIRES these minimum versions:
+
+- Python__ 2.5
+- docutils__ 0.4.1 (including its bundled roman.py)
+- pyglet__ 1.1.2
+- Cocos__ 0.3.0
+
+__ http://www.python.org/
+__ http://docutils.sf.net/
+__ http://pyglet.org/
+__ http://cocos2d.org/
+
+And you may also optionally install:
+
+- Pygments__ 0.10
+- Tkinter for the GUI interface (Tkinter is usually bundled with Python)
+
+__ http://pygments.org/
+
+To install Bruce, run::
+
+    # python setup.py install
+
+This will install a shell script "bruce" which may be used to run the
+application.
