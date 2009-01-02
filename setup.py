@@ -62,7 +62,6 @@ class BuildApps(Command):
 
         def writepy(path):
             dirlist = os.listdir(path)
-            dirlist.remove("__init__.py")
             for filename in dirlist:
                 filename = os.path.join(path, filename)
                 if os.path.isfile(os.path.join(filename, "__init__.py")):
