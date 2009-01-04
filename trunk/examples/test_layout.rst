@@ -4,28 +4,28 @@ The Title, Centered
 .. style::
    :layout.background_color: silver
    :layout.viewport: 0,64,w,h-(64+48)
+   :literal.background_color: #00000020
 
 .. layout::
    :image: pyglet-trans-64.png;halign=right;valign=bottom
+   :vgradient: white;#ffc0a0
    :quad: C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
    :quad: C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
 
 .. footer::
    a footer
 
-Salmony bar at top behind title.
-
-Silver background.
-
+Salmony bar at top behind title. Vertical gradient from white to salmon in background.
 Salmony bar fading to black across the bottom, with logo on the right.
 
 Also with a viewport to make sure we don't cover the bars.
 
 (Try scrolling the text to make sure the viewport works)
 
-Lorem ipsum dolor sit amet.
+Literal block with alpha backgruond::
 
-Consectetur adipisicing elit.
+    Lorem ipsum dolor sit amet.
+    Consectetur adipisicing elit.
 
 Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
@@ -97,4 +97,10 @@ red to blue across
    :hgradient: red;blue
 
 Content
+
+With a big literal block::
+
+    With lots of stuff. With lots of stuff. 
+    With lots of stuff. With lots of stuff. 
+    With lots of stuff. With lots of stuff. 
 

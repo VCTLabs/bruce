@@ -15,7 +15,7 @@ from cocos.director import director
 class interpreter(nodes.Special, nodes.Invisible, nodes.Element):
     '''Document tree node representing Python interpreter a directive.
     '''
-    def get_interpreter(self):
+    def get_interpreter(self, stylesheet):
         # XXX allow to fill the available layout dimensions
 
         # handle width and height, retaining aspect if only one is specified
@@ -27,7 +27,7 @@ class interpreter(nodes.Special, nodes.Invisible, nodes.Element):
         if self.has_key('sysver'):
             kw['sysver'] = True
 
-        return InterpreterElement(self.rawsource, **kw)
+        return InterpreterElement(self.rawsource, stylesheet, **kw)
 
 def interpreter_directive(name, arguments, options, content, lineno,
                           content_offset, block_text, state, state_machine):
@@ -119,7 +119,14 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     prompt = ">>> "
     prompt_more = "... "
 
-    def __init__(self, content, width=800, height=400, sysver=False):
+    def __init__(self, content, stylesheet, width=800, height=400, sysver=False):
+        self.stylesheet = stylesheet.copy()
+        
+        # figure style information
+        self.style = self.stylesheet['default'].copy()
+        self.style.update(self.stylesheet['literal'])
+        self.style.update(self.stylesheet['literal_block'])
+
         self.width_spec = self.width = width
         self.height_spec = self.height = height
         self.dpi = 96
@@ -157,17 +164,15 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     def place(self, layout, x, y):
         # format the code
         self.document = pyglet.text.document.FormattedDocument(self.content)
-
-        # XXX stylesheet here, please...
-        self.document.set_style(0, len(self.document.text), {
-            'font_name': 'Courier New',
-            'font_size': 18, 
-            'color': (0, 0, 0, 255),
-        })
-        self.start_of_line = len(self.document.text)
         director.window.push_handlers(self)
 
-        # XXX allow myself to be added to multiple layouts for whatever that's worth
+        # set style information
+        self.document.set_style(0, len(self.document.text), self.style)
+
+        # remember the start of the line for later command handling and cursor movement
+        self.start_of_line = len(self.document.text)
+
+        # XXX maybe allow myself to be added to multiple layouts for whatever that's worth
         if self.layout is not None:
             # just position
             self.layout.begin_update()
@@ -178,8 +183,9 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             self.layout.end_update()
             return
 
+        bgcolor = self.style['background_color']
         self.quad = layout.batch.add(4, GL_QUADS, layout.top_group,
-            ('c4B', (220, 220, 220, 255)*4),
+            ('c4B', bgcolor*4),
             ('v2i', (x, y, x, y+self.height, x+self.width, y+self.height, x+self.width, y))
         )
         self.layout = ScrolledIncrementalTextLayout(self.document,
@@ -198,7 +204,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         # modify our scissor based on its screen position (ugh)
         self.layout.top_group.parent_group = layout.top_group
 
-        self.caret = pyglet.text.caret.Caret(self.layout, color=(0, 0, 0))
+        self.caret = pyglet.text.caret.Caret(self.layout, color=self.style['color'][:3])
         self.caret.on_activate()
         self.caret.position = len(self.document.text)
 
@@ -286,11 +292,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         return pyglet.event.EVENT_HANDLED
 
     def _write(self, s):
-        self.document.insert_text(len(self.document.text), s, {
-            'font_name': 'Courier New',
-            'font_size': 18,
-            'color': (0, 0, 0, 255),
-        })
+        self.document.insert_text(len(self.document.text), s, self.style)
         self._scroll_to_bottom()
 
     def _scroll_to_bottom(self):

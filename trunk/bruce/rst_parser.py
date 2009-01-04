@@ -399,7 +399,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         if not isinstance(node.parent, nodes.TextElement):
             self.break_paragraph()
 
-        self.add_element(node.get_interpreter())
+        self.add_element(node.get_interpreter(self.stylesheet))
 
     def visit_table(self, node):
         # if the parent is structural - document, section, etc then we need
