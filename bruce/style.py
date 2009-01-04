@@ -221,11 +221,11 @@ default_stylesheet = Stylesheet(
     literal = dict(
         font_name='Courier New',
         font_size=20,
+        # XXX make regular literal blocks use this
+        background_color=(220, 220, 220, 255),
     ),
     literal_block = dict(
         margin_left=20,
-        # XXX reinstate if we can bg the whole block
-        #background_color=(220, 220, 220, 255),
     ),
     line_block = dict(
         margin_left=40,
