@@ -214,6 +214,9 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
             p = page.Page(d, self.stylesheet.copy(), d.elements, node,
                 g.top_level_bullets)
             self.pages.append(p)
+
+        self.stylesheet = g.next_stylesheet
+
         raise docutils.nodes.SkipNode
 
     def visit_decoration(self, node):
@@ -233,7 +236,13 @@ class DummyReporter(object):
 class DocumentGenerator(structured.StructuredTextDecoder):
     def __init__(self, stylesheet, style_base_class='default'):
         super(DocumentGenerator, self).__init__()
+
+        # the stylesheet for the this page
         self.stylesheet = stylesheet
+
+        # the stylesheet for the *next* page
+        self.next_stylesheet = stylesheet
+
         self.style_base_class = style_base_class
         self.is_blank = False
         self.top_level_bullets = []
@@ -552,6 +561,10 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.push_style('default', self.stylesheet['default'])
         self.next_style = dict(self.current_style)
 
+    def visit_page_load_style(self, node):
+        self.next_stylesheet = self.stylesheet.copy()
+        self.visit_load_style(node)
+
     def visit_style(self, node):
         # XXX detect changes in footer style
         for key, value in node.attlist():
@@ -561,6 +574,10 @@ class DocumentGenerator(structured.StructuredTextDecoder):
                 group = 'default'
                 self.push_style('style-element', {key: value})
             self.stylesheet[group][key] = value
+
+    def visit_page_style(self, node):
+        self.next_stylesheet = self.stylesheet.copy()
+        self.visit_style(node)
 
     def visit_layout(self, node):
         # update the current layout using the node contents

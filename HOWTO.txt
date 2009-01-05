@@ -123,17 +123,22 @@ __ http://pygments.org/
 
 **style sheets**
     `Bruce Style Sheets (.bss)`_ may be specified on the command-line or
-    in the presentation itself using the ``.. load-style::`` directive
-    which takes either a built-in style name or a ".bss" filename.
+    in the presentation itself using the ``load-page-style::`` or 
+    ``.. load-style::`` directives which take either a built-in style name
+    or a ".bss" filename.
 
 
 Style Changes
 -------------
 
-The rendering stylesheet may be altered on the fly using the ``.. style::``
-directive. Changes made in this way are immediate and affect all subsequent
-text. The exception to this is the "layout" style which applies to the
-entire current and subsequent pages.
+The rendering stylesheet may be altered on the fly using the
+``.. page-style::`` and ``.. style::`` directives. Changes made in this way
+are immediate. The difference between the two directives is that the first
+will affect only the current page whereas the second will affect it and
+all subsequent pages.
+
+Similarly the ``.. load-page-style::`` directive only affects the current page
+whereas the ``.. load-style::`` directive affects it and all subsequent pages.
 
 The stylesheet is broken up into sections: default, literal, emphasis, strong,
 title, footer, block_quote, line_block, literal_block, layout and transition.

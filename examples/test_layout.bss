@@ -8,5 +8,5 @@
 [style]
 inherit-style = default
 
-layout.background_color = silver
+background_color = silver
 layout.viewport = 0,64,w,h-(64+48)

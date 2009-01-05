@@ -2,7 +2,7 @@
 
 [style]
 color = white
-layout.background_color = black
+background_color = black
 
 # table styles
 table.heading_background_color = #323232
