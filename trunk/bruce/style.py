@@ -79,12 +79,18 @@ class load_style(nodes.Special, nodes.Invisible, nodes.Element):
     def get_style(self):
         return get(self.rawsource)
 
+class page_load_style(load_style): pass
+
 def load_style_directive(name, arguments, options, content, lineno,
                           content_offset, block_text, state, state_machine):
-    return [ load_style(arguments[0]) ]
+    if name == 'page-load-style':
+        return [ page_load_style(arguments[0]) ]
+    else:
+        return [ load_style(arguments[0]) ]
 load_style_directive.arguments = (1, 0, 1)
 load_style_directive.content = False
 directives.register_directive('load-style', load_style_directive)
+directives.register_directive('page-load-style', load_style_directive)
 
 class style(nodes.Special, nodes.Invisible, nodes.Element):
     '''Document tree node representing a style directive.
@@ -92,18 +98,26 @@ class style(nodes.Special, nodes.Invisible, nodes.Element):
     def get_style(self):
         return self.rawsource
 
+class page_style(style): pass
+
 def style_directive(name, arguments, options, content, lineno,
                           content_offset, block_text, state, state_machine):
-    return [ style('', **options) ]
+    if name == 'page-style':
+        return [ page_style('', **options) ]
+    else:
+        return [ style('', **options) ]
 style_directive.arguments = (0, 0, 0)
 style_directive.options = {
+    # does anything else want a background_color?
+     'background_color': color,
+     'default.background_color': color,
+
      'transition.name': stripped,
      'transition.duration': float,
 
      'list.expose': expose_options,
 
      'layout.valign': valignment,
-     'layout.background_color': color,
      'layout.viewport': coordinates,
 
      'title.position': coordinates,
@@ -149,6 +163,8 @@ for group in 'default literal_block line_block'.split():
 style_directive.content = False
 directives.register_directive('style', style_directive)
 
+directives.register_directive('page-style', style_directive)
+
 class Stylesheet(dict):
     '''Container for the styles used in rendering Bruce pages.
 
@@ -159,7 +175,6 @@ class Stylesheet(dict):
         if 'layout' not in kw:
             kw['layout'] = layout.Layout(
                 valign='top',
-                background_color=(255, 255, 255, 255),
                 # default viewport=('0', '0', 'w', 'h'),
             )
         super(Stylesheet, self).__init__(**kw)
@@ -193,7 +208,7 @@ class Stylesheet(dict):
         kwargs = dict(duration=self['transition']['duration'])
 
         if klass is transitions.FadeTransition:
-            kwargs['color'] = self['layout']['background_color'][:3]
+            kwargs['color'] = self['default']['background_color'][:3]
 
         def _transition(new_scene, klass=klass, kwargs=kwargs):
             director.replace(klass(new_scene, **kwargs))
@@ -208,6 +223,7 @@ default_stylesheet = Stylesheet(
         margin_bottom=12,
         align='left',
         color=(0,0,0,255),
+        background_color=(255, 255, 255, 0),
     ),
     emphasis = dict(
         italic=True,
@@ -236,7 +252,6 @@ default_stylesheet = Stylesheet(
     ),
     layout = layout.Layout(
         valign='top',
-        background_color=(255, 255, 255, 255),
         # default viewport=('0', '0', 'w', 'h'),
     ),
     title = dict(
@@ -317,7 +332,7 @@ white_on_black = default_stylesheet.copy()
 big_centered_wob = big_centered.copy()
 for d in (white_on_black, big_centered_wob):
     d['default']['color'] = (0xff, 0xff, 0xff, 0xff)
-    d['layout']['background_color'] = (0, 0, 0, 255)
+    d['default']['background_color'] = (0, 0, 0, 255)
 
     # table styles
     d['table']['heading_background_color'] = (0x32, 0x32, 0x32, 0xff)

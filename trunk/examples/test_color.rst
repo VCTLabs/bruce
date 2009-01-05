@@ -1,6 +1,6 @@
 
 .. layout::
-   bgcolor: yellow
+   :bgcolor: yellow
 
 Black on yellow
 
