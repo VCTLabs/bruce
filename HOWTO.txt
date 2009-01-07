@@ -436,6 +436,15 @@ by setting the property needs_tick either on your class or in your
     position of the bottom left of the element in that layout. This
     position almost always has a negative y value.
 
+    Note also that this method may be called multiple times for a single
+    layout with the same position. And then removed. That's just the way
+    it is.
+
+**set_opacity(self, opacity)**
+    Set the opacity (alpha channel value) of the element, allowing Bruce
+    to fade the element into or out of display. The opacity will be an
+    integer value from 0 to 255.
+
 **remove(self, layout)**
     Invoked when page layout removes the element from display.
 

@@ -6,4 +6,4 @@ KNOWN BUGS
 - footer doesn't handle color changes
 - interpreter focus when multiple in page (should follow mouse)
   focus should be in first on page, then follow mouse if it changes focus
-- table, video, interpreter, plugin don't handle set_alpha
+- table, interpreter, plugin don't handle set_alpha

@@ -65,6 +65,10 @@ class PluginElement(pyglet.text.document.InlineElement):
 
         super(PluginElement, self).__init__(self.height, 0, self.width)
 
+    def set_opacity(self, opacity):
+        self.opacity = opacity
+        self.implementation.set_opacity(opacity)
+
     def set_scale(self, scale):
         self.width = int(self.width_spec * scale)
         self.height = int(self.height_spec * scale)
@@ -96,6 +100,9 @@ class Plugin(object):
         pass
 
     def place(self, layout, x, y):
+        pass
+
+    def set_opacity(self, opacity):
         pass
 
     def tick(self, dt):

@@ -1,5 +1,6 @@
 import pyglet
 import cocos
+from cocos.actions import FadeIn, FadeOut
 from cocos.director import director
 
 class Page(cocos.scene.Scene):
@@ -68,6 +69,29 @@ class Page(cocos.scene.Scene):
         x, y, vw, vh = self.get_viewport()
         self.content.handle_resize(x, y, vw, vh, scale)
 
+class FadeSection(object):
+    def __init__(self, layout, document, section):
+        self.layout = layout
+        self.document = document
+        self.section = section
+
+    def set_opacity(self, opacity):
+        v = opacity/255.
+        opacity = int(opacity)
+
+        self.layout.begin_update()
+
+        for element in self.section['elements']:
+            element.set_opacity(self.layout, opacity)
+
+        for s, e, color in self.section['runs']:
+            color = color[:3] + (int(v * color[3]),)
+            self.document.set_style(s, e, dict(color=color))
+
+        self.layout.end_update()
+
+    opacity = property(lambda s:s._opacity, set_opacity) 
+
 class PageContent(cocos.layer.Layer):
     is_event_handler = True
     def __init__(self, document, stylesheet, elements, expose_text_runs):
@@ -89,21 +113,14 @@ class PageContent(cocos.layer.Layer):
         for section in self.expose_text_runs:
             if section['on']: continue
             section['on'] = True
-            for element in section['elements']:
-                element.set_alpha(self.text_layout, 255)
-            for s, e, color in section['runs']:
-                self.document.set_style(s, e, dict(color=color))
+            self.do(FadeIn(.5), FadeSection(self.text_layout, self.document, section))
             return pyglet.event.EVENT_HANDLED
 
     def on_previous(self):
         for section in reversed(self.expose_text_runs):
             if not section['on']: continue
             section['on'] = False
-            for element in section['elements']:
-                element.set_alpha(self.text_layout, 0)
-            for s, e, color in section['runs']:
-                color = color[:3] + (0,)
-                self.document.set_style(s, e, dict(color=color))
+            self.do(FadeOut(.5), FadeSection(self.text_layout, self.document, section))
             return pyglet.event.EVENT_HANDLED
 
     def on_enter(self):
@@ -121,7 +138,7 @@ class PageContent(cocos.layer.Layer):
         for section in self.expose_text_runs:
             section['on'] = False
             for element in section['elements']:
-                element.set_alpha(self.text_layout, 0)
+                element.set_opacity(self.text_layout, 0)
             for s, e, color in section['runs']:
                 color = color[:3] + (0,)
                 self.document.set_style(s, e, dict(color=color))

@@ -65,8 +65,13 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.height = height or self.video_height
 
         self.vertex_lists = {}
+        self.opacity = 255
 
         super(VideoElement, self).__init__(self.height, 0, self.width)
+
+    def set_opacity(self, layout, opacity):
+        self.opacity = int(opacity)
+        self.vertex_lists[layout].colors[:] = [255, 255, 255, self.opacity]*4
 
     def set_scale(self, scale):
         width, height = self.width_spec, self.height_spec
@@ -101,15 +106,18 @@ class VideoElement(pyglet.text.document.InlineElement):
 
         texture = self.player.texture
 
+        group = pyglet.sprite.SpriteGroup(self.image.texture,
+            pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA,
+            layout.top_group)
+
         # set up rendering the player texture
         x1 = int(x)
         y1 = int(y + self.descent)
         x2 = int(x + self.width)
         y2 = int(y + self.height + self.descent)
-        group = pyglet.graphics.TextureGroup(texture, layout.top_group)
         vertex_list = layout.batch.add(4, pyglet.gl.GL_QUADS, group,
             ('v2i', (x1, y1, x2, y1, x2, y2, x1, y2)),
-            ('c3B', (255, 255, 255) * 4),
+            ('c4B', (255, 255, 255, self.opacity) * 4),
             ('t3f', texture.tex_coords))
         self.vertex_lists[layout] = vertex_list
 
