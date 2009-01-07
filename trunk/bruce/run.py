@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import re
 from cgi import escape as html_quote
 
 import pyglet
@@ -181,7 +182,7 @@ def run(filename, options):
     #if options.progress_screen:
     #    progress_screen = int(options.progress_screen)-1
     #    progress_screen = display.get_screens()[progress_screen]
-    width, height = map(int, options.window_size.split('x'))
+    width, height = map(int, re.split('\D+', options.window_size))
     width = min(width, screen.width)
     height = min(height, screen.height)
     screen=int(options.screen)-1

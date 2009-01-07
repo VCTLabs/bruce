@@ -2,7 +2,7 @@ The Title, Centered
 -------------------
 
 .. style::
-   :background_color: silver
+   :layout.background_color: silver
    :layout.viewport: 0,64,w,h-(64+48)
    :literal.background_color: #00000020
 

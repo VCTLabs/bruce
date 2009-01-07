@@ -2,7 +2,7 @@
 
 .. style::
    :color: red
-   :background_color: black
+   :layout.background_color: black
 
 Red on black
 
@@ -10,7 +10,7 @@ Red on black
 
 .. page-style::
    :color: black
-   :background_color: white
+   :layout.background_color: white
 
 Black on white
 
@@ -22,7 +22,7 @@ Back to red on black
 
 .. style::
    :color: black
-   :background_color: white
+   :layout.background_color: white
 
 Black on white permanently now
 

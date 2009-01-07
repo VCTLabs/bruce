@@ -15,13 +15,11 @@ class Page(cocos.scene.Scene):
         self.add(self.layout, z=-.5)
 
         # actual page content
-        self.content = PageContent(document, stylesheet, elements)
+        self.content = PageContent(document, stylesheet, elements, top_level_bullets)
         self.add(self.content, z=0)
 
         self.docnode = docnode
         self.transition = stylesheet.get_transition()
-
-        self.top_level_bullets = top_level_bullets
 
         viewport_width, viewport_height = director.get_window_size()
 
@@ -30,26 +28,16 @@ class Page(cocos.scene.Scene):
         button). If the handler returns event.EVENT_HANDLED then
         the presentation does not leave this page.
         '''
-        for bullet in self.top_level_bullets:
-            s, e, on = bullet
-            if not on:
-                bullet[-1] = True
-                color = self.stylesheet.value('default', 'color')
-                self.document.set_style(s, e, dict(color=color))
-                return pyglet.event.EVENT_HANDLED
+        # XXX consider that this is suboptimal
+        return self.content.on_next()
 
     def on_previous(self):
         '''Invoked on the "previous" event (cursor left or right mouse
         button). If the handler returns event.EVENT_HANDLED then
         the presentation does not leave this page.
         '''
-        for bullet in reversed(self.top_level_bullets):
-            s, e, on = bullet
-            if on:
-                bullet[-1] = False
-                color = self.stylesheet.value('default', 'color')[:3] + (0,)
-                self.document.set_style(s, e, dict(color=color))
-                return pyglet.event.EVENT_HANDLED
+        # XXX consider that this is suboptimal
+        return self.content.on_previous()
 
     def print_source(self):
         for child in self.docnode.children:
@@ -80,17 +68,41 @@ class Page(cocos.scene.Scene):
 
 class PageContent(cocos.layer.Layer):
     is_event_handler = True
-    def __init__(self, document, stylesheet, elements):
+    def __init__(self, document, stylesheet, elements, top_level_bullets):
         self.document = document
         self.stylesheet = stylesheet
         self.elements = elements
+        self.top_level_bullets = top_level_bullets
         super(PageContent, self).__init__()
 
     def update(self, dt):
         '''Invoked periodically with the time since the last
         update()
+
+        XXX except not
         '''
         pass
+
+    def on_next(self):
+        for bullet in self.top_level_bullets:
+            if bullet['on']: continue
+            bullet['on'] = True
+            for element in bullet['elements']:
+                element.set_alpha(self.text_layout, 255)
+            for s, e, color in bullet['runs']:
+                self.document.set_style(s, e, dict(color=color))
+            return pyglet.event.EVENT_HANDLED
+
+    def on_previous(self):
+        for bullet in reversed(self.top_level_bullets):
+            if not bullet['on']: continue
+            bullet['on'] = False
+            for element in bullet['elements']:
+                element.set_alpha(self.text_layout, 0)
+            for s, e, color in bullet['runs']:
+                color = color[:3] + (0,)
+                self.document.set_style(s, e, dict(color=color))
+            return pyglet.event.EVENT_HANDLED
 
     def on_enter(self):
         '''Invoked when the page is put up on the screen of the given
@@ -98,10 +110,19 @@ class PageContent(cocos.layer.Layer):
         '''
         super(PageContent, self).on_enter()
 
-        x, y, vw, vh = self.parent.get_viewport()
-
+        # create the layout
         self.batch = pyglet.graphics.Batch()
+        x, y, vw, vh = self.parent.get_viewport()
         self.create_layout(x, y, vw, vh, self.parent.get_scale())
+
+        # set all top exposable bullets to transparent
+        for bullet in self.top_level_bullets:
+            bullet['on'] = False
+            for element in bullet['elements']:
+                element.set_alpha(self.text_layout, 0)
+            for s, e, color in bullet['runs']:
+                color = color[:3] + (0,)
+                self.document.set_style(s, e, dict(color=color))
 
     _current_dimensions = None
     def create_layout(self, x, y, vw, vh, scale):

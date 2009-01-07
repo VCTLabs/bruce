@@ -10,8 +10,6 @@ font_size = 20
 margin_bottom = 12
 align = left
 color = black
-# default color transparent (alpha=00) so it's not actually visible
-background_color = #ffffff00
 
 # special text styles
 emphasis.italic = yes
@@ -39,6 +37,7 @@ footer.hanchor = center
 footer.vanchor = bottom
 layout.viewport = 0,0,w,h
 layout.valign = top
+layout.background_color = white
 
 # default transition
 transition.name = none

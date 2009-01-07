@@ -110,7 +110,6 @@ style_directive.arguments = (0, 0, 0)
 style_directive.options = {
     # does anything else want a background_color?
      'background_color': color,
-     'default.background_color': color,
 
      'transition.name': stripped,
      'transition.duration': float,
@@ -119,6 +118,7 @@ style_directive.options = {
 
      'layout.valign': valignment,
      'layout.viewport': coordinates,
+     'layout.background_color': color,
 
      'title.position': coordinates,
      'title.hanchor': halignment,
@@ -208,7 +208,7 @@ class Stylesheet(dict):
         kwargs = dict(duration=self['transition']['duration'])
 
         if klass is transitions.FadeTransition:
-            kwargs['color'] = self['default']['background_color'][:3]
+            kwargs['color'] = self['layout']['background_color'][:3]
 
         def _transition(new_scene, klass=klass, kwargs=kwargs):
             director.replace(klass(new_scene, **kwargs))
@@ -223,7 +223,6 @@ default_stylesheet = Stylesheet(
         margin_bottom=12,
         align='left',
         color=(0,0,0,255),
-        background_color=(255, 255, 255, 0),
     ),
     emphasis = dict(
         italic=True,
@@ -252,6 +251,7 @@ default_stylesheet = Stylesheet(
     ),
     layout = layout.Layout(
         valign='top',
+        background_color=(255, 255, 255, 255),
         # default viewport=('0', '0', 'w', 'h'),
     ),
     title = dict(
