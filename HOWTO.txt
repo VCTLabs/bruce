@@ -70,6 +70,7 @@ features:
 - backgrounds using images or gradients
 - transitions between pages
 - blank pages
+- gradual exposing of list items
 - plugins to create your own inline elements
 
 __ http://pygments.org/
@@ -123,7 +124,7 @@ __ http://pygments.org/
 
 **style sheets**
     `Bruce Style Sheets (.bss)`_ may be specified on the command-line or
-    in the presentation itself using the ``load-page-style::`` or 
+    in the presentation itself using the ``load-page-style::`` or
     ``.. load-style::`` directives which take either a built-in style name
     or a ".bss" filename.
 
@@ -200,6 +201,10 @@ to run it for.
 **duration**
     Only valid in the **transition** section; gives the duration in seconds
     to run the current transition for. Default is ``0.5``.
+**list-expose**
+    If set to "expose" then the subsequent *top-level* list items (bullet,
+	ordered or definition) will be gradually exposed on the page rather
+	than displayed all at once.
 
 The default builtin stylesheet may be seen in "examples/default_style.bss".
 

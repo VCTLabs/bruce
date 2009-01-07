@@ -104,7 +104,9 @@ Controls
 When running a presentation the following controls are active:
 
 left, right arrows; left, right mouse button; space bar (forward)
-  Move back and forward pages.
+  Move back and forward pages. If the page contains a list and list-expose
+  has been enabled then each list item will be exposed in turn before the
+  next page is displayed.
 page up, page down
   Move back and forward 5 pages.
 mouse scroll wheel

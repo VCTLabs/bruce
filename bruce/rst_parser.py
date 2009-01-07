@@ -212,7 +212,7 @@ class DocutilsDecoder(structured.StructuredTextDecoder):
         d = g.decode(node)
         if g.len_text or g.is_blank:
             p = page.Page(d, self.stylesheet.copy(), d.elements, node,
-                g.top_level_bullets)
+                g.expose_text_runs)
             self.pages.append(p)
 
         self.stylesheet = g.next_stylesheet
@@ -245,7 +245,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
         self.style_base_class = style_base_class
         self.is_blank = False
-        self.top_level_bullets = []
+        self.expose_text_runs = []
 
     def decode_structured(self, doctree, location):
         # attach a reporter so docutil's walkabout doesn't get confused by us
@@ -284,8 +284,8 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         raise docutils.nodes.SkipNode
 
     def add_element(self, element):
-        if self.top_level_bullets:
-            self.top_level_bullets[-1].append(element)
+        if self.expose_text_runs:
+            self.expose_text_runs[-1].append(element)
         self.elements.append(element)
         super(DocumentGenerator, self).add_element(element)
 
@@ -470,35 +470,58 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     item_depth = 0
     def visit_list_item(self, node):
         self.break_paragraph()
+
+        # possibly mark the item contents as a new expose run
+        self.item_depth += 1
+        self.mark_expose_run(node)
+
+        # place the bullet or number
         self.list_stack[-1].item(self, {})
+
+        # don't insert a newline for the first paragraph of the item
         self.paragraph_suppress_newline = True
+
         # indicate that new paragraphs need to be indented
         self.in_item = True
-        self.item_depth += 1
 
-        # if we're to expose list items then modify them to be initially transparent
-        if self.item_depth == 1 and self.stylesheet.value('list', 'expose') == 'expose':
-            # XXX also track images, video, plugins, ...
-            color = self.stylesheet.value('default', 'color')
-            self.push_style(node, dict(color=color))
-            self.top_level_bullets.append([self.len_text])
+    def mark_expose_run(self, node):
+        if self.item_depth != 1 or self.stylesheet.value('list', 'expose') != 'expose':
+            return
+        # yep, we want the contents of this node marked for gradual exposure
+        color = self.stylesheet.value('default', 'color')
+        self.push_style(node, dict(color=color))
+        self.expose_text_runs.append([self.len_text])
+
+    def close_expose_run(self):
+        if self.item_depth != 1 or not self.expose_text_runs:
+            return
+
+        # get list of [(start, end, color)] for the document text of the list
+        # item contents
+        b = self.expose_text_runs[-1]
+        start = b[0]
+        iter = self.document.get_style_runs('color')
+        self.expose_text_runs[-1] = dict(on=False,
+            elements = b[1:],
+            runs = [[s, e, c] for s, e, c in iter.ranges(start, self.len_text)])
 
     def depart_list_item(self, node):
         self.in_item = False
-        if self.item_depth == 1 and self.top_level_bullets:
-            # get list if [(start, end, color)] for the list item text in the document
-            b = self.top_level_bullets[-1]
-            start = b[0]
-            iter = self.document.get_style_runs('color')
-            self.top_level_bullets[-1] = dict(on=False,
-                elements = b[1:],
-                runs = [[s, e, c] for s, e, c in iter.ranges(start, self.len_text)])
+        self.close_expose_run()
         self.item_depth -= 1
 
     def visit_definition_list(self, node):
         pass
+
     def visit_definition_list_item(self, node):
-        pass
+        # possibly mark the item contents as a new expose run
+        self.item_depth += 1
+        self.mark_expose_run(node)
+
+    def depart_definition_list_item(self, node):
+        self.close_expose_run()
+        self.item_depth -= 1
+
     def visit_term(self, node):
         self.break_paragraph()
         self.in_item = False
