@@ -3,7 +3,7 @@
 - distribute as an application
 - add Bruce Style Sheets (BSS)
 - add simpler vertical / horizontal gradients
-- add in exposure of list items
+- add in gradual exposure of list items
 - default to fade transition and use layout.background_color as tween color
 - fix layout losing footer alignment when going backwards
 

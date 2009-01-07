@@ -3,7 +3,8 @@ import cocos
 from cocos.director import director
 
 class Page(cocos.scene.Scene):
-    def __init__(self, document, stylesheet, elements, docnode, top_level_bullets):
+    def __init__(self, document, stylesheet, elements, docnode,
+            expose_text_runs):
         cocos.scene.Scene.__init__(self)
         pyglet.event.EventDispatcher.__init__(self)
 
@@ -15,7 +16,8 @@ class Page(cocos.scene.Scene):
         self.add(self.layout, z=-.5)
 
         # actual page content
-        self.content = PageContent(document, stylesheet, elements, top_level_bullets)
+        self.content = PageContent(document, stylesheet, elements,
+            expose_text_runs)
         self.add(self.content, z=0)
 
         self.docnode = docnode
@@ -68,11 +70,11 @@ class Page(cocos.scene.Scene):
 
 class PageContent(cocos.layer.Layer):
     is_event_handler = True
-    def __init__(self, document, stylesheet, elements, top_level_bullets):
+    def __init__(self, document, stylesheet, elements, expose_text_runs):
         self.document = document
         self.stylesheet = stylesheet
         self.elements = elements
-        self.top_level_bullets = top_level_bullets
+        self.expose_text_runs = expose_text_runs
         super(PageContent, self).__init__()
 
     def update(self, dt):
@@ -84,22 +86,22 @@ class PageContent(cocos.layer.Layer):
         pass
 
     def on_next(self):
-        for bullet in self.top_level_bullets:
-            if bullet['on']: continue
-            bullet['on'] = True
-            for element in bullet['elements']:
+        for section in self.expose_text_runs:
+            if section['on']: continue
+            section['on'] = True
+            for element in section['elements']:
                 element.set_alpha(self.text_layout, 255)
-            for s, e, color in bullet['runs']:
+            for s, e, color in section['runs']:
                 self.document.set_style(s, e, dict(color=color))
             return pyglet.event.EVENT_HANDLED
 
     def on_previous(self):
-        for bullet in reversed(self.top_level_bullets):
-            if not bullet['on']: continue
-            bullet['on'] = False
-            for element in bullet['elements']:
+        for section in reversed(self.expose_text_runs):
+            if not section['on']: continue
+            section['on'] = False
+            for element in section['elements']:
                 element.set_alpha(self.text_layout, 0)
-            for s, e, color in bullet['runs']:
+            for s, e, color in section['runs']:
                 color = color[:3] + (0,)
                 self.document.set_style(s, e, dict(color=color))
             return pyglet.event.EVENT_HANDLED
@@ -115,12 +117,12 @@ class PageContent(cocos.layer.Layer):
         x, y, vw, vh = self.parent.get_viewport()
         self.create_layout(x, y, vw, vh, self.parent.get_scale())
 
-        # set all top exposable bullets to transparent
-        for bullet in self.top_level_bullets:
-            bullet['on'] = False
-            for element in bullet['elements']:
+        # set all top exposable sections to transparent
+        for section in self.expose_text_runs:
+            section['on'] = False
+            for element in section['elements']:
                 element.set_alpha(self.text_layout, 0)
-            for s, e, color in bullet['runs']:
+            for s, e, color in section['runs']:
                 color = color[:3] + (0,)
                 self.document.set_style(s, e, dict(color=color))
 
