@@ -284,6 +284,8 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         raise docutils.nodes.SkipNode
 
     def add_element(self, element):
+        if self.top_level_bullets:
+            self.top_level_bullets[-1].append(element)
         self.elements.append(element)
         super(DocumentGenerator, self).add_element(element)
 
@@ -476,16 +478,21 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
         # if we're to expose list items then modify them to be initially transparent
         if self.item_depth == 1 and self.stylesheet.value('list', 'expose') == 'expose':
-            # XXX track all style changes within the list item
-            # XXX to control all colors ... also track images, video, plugins, ...
-            color = self.stylesheet.value('default', 'color')[:3] + (0,)
+            # XXX also track images, video, plugins, ...
+            color = self.stylesheet.value('default', 'color')
             self.push_style(node, dict(color=color))
-            self.top_level_bullets.append([self.len_text, None, False])
+            self.top_level_bullets.append([self.len_text])
 
     def depart_list_item(self, node):
         self.in_item = False
         if self.item_depth == 1 and self.top_level_bullets:
-            self.top_level_bullets[-1][1] = self.len_text
+            # get list if [(start, end, color)] for the list item text in the document
+            b = self.top_level_bullets[-1]
+            start = b[0]
+            iter = self.document.get_style_runs('color')
+            self.top_level_bullets[-1] = dict(on=False,
+                elements = b[1:],
+                runs = [[s, e, c] for s, e, c in iter.ranges(start, self.len_text)])
         self.item_depth -= 1
 
     def visit_definition_list(self, node):

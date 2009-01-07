@@ -9,18 +9,22 @@ First Page
   - **bolded**
   - second level
 
+- .. image:: biohazard.png
+
 - second bullet
 
-Second Page
------------
+Second Page with expose on
+--------------------------
 
 .. style:: :list.expose: expose
 
-- first bullet
+- first bullet (same as first page)
 
-  - second level
-  - **bolded**
-  - second level
+  - second level (should appear)
+  - **bolded** (same time as)
+  - second level (first bullet)
+
+- .. image:: biohazard.png
 
 - second bullet
 

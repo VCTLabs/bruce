@@ -30,10 +30,46 @@ class ImageElement(structured.ImageElement):
         self.width_spec = width
         self.height_spec = height
         self.scale = 1.0
+        self.alpha = 255
 
         self.width, self.height = calculate_dimensions(width, height, image)
 
         super(ImageElement, self).__init__(image, self.width, self.height)
+
+    def place(self, layout, x, y):
+        x1 = x
+        y1 = y + self.descent
+        x2 = x + self.width
+        y2 = y + self.height + self.descent
+        vertices = [x1, y1, x2, y1, x2, y2, x1, y2]
+
+        if layout in self.vertex_lists:
+            # being asked to re-place
+            lx, ly, list = self.vertex_lists[layout]
+            if (lx, ly) != (x, y):
+                list.vertices[:] = vertices
+                self.vertex_lists[layout] = (x, y, list)
+            return
+
+        # override to use c4B and blending
+        group = pyglet.sprite.SpriteGroup(self.image.texture,
+            pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA,
+            layout.top_group)
+
+        vertex_list = layout.batch.add(4, pyglet.gl.GL_QUADS, group,
+            ('v2i', vertices),
+            ('c4B', [255, 255, 255, self.alpha] * 4),
+            ('t3f', self.image.tex_coords))
+        self.vertex_lists[layout] = (x, y, vertex_list)
+
+    def remove(self, layout):
+        self.vertex_lists[layout][-1].delete()
+        del self.vertex_lists[layout]
+
+    def set_alpha(self, layout, alpha):
+        self.alpha = alpha
+        list = self.vertex_lists[layout][-1]
+        list.colors[:] = [255, 255, 255, alpha]*4
 
     def set_scale(self, scale):
         if self.scale == scale:

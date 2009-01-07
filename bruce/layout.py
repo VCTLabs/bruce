@@ -59,9 +59,10 @@ class QuadGroup(pyglet.graphics.Group):
 class Layout(dict):
     '''Rendering of page layouts.
     '''
-    def __init__(self, valign='top', viewport=None):
+    def __init__(self, valign='top', background_color=(255, 255, 255, 255), viewport=None):
         self.update(
             valign=valign,
+            background_color=background_color,
             viewport=viewport,
         )
 
@@ -136,7 +137,7 @@ class LayoutLayer(cocos.layer.Layer):
         self.decorations = []
 
         # background
-        c = tuple(self.stylesheet.value('default', 'background_color')) * 4
+        c = tuple(self.stylesheet.value('layout', 'background_color')) * 4
         v = [vx, vy, vx+vw, vy, vx+vw, vy+vh, vx, vy+vh]
         q = self.batch.add(4, GL_QUADS, QuadGroup(), ('c4B', c), ('v2i', v))
         self.decorations.append(q)
