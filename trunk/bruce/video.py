@@ -40,10 +40,10 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.width_spec = width
         self.height_spec = height
 
-        video = pyglet.resource.media(self.video_filename)
+        self.video = pyglet.resource.media(self.video_filename)
         self.loop = loop
-        assert video.video_format
-        video_format = video.video_format
+        assert self.video.video_format
+        video_format = self.video.video_format
 
         # determine dimensions
         self.video_width = video_format.width
@@ -93,8 +93,6 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.advance = self.width
 
     def place(self, layout, x, y):
-        self.video = pyglet.resource.media(self.video_filename)
-
         # create the player
         self.player = pyglet.media.Player()
         self.player.queue(self.video)
@@ -120,6 +118,10 @@ class VideoElement(pyglet.text.document.InlineElement):
             ('c4B', (255, 255, 255, self.opacity) * 4),
             ('t3f', texture.tex_coords))
         self.vertex_lists[layout] = vertex_list
+
+    def set_opacity(self, opacity):
+        self.opacity = int(opacity)
+        self.vertex_lists[layout].colors[:] = [255, 255, 255, self.opacity]*4
 
     def remove(self, layout):
         if layout in self.vertex_lists:

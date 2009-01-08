@@ -195,16 +195,32 @@ to run it for.
         viewport:x,y,width,height
 
    Giving the bottom-left corner x,y position and the width and height.
-**name**
-    Only valid in the **transition** section; one of the `transition names`_
-    listed below. Default is ``none``.
-**duration**
-    Only valid in the **transition** section; gives the duration in seconds
-    to run the current transition for. Default is ``0.5``.
-**list-expose**
+**transition.name**
+    Must be one of the `transition names`_ listed below. Default is ``fade``.
+**transition.duration**
+    Gives the duration in seconds to run the current transition for. Default
+    is ``0.5``.
+**list.bullet**
+    Gives the bullet style to used for bullet lists. Default is 'bullet' and
+    the other options are 'circle', 'box' and 'none'. This only indicates
+    the bullet style for the first level of bullets - any deeper level will
+    be automatically given a different bullet type (except where the style
+    is 'none').
+**list.expose**
     If set to "expose" then the subsequent *top-level* list items (bullet,
 	ordered or definition) will be gradually exposed on the page rather
-	than displayed all at once.
+	than displayed all at once. Several values are available:
+
+    show
+      The default, indicates that the list items should all be visible
+      immediately on the page.
+
+    expose
+      Expose each item in the list in turn with no fanciness.
+
+    fade
+      Expose each item in the list in turn by fading them in (or out if
+      hiding the list).
 
 The default builtin stylesheet may be seen in "examples/default_style.bss".
 
@@ -436,14 +452,18 @@ by setting the property needs_tick either on your class or in your
     position of the bottom left of the element in that layout. This
     position almost always has a negative y value.
 
+    The element's opacity should be set according to its ``self.opacity``
+    attribute.
+
     Note also that this method may be called multiple times for a single
     layout with the same position. And then removed. That's just the way
     it is.
 
 **set_opacity(self, opacity)**
-    Set the opacity (alpha channel value) of the element, allowing Bruce
-    to fade the element into or out of display. The opacity will be an
-    integer value from 0 to 255.
+    Indicates the opacity of the element has changed in response to
+    Bruce fading the element into or out of display.
+    The opacity will be an integer value from 0 to 255. It is also
+    available as ``self.opacity``.
 
 **remove(self, layout)**
     Invoked when page layout removes the element from display.

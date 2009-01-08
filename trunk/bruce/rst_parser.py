@@ -21,8 +21,6 @@ from bruce import pygments_parser
 
 from bruce.style import *
 
-BULLETS = u'\u25cf\u25cb\u25a1'
-
 class Section(object):
     def __init__(self, level):
         self.level = level
@@ -285,7 +283,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def add_element(self, element):
         if self.expose_text_runs:
-            self.expose_text_runs[-1].append(element)
+            self.expose_text_runs[-1]['elements'].append(element)
         self.elements.append(element)
         super(DocumentGenerator, self).add_element(element)
 
@@ -438,7 +436,12 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.add_element(node.get_plugin())
 
     def visit_bullet_list(self, node):
-        bullet = BULLETS[len(self.list_stack)%3]
+        n = len(self.list_stack)%3
+        style = self.stylesheet['list']['bullet']
+        if style:
+            bullet = style[n]
+        else:
+            bullet = ''
         l = structured.UnorderedListBuilder(bullet)
         style = {}
         l.begin(self, style)
@@ -485,12 +488,14 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         self.in_item = True
 
     def mark_expose_run(self, node):
-        if self.item_depth != 1 or self.stylesheet.value('list', 'expose') != 'expose':
+        expose = self.stylesheet.value('list', 'expose')
+        if self.item_depth != 1 or expose == 'show':
             return
         # yep, we want the contents of this node marked for gradual exposure
         color = self.stylesheet.value('default', 'color')
         self.push_style(node, dict(color=color))
-        self.expose_text_runs.append([self.len_text])
+        self.expose_text_runs.append(dict(style=expose, start=self.len_text,
+            on=False, elements=[]))
 
     def close_expose_run(self):
         if self.item_depth != 1 or not self.expose_text_runs:
@@ -498,12 +503,10 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
         # get list of [(start, end, color)] for the document text of the list
         # item contents
-        b = self.expose_text_runs[-1]
-        start = b[0]
+        run = self.expose_text_runs[-1]
         iter = self.document.get_style_runs('color')
-        self.expose_text_runs[-1] = dict(on=False,
-            elements = b[1:],
-            runs = [[s, e, c] for s, e, c in iter.ranges(start, self.len_text)])
+        run['runs'] = [[s, e, c] for s, e, c in iter.ranges(run['start'],
+            self.len_text)]
 
     def depart_list_item(self, node):
         self.in_item = False

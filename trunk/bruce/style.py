@@ -34,7 +34,14 @@ def halignment(argument):
 def valignment(argument):
     return directives.choice(argument, ('top', 'center', 'bottom'))
 def expose_options(argument):
-    return directives.choice(argument, ('show', 'expose'))
+    return directives.choice(argument, ('show', 'expose', 'fade'))
+def bullet_options(argument):
+    # actually indicates a preference
+    return dict(none=None,
+        bullet=u'\u25cf\u25cb\u25a1',
+        circle=u'\u25cb\u25cf\u25a1',
+        box=u'\u25a1\u25cb\u25cf',
+    )[argument]
 def coordinates(argument):
     return [a.strip() for a in argument.split(',')]
 
@@ -115,6 +122,7 @@ style_directive.options = {
      'transition.duration': float,
 
      'list.expose': expose_options,
+     'list.bullet': bullet_options,
 
      'layout.valign': valignment,
      'layout.viewport': coordinates,
@@ -232,6 +240,7 @@ default_stylesheet = Stylesheet(
     ),
     list = dict(
         expose='show',
+        bullet=bullet_options('bullet'),
     ),
     literal = dict(
         font_name='Courier New',
