@@ -21,8 +21,9 @@ line_block.margin_left = 40
 block_quote.italic = yes
 block_quote.bold = False
 
-# list exposure control
+# list control
 list.expose = show
+list.bullet = bullet
 
 # layout styles
 title.font_size = 28

@@ -65,8 +65,11 @@ class PluginElement(pyglet.text.document.InlineElement):
 
         super(PluginElement, self).__init__(self.height, 0, self.width)
 
-    def set_opacity(self, opacity):
+    def set_opacity(self, layout, opacity):
+        # XXX multiple layouts
+        print 'SET OPACITY', opacity
         self.opacity = opacity
+        self.implementation.opacity = opacity
         self.implementation.set_opacity(opacity)
 
     def set_scale(self, scale):
@@ -81,16 +84,19 @@ class PluginElement(pyglet.text.document.InlineElement):
         self.advance = self.width
 
     def place(self, layout, x, y):
+        print 'PLACE'
         if self.implementation.needs_tick:
             pyglet.clock.schedule(self.implementation.tick)
         self.implementation.place(layout, x, y)
 
     def remove(self, layout):
+        print 'REMOVE'
         if self.implementation.needs_tick:
             pyglet.clock.unschedule(self.implementation.tick)
         self.implementation.remove(layout)
 
 class Plugin(object):
+    opacity = 255
     needs_tick = False
     def __init__(self, w, h):
         pass 

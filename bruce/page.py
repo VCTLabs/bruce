@@ -109,20 +109,6 @@ class PageContent(cocos.layer.Layer):
         '''
         pass
 
-    def on_next(self):
-        for section in self.expose_text_runs:
-            if section['on']: continue
-            section['on'] = True
-            self.do(FadeIn(.5), FadeSection(self.text_layout, self.document, section))
-            return pyglet.event.EVENT_HANDLED
-
-    def on_previous(self):
-        for section in reversed(self.expose_text_runs):
-            if not section['on']: continue
-            section['on'] = False
-            self.do(FadeOut(.5), FadeSection(self.text_layout, self.document, section))
-            return pyglet.event.EVENT_HANDLED
-
     def on_enter(self):
         '''Invoked when the page is put up on the screen of the given
         dimensions.
@@ -135,6 +121,7 @@ class PageContent(cocos.layer.Layer):
         self.create_layout(x, y, vw, vh, self.parent.get_scale())
 
         # set all top exposable sections to transparent
+        self.text_layout.begin_update()
         for section in self.expose_text_runs:
             section['on'] = False
             for element in section['elements']:
@@ -142,6 +129,38 @@ class PageContent(cocos.layer.Layer):
             for s, e, color in section['runs']:
                 color = color[:3] + (0,)
                 self.document.set_style(s, e, dict(color=color))
+        self.text_layout.end_update()
+
+    def on_next(self):
+        for section in self.expose_text_runs:
+            if section['on']: continue
+            section['on'] = True
+            if section['style'] == 'fade':
+                self.do(FadeIn(.5), FadeSection(self.text_layout, self.document, section))
+            else:
+                self.text_layout.begin_update()
+                for element in section['elements']:
+                    element.set_opacity(self.text_layout, 255)
+                for s, e, color in section['runs']:
+                    self.document.set_style(s, e, dict(color=color))
+                self.text_layout.end_update()
+            return pyglet.event.EVENT_HANDLED
+
+    def on_previous(self):
+        for section in reversed(self.expose_text_runs):
+            if not section['on']: continue
+            section['on'] = False
+            if section['style'] == 'fade':
+                self.do(FadeOut(.5), FadeSection(self.text_layout, self.document, section))
+            else:
+                self.text_layout.begin_update()
+                for element in section['elements']:
+                    element.set_opacity(self.text_layout, 0)
+                for s, e, color in section['runs']:
+                    color = color[:3] + (0,)
+                    self.document.set_style(s, e, dict(color=color))
+                self.text_layout.end_update()
+            return pyglet.event.EVENT_HANDLED
 
     _current_dimensions = None
     def create_layout(self, x, y, vw, vh, scale):

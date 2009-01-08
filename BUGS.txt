@@ -4,6 +4,13 @@ KNOWN BUGS
 - test_interpreter (first page) shows resizing issues
 - indentation of list item content varies when list enumeration gets wide
 - footer doesn't handle color changes
+
 - interpreter focus when multiple in page (should follow mouse)
   focus should be in first on page, then follow mouse if it changes focus
-- table, interpreter, plugin don't handle set_alpha
+
+- table & interpreter don't handle set_alpha
+
+- FADE transition causes the new page to be on_enter()'ed TWICE
+  (and the outgoing one to be on_exit()'ed twice too)
+
+- plugin (and other) elements placed/removed TONS during list fade
