@@ -1,3 +1,5 @@
+.. style: :transition.name: none
+
 page one
 
 ----
@@ -16,7 +18,15 @@ page one
 1. numbered list with fade expose on
 2. with expose turned on
 3. .. image:: sample-image.png
-4. last item
+4. Simple table:
+
+   ========= =========
+   Heading 1 Heading 2
+   ========= =========
+   Cell 1    Cell 2
+   Cell 3    Cell 4
+   ========= =========
+5. last item
 
 ----
 

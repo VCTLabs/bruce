@@ -1,4 +1,5 @@
-Table test
+Table test - no heading
+-----------------------
 
 ============ =======================================
 Row 1 Cell 1 Row 1 Cell 2
@@ -9,7 +10,8 @@ Row 2 Cell 1 Row 2 Cell 2
 Row 3 Cell 1 .. image:: sample-image.png
 ============ =======================================
 
-Next one should be centered with heading
+Centered with heading
+---------------------
 
 .. style::
    :align: center
@@ -27,4 +29,18 @@ Row 2 Cell 1 Row 2 Cell 2
 Row 3 Cell 1 .. image:: sample-image.png
 ============ =======================================
 
-All done
+
+Table in a list
+---------------
+
+.. style:: :align: left
+
+- item 1
+- ============ =======================================
+  Row 1 Cell 1 Row 1 Cell 2
+  ------------ ---------------------------------------
+  Row 2 Cell 1 Row 2 Cell 2
+  ------------ ---------------------------------------
+  Row 3 Cell 1 .. image:: sample-image.png
+  ============ =======================================
+- item 3
