@@ -36,6 +36,9 @@ class TableElement(pyglet.text.document.InlineElement):
         self.dpi = int(scale * 96)
         # XXX relayout table
 
+    def set_opacity(self, layout, opacity):
+        self.table.set_opacity(opacity)
+
     def place(self, layout, x, y):
         self.table.place(layout, x, y)
 
@@ -55,12 +58,21 @@ class TableVisitor(rst_parser.DocutilsVisitor):
         nodes.NodeVisitor.__init__(self, document)
         self.decoder = decoder
 
+class BlendGroup(pyglet.graphics.Group):
+    def set_state(self):
+        glPushAttrib(GL_COLOR_BUFFER_BIT)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    def unset_state(self):
+        glPopAttrib()
+
 class TableGenerator(object):
     def __init__(self, element):
         self.element = element
         self.num_rows = self.num_columns = 0
         self.cells = {}
         self.cell_layouts = {}
+        self.cell_colors = {}
         self.column_specs = []
         self.cell_decoration = {}
         self.body_rows = set()
@@ -69,6 +81,8 @@ class TableGenerator(object):
         # layout spec
         # XXX maybe allow multiple layouts?
         self.parent_layout = self.x = self.y = None
+
+        self.opacity = 255
 
     def layout(self):
         width = director.get_window_size()[0]
@@ -91,6 +105,11 @@ class TableGenerator(object):
             for col in range(self.num_columns):
                 width = spec_widths[col]
                 document = self.cells[row, col]
+
+                # also remember cell color style runs
+                iter = document.get_style_runs('color')
+                self.cell_colors[row, col] = list(iter.ranges(iter.start, iter.end))
+
                 l = pyglet.text.layout.IncrementalTextLayout(
                     document, width, 50, dpi=self.element.dpi,
                     multiline=True)
@@ -154,7 +173,8 @@ class TableGenerator(object):
                     color = style['odd_background_color']
                 else:
                     color = style['even_background_color']
-                r = layout.batch.add(4, pyglet.gl.GL_QUADS, background,
+                r = layout.batch.add(4, pyglet.gl.GL_QUADS,
+                    BlendGroup(background),
                     ('v2i', (x, 0, x2, 0, x2, height, x, height)),
                     ('c4B', color * 4),
                 )
@@ -167,7 +187,7 @@ class TableGenerator(object):
             l = [0] * 4 * (self.num_rows-1 + self.num_columns-1)
             n = len(l)//2
             self.border_decoration = layout.batch.add(n,
-                pyglet.gl.GL_LINES, foreground,
+                pyglet.gl.GL_LINES, BlendGroup(foreground),
                 ('v2i', l), ('c4B', color * n),
             )
 
@@ -238,7 +258,39 @@ class TableGenerator(object):
         self.cell_decoration = {}
         self.border_decoration.delete()
         self.border_decoration = None
-        self.layout = self.x = self.y = None
+        self.parent_layout = self.x = self.y = None
+
+    def set_opacity(self, opacity):
+        self.opacity = opacity
+        v = opacity/255.
+        style = self.element.stylesheet['table']
+        for row in range(self.num_rows):
+            for column in range(self.num_columns):
+                # fade document
+                l = self.cell_layouts[row, column]
+                d = self.cells[row, column]
+                l.begin_update()
+                for s, e, c in self.cell_colors[row, column]:
+                    c = c[:3] + (int(v * c[3]),)
+                    d.set_style(s, e, dict(color=c))
+                l.end_update()
+
+                # fade background
+                if row in self.heading_rows:
+                    color = style['heading_background_color']
+                elif row%2:
+                    color = style['odd_background_color']
+                else:
+                    color = style['even_background_color']
+                l = self.cell_decoration[row, column]
+                color = color[:3] + (int(color[3] * v), )
+                l.colors[:] = color * 4
+
+                # fade border lines
+                color = style['border_color']
+                color = color[:3] + (int(color[3] * v), )
+                colors = color * (len(self.border_decoration.colors) // 4)
+                self.border_decoration.colors = colors
 
     def pop_style(self, *args):
         # NOP - we don't track styles

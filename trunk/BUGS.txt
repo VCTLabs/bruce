@@ -8,9 +8,12 @@ KNOWN BUGS
 - interpreter focus when multiple in page (should follow mouse)
   focus should be in first on page, then follow mouse if it changes focus
 
-- table & interpreter don't handle set_alpha
+- interpreter doen't handle set_opacity
 
-- FADE transition causes the new page to be on_enter()'ed TWICE
-  (and the outgoing one to be on_exit()'ed twice too)
+- table contents double-rendered during list fade
+- table decorations not faded in list fade
 
-- plugin (and other) elements placed/removed TONS during list fade
+- elements placed/removed TONS during list fade (& construction)
+  - table performance sucks ass because of this
+
+(could I pre-layout all page content and then just hide pages??? could do second display then...)
