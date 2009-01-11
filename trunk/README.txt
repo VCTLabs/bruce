@@ -117,6 +117,9 @@ mouse scroll wheel
   Clicking and dragging always scrolls the whole page.
 control-F
   Switch between fullscreen and windowed mode
+control-S
+  Save a screenshot as "screenshot-<random number>.png" in the current
+  directory.
 escape
   Exit presentation
 home, end

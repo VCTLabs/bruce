@@ -1,19 +1,15 @@
 KNOWN BUGS
 
-- transitions mostly get confused when in fullscreen
+- transitions sometimes get confused when in fullscreen
 - test_interpreter (first page) shows resizing issues
 - indentation of list item content varies when list enumeration gets wide
 - footer doesn't handle color changes
-
+- better places to put screenshots...
 - interpreter focus when multiple in page (should follow mouse)
   focus should be in first on page, then follow mouse if it changes focus
-
 - interpreter doen't handle set_opacity
-
-- table contents double-rendered during list fade
-- table decorations not faded in list fade
-
 - elements placed/removed TONS during list fade (& construction)
-  - table performance sucks ass because of this
+  table performance sucks ass because of this
+  (could I pre-layout all page content and then just hide pages???
+  could do second display then...)
 
-(could I pre-layout all page content and then just hide pages??? could do second display then...)
