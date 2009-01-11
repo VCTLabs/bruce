@@ -1,3 +1,4 @@
+import os
 import time
 import pyglet
 import cocos
@@ -7,7 +8,6 @@ from pyglet.window import key, mouse
 from bruce import info_layer
 
 class Presentation(pyglet.event.EventDispatcher):
-
     def __init__(self, pages, start_page, show_timer,
             show_count, desired_size):
         director.window.set_mouse_visible(False)
@@ -55,7 +55,7 @@ class Presentation(pyglet.event.EventDispatcher):
     def on_resize(self, viewport_width, viewport_height):
         self.page.on_resize(viewport_width, viewport_height)
 
-    def __move(self, dir):
+    def change_page(self, dir):
         # determine the new page, with limits
         new = min(self.num_pages-1, max(0, self.page_num + dir))
         if new == self.page_num: return
@@ -68,11 +68,11 @@ class Presentation(pyglet.event.EventDispatcher):
 
     def __next(self):
         if not self.page.on_next():
-            self.__move(1)
+            self.change_page(1)
 
     def __previous(self):
         if not self.page.on_previous():
-            self.__move(-1)
+            self.change_page(-1)
 
     def dispatch_event(self, event_type, *args):
         '''Overridden so it doesn't invoke the method on self and cause a loop
@@ -100,10 +100,10 @@ class Presentation(pyglet.event.EventDispatcher):
     def on_text_motion(self, motion):
         if motion == key.MOTION_LEFT: self.__previous()
         elif motion == key.MOTION_RIGHT: self.__next()
-        elif motion == key.MOTION_NEXT_PAGE: self.__move(5)
-        elif motion == key.MOTION_PREVIOUS_PAGE: self.__move(-5)
-        elif motion == key.MOTION_BEGINNING_OF_FILE: self.__move(-self.num_pages)
-        elif motion == key.MOTION_END_OF_FILE: self.__move(self.num_pages)
+        elif motion == key.MOTION_NEXT_PAGE: self.change_page(5)
+        elif motion == key.MOTION_PREVIOUS_PAGE: self.change_page(-5)
+        elif motion == key.MOTION_BEGINNING_OF_FILE: self.change_page(-self.num_pages)
+        elif motion == key.MOTION_END_OF_FILE: self.change_page(self.num_pages)
         else: return pyglet.event.EVENT_UNHANDLED
         return pyglet.event.EVENT_HANDLED
 

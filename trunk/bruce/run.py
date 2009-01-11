@@ -7,6 +7,7 @@ from cgi import escape as html_quote
 
 import pyglet
 from cocos.director import director
+from cocos import actions
 
 from bruce import rst_parser
 from bruce import presentation
@@ -109,6 +110,17 @@ def cmd_line():
     p.add_option("-f", "--fullscreen", dest="fullscreen",
                       action="store_true", default=False,
                       help="run in fullscreen mode")
+    p.add_option("", "--screen", dest="screen",
+                      default="1",
+                      help="display on screen (1+, default 1)")
+    p.add_option("-w", "--window-size", dest="window_size",
+                      default="1024x768",
+                      help="size of the window when not fullscreen")
+
+    p.add_option("-v", "--version", dest="version",
+                      action="store_true", default=False,
+                      help="display version and quit")
+
     p.add_option("-t", "--timer", dest="timer",
                       action="store_true", default=False,
                       help="display a timer")
@@ -118,9 +130,12 @@ def cmd_line():
     p.add_option("-s", "--startpage", dest="start_page",
                       default="1",
                       help="start at page N (1+, default 1)")
-    p.add_option("", "--screen", dest="screen",
-                      default="1",
-                      help="display on screen (1+, default 1)")
+    p.add_option("-r", "--record", dest="record", default="",
+                      help="record timing and screenshots")
+
+    p.add_option("", "--playback", dest="playback", default="",
+                      help="play back a presentation using timing.txt")
+
     p.add_option("-b", "--bullet-mode", dest="bullet_mode",
                       action="store_true", default=False,
                       help="run in bullet mode (page per bulet)")
@@ -130,27 +145,12 @@ def cmd_line():
                       action="store_true", default=False,
                       help="list available style names")
 
-    #p.add_option("-n", "--notes", dest="notes",
-    #                  action="store_true", default=False,
-    #                  help="generate HTML notes (do not run presentation)")
-    #p.add_option("-o", "--out-file", dest="out_file",
-    #                  default="",
-    #                  help="filename to write notes to (default stdout)")
-    #p.add_option("-c", "--columns", dest="columns",
-    #                  default="2",
-    #                  help="number of columns in notes (default 2)")
-    p.add_option("-v", "--version", dest="version",
-                      action="store_true", default=False,
-                      help="display version and quit")
     #p.add_option("-d", "--progress-screen", dest="progress_screen",
     #                  default=None,
     #                  help="display progress in screen (1+, default none)")
     p.add_option("-D", "--display-source", dest="source",
                       action="store_true", default=False,
                       help="display source in terminal")
-    p.add_option("-w", "--window-size", dest="window_size",
-                      default="1024x768",
-                      help="size of the window when not fullscreen")
 
     (options, args) = p.parse_args()
 
@@ -158,12 +158,12 @@ def cmd_line():
         print __version__
         sys.exit(0)
 
-    elif options.list_styles:
+    if options.list_styles:
         print 'Available built-in style names:'
         print '\n'.join(sorted(style.stylesheets.keys()))
         sys.exit(0)
 
-    elif not args:
+    if not args:
         print 'Error: presentation filename required'
         print p.get_usage()
         sys.exit(1)
@@ -211,6 +211,10 @@ def run(filename, options):
             stylesheet = style.stylesheets['default'].copy()
     else:
         stylesheet = style.get(options.style)
+
+    # override some stuff because of recording
+    stylesheet.set_recording(options.record)
+
     pages = rst_parser.parse(content, stylesheet=stylesheet,
         bullet_mode=options.bullet_mode)
 
@@ -219,6 +223,44 @@ def run(filename, options):
         show_timer=options.timer, show_count=options.page_count,
         start_page=int(options.start_page)-1,
         desired_size=(width, height))
+
+    # listen for page changes if we're recording
+    if options.record:
+        if not os.path.exists(options.record):
+            os.makedirs(options.record)
+        open(os.path.join(options.record, 'timing.txt'), 'w').close()
+
+        @pres.event
+        def on_page_changed(page, num):
+            # XXX record non-page-changes?
+            def save(num=num):
+                t = time.time()
+                filename = 'screenshot-%d.png'%num
+                f = open(os.path.join(options.record, 'timing.txt'), 'a')
+                f.write('%.1f %s\n'%(t, filename))
+                filename = os.path.join(options.record, filename)
+                buffer = pyglet.image.get_buffer_manager().get_color_buffer()
+                buffer.save(filename)
+            page.do(actions.Delay(.25) + actions.CallFunc(save))
+
+    # playback?
+    if options.playback:
+        start_time = time.time()
+        times = [float(l.split()[0]) for l in open(options.playback)]
+        times = [t-times[0]+start_time for t in times]
+        del times[0]
+        @pres.event
+        def on_page_changed(page, num):
+            if not times:
+                return
+            dt = times.pop(0) - time.time()
+            # XXX handle backward, use page num from screenshot?
+            # XXX handle non-page changes?
+            if dt > 0:
+                page.do(actions.Delay(dt) + actions.CallFunc(pres.change_page, num+1))
+            else:
+                pres.change_page(num+1)
+
 
     director.window.push_handlers(pres)
 
