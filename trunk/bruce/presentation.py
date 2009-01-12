@@ -55,9 +55,9 @@ class Presentation(pyglet.event.EventDispatcher):
 
         # and cue up the on_page_changed event for when the transition finishes
         # XXX would be nice to be able to be notified by Cocos when the transition finishes
-        page.do(actions.Delay(duration + 0.1) + 
-            actions.CallFunc(self.dispatch_event,
-                'on_page_changed', self.page, self.page_num))
+        def f(dt, self=self):
+            self.dispatch_event('on_page_changed', self.page, self.page_num)
+        pyglet.clock.schedule_once(f, duration + 0.1)
 
         director.window.set_caption('Presentation: Slide %s'%(self.page_num+1))
 
