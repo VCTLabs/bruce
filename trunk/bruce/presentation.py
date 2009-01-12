@@ -3,6 +3,7 @@ import time
 import pyglet
 import cocos
 from cocos.director import director
+from cocos import actions
 from pyglet.window import key, mouse
 
 from bruce import info_layer
@@ -41,16 +42,24 @@ class Presentation(pyglet.event.EventDispatcher):
         pyglet.gl.glClearColor(*bgcolor)
         page.desired_size = self.desired_size
 
-        # enter the page
+        # play the transition, if any
         if forward and page.transition is not None:
+            duration = page.stylesheet['transition']['duration']
             page.transition(page)
         elif not forward and old_page.transition is not None:
+            duration = old_page.stylesheet['transition']['duration']
             old_page.transition(page)
         else:
+            duration = 0
             director.replace(page)
 
+        # and cue up the on_page_changed event for when the transition finishes
+        # XXX would be nice to be able to be notified by Cocos when the transition finishes
+        page.do(actions.Delay(duration + 0.1) + 
+            actions.CallFunc(self.dispatch_event,
+                'on_page_changed', self.page, self.page_num))
+
         director.window.set_caption('Presentation: Slide %s'%(self.page_num+1))
-        self.dispatch_event('on_page_changed', self.page, self.page_num)
 
     def on_resize(self, viewport_width, viewport_height):
         self.page.on_resize(viewport_width, viewport_height)

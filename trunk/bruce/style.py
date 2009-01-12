@@ -185,7 +185,6 @@ class Stylesheet(dict):
                 valign='top',
                 # default viewport=('0', '0', 'w', 'h'),
             )
-        self.is_recording = False
         super(Stylesheet, self).__init__(**kw)
     def value(self, section, name, default=None):
         return self[section].get(name, self['default'].get(name, default))
@@ -206,16 +205,11 @@ class Stylesheet(dict):
 
     def copy(self):
         new = Stylesheet()
-        new.is_recording = self.is_recording
         for k in self:
             new[k] = self[k].copy()
         return new
 
     def get_transition(self):
-        # never do transitions while recording
-        if self.is_recording:
-            return None
-
         klass = _transitions[self['transition']['name']]
         if klass is None: return None
 
@@ -228,9 +222,6 @@ class Stylesheet(dict):
             director.replace(klass(new_scene, **kwargs))
 
         return _transition
-
-    def set_recording(self, recording):
-        self.is_recording = bool(recording)
 
 # set up the default style
 default_stylesheet = Stylesheet(
