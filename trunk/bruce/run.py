@@ -241,7 +241,8 @@ def run(filename, options):
                 filename = os.path.join(options.record, filename)
                 buffer = pyglet.image.get_buffer_manager().get_color_buffer()
                 buffer.save(filename)
-            page.do(actions.Delay(.25) + actions.CallFunc(save))
+            # delay a moment to allow rendering to complete
+            page.do(actions.Delay(.1) + actions.CallFunc(save))
 
     # playback?
     if options.playback:
