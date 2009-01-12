@@ -10,6 +10,12 @@ KNOWN BUGS
 - interpreter doen't handle set_opacity
 - elements placed/removed TONS during list fade (& construction)
   table performance sucks ass because of this
-  (could I pre-layout all page content and then just hide pages???
-  could do second display then...)
+
+  Options:
+
+  1. layout all page scenes at startup,
+  2. modify IncrementalTextLayout._update_vertex_lists to not delete the
+     lines being changed but rather update them, or
+  3. extreme option is to avoid IncrementalTextLayout and switch to a
+     customised TextLayout that knows how to change colors.
 
