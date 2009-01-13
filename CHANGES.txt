@@ -4,6 +4,9 @@
 - add Bruce Style Sheets (BSS)
 - add simpler vertical / horizontal gradients
 - add in gradual exposure of list items
+- add recording of timing and screenshots
+- add playback of previous recording
+- add playback at a constant speed
 - default to fade transition and use layout.background_color as tween color
 - fix layout losing footer alignment when going backwards
 

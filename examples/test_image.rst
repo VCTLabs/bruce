@@ -1,6 +1,7 @@
 .. style::
    :layout.valign: center
    :align: center
+   :transition.name: none
 
 Raw Image
 ---------
