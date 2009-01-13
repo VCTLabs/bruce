@@ -218,7 +218,11 @@ There's a few options for automatically playing a presentation:
 **Looping**
   If you wish for your automitically-played presentation to loop then use the
   ``--loop`` command-line option.
-  
+
+**Only play once**
+  If you wish for your automitically-played presentation to quit after playing
+  through once use the ``--once`` command-line option.
+
 **Automatically capture a screenshot of every page**
   You may combine ``--record`` and ``--playspeed`` to automatically page
   through the presentation and capture a screenshot of each page. Use
@@ -228,7 +232,7 @@ There's a few options for automatically playing a presentation:
           --playspeed=.5
 
   You'll want to make sure the presentation has::
-  
+
     .. style:: :transition.name: none
 
   at the top. Using a speed faster than .5 is discouraged until some
