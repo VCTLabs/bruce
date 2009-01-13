@@ -143,7 +143,7 @@ def cmd_line():
                            "(supply seconds to pause per page)")
     p.add_option("", "--loop", dest="loop", default=False, action="store_true",
                       help="loop back to the start when playing automatically")
-    p.add_option("", "--once", dest="once", default=False, action="store_true",
+    p.add_option("", "--autoquit", dest="autoquit", default=False, action="store_true",
                       help="quit Bruce after playing through the " \
                           "presentation once automatically")
 

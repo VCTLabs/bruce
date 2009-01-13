@@ -50,7 +50,7 @@ class AutoPlayer(object):
                 def f(dt, dir, self=self):
                     self.pres.change_page(dir)
                 pyglet.clock.schedule_once(f, self.delay, -len(self.pres.pages))
-            elif self.options.once:
+            elif self.options.autoquit:
                 # quit after we've displayed this page
                 def f(dt):
                     pyglet.app.exit()

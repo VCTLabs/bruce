@@ -221,7 +221,7 @@ There's a few options for automatically playing a presentation:
 
 **Only play once**
   If you wish for your automitically-played presentation to quit after playing
-  through once use the ``--once`` command-line option.
+  through once use the ``--autoquit`` command-line option.
 
 **Automatically capture a screenshot of every page**
   You may combine ``--record`` and ``--playspeed`` to automatically page
