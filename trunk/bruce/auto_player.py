@@ -22,7 +22,7 @@ class AutoPlayer(object):
             self.times = [t-times[0]+self.start for t in times]
             del self.times[0]
         else:
-            self.delay = int(self.options.playspeed)
+            self.delay = float(self.options.playspeed)
             num_pages = len(self.pres.pages)
             self.times = [self.start + n * self.delay
                 for n in range(num_pages)]
