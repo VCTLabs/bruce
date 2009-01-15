@@ -114,7 +114,7 @@ __ http://pygments.org/
 
 **interpreter**
     Embeds a Python interpreter in the page. The options available are
-    ``:width:`` and ``:height:`` (default 800 by 300). You may also have
+    ``:width:`` and ``:height:`` (default 1024 by 400). You may also have
     the optional flag ``:sysver:`` which will cause the standard Python
     interactive intepreter greeting with the Python version to be displayed.
 

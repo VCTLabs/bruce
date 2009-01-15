@@ -1,12 +1,12 @@
 .. style::
    :font_size: 100
+   :layout.background_color: silver
+   :layout.viewport: 0,64,w,h-(64+48)
 
 .. layout::
-   bgcolor: silver
-   image:pyglet-trans-64.png;halign=right;valign=bottom
-   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
-   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
-   viewport:0,64,w,h-(64+48)
+   :image:pyglet-trans-64.png;halign=right;valign=bottom
+   :quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
+   :quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
 
 first page, no transition
 

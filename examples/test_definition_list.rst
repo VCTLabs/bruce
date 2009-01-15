@@ -13,8 +13,6 @@ term
 
     .. image:: pyglet-trans-64.png
 
-----
-
 term which is a little longer really
     - definition
     - list

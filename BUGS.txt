@@ -1,7 +1,7 @@
 KNOWN BUGS
 
 - line break before tables / interpreters in list items
-- table backgroun not being faded correctly; also text appears to be rendered mutiple times
+- table background not being faded correctly; also text appears to be rendered mutiple times
 - transitions sometimes get confused when in fullscreen
 - test_interpreter (first page) shows resizing issues
 - indentation of list item content varies when list enumeration gets wide
@@ -10,8 +10,8 @@ KNOWN BUGS
   focus should be in first on page, then follow mouse if it changes focus
 - need additional set_active(boolen) on elements to disable plugins /
   interpreter when they're not displayed
-- elements placed/removed TONS during list fade (& construction)
-  table performance sucks ass because of this
+- elements placed/removed TONS during page & list fade (& construction)
+  video playback stutters and table performance sucks ass because of this
 
   Options:
 
