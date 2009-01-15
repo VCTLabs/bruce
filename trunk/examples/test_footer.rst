@@ -1,7 +1,3 @@
-.. layout::
-   bgcolor: black
-.. style::
-   :color: white
 
 Nullam at risus. Sed hendrerit. Phasellus rhoncus eleifend dui. Curabitur gravida. Curabitur lorem turpis, consectetuer sit amet, tincidunt ac, aliquet eget, massa. Ut quis libero. Praesent elementum. Sed suscipit viverra libero. Sed ultrices fermentum pede. Etiam tempus nunc et neque tempor dapibus. Proin mi ipsum, tristique eu, rhoncus mattis, consequat eget, est. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nulla feugiat libero eget massa. Nulla adipiscing, dui ac tempor euismod, velit justo pretium mauris, ut aliquet nulla eros eu odio. Phasellus ut odio.
 

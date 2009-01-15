@@ -40,10 +40,10 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.width_spec = width
         self.height_spec = height
 
-        self.video = pyglet.resource.media(self.video_filename)
+        video = pyglet.resource.media(self.video_filename)
         self.loop = loop
-        assert self.video.video_format
-        video_format = self.video.video_format
+        assert video.video_format
+        video_format = video.video_format
 
         # determine dimensions
         self.video_width = video_format.width
@@ -94,6 +94,7 @@ class VideoElement(pyglet.text.document.InlineElement):
 
     def place(self, layout, x, y):
         # create the player
+        self.video = pyglet.resource.media(self.video_filename)
         self.player = pyglet.media.Player()
         self.player.queue(self.video)
         if self.loop:
@@ -104,7 +105,7 @@ class VideoElement(pyglet.text.document.InlineElement):
 
         texture = self.player.texture
 
-        group = pyglet.sprite.SpriteGroup(self.image.texture,
+        group = pyglet.sprite.SpriteGroup(self.player.texture,
             pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA,
             layout.top_group)
 

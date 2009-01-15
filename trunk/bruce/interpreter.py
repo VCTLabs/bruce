@@ -119,9 +119,9 @@ class InterpreterElement(pyglet.text.document.InlineElement):
     prompt = ">>> "
     prompt_more = "... "
 
-    def __init__(self, content, stylesheet, width=800, height=400, sysver=False):
+    def __init__(self, content, stylesheet, width=1024, height=400, sysver=False):
         self.stylesheet = stylesheet.copy()
-        
+
         # figure style information
         self.style = self.stylesheet['default'].copy()
         self.style.update(self.stylesheet['literal'])
