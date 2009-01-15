@@ -1,13 +1,15 @@
 KNOWN BUGS
 
+- line break before tables / interpreters in list items
+- table backgroun not being faded correctly; also text appears to be rendered mutiple times
 - transitions sometimes get confused when in fullscreen
 - test_interpreter (first page) shows resizing issues
 - indentation of list item content varies when list enumeration gets wide
 - footer doesn't handle color changes
-- better places to put screenshots...
 - interpreter focus when multiple in page (should follow mouse)
   focus should be in first on page, then follow mouse if it changes focus
-- interpreter doen't handle set_opacity
+- need additional set_active(boolen) on elements to disable plugins /
+  interpreter when they're not displayed
 - elements placed/removed TONS during list fade (& construction)
   table performance sucks ass because of this
 
