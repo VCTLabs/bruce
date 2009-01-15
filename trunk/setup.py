@@ -129,6 +129,7 @@ setup(
     author = "Richard Jones",
     author_email = "richard@mechanicalcat.net",
     url = "http://r1chardj0n3s.googlepages.com/bruce",
+    download_url = "http://code.google.com/p/bruce-tpt/downloads/list",
     packages = ["bruce"],
     scripts = ['scripts/bruce'],
     classifiers = [
