@@ -13,8 +13,15 @@ from prior to version 3.0!
 
 Changes in this release:
 
-- add support for arbitrary display elements via ``.. plugin::``
-- fixed display of code blocks in absence of Pygments
+- distribute as an application
+- add Bruce Style Sheets (BSS)
+- add simpler vertical / horizontal gradients
+- add in gradual exposure of list items
+- add recording of timing and screenshots
+- add playback of previous recording
+- add playback at a constant speed
+- default to fade transition and use layout.background_color as tween color
+- fix layout losing footer alignment when going backwards
 
 
 Bruce, the Presentation Tool Features
@@ -62,11 +69,11 @@ Bruce requires Python 2.5 or later to be installed on your system. Obtain
 it from <http://www.python.org/>.
 
 Please download the Bruce version for your operating system from
-<http://pypi.python.org/pypi/bruce>:
+<http://code.google.com/p/bruce-tpt/downloads/list>:
 
-- Linux "bruce-<version>-linux.zip" (eg. "bruce-3.1-linux.zip")
-- Windows "bruce-<version>-windows.zip" (eg. "bruce-3.1-windows.zip")
-- OS X "bruce-<version>-osx.zip" (eg. "bruce-3.1-osx.zip")
+- Linux "bruce-<version>-linux.zip" (eg. "bruce-3.2-linux.zip")
+- Windows "bruce-<version>-windows.zip" (eg. "bruce-3.2-windows.zip")
+- OS X "bruce-<version>-osx.zip" (eg. "bruce-3.2-osx.zip")
 
 Unzip the application and double-click the "bruce" program in the created
 folder. The program may be shown with a ".sh" or ".pyw" extension. Linux
