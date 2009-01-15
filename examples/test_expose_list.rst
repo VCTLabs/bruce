@@ -16,16 +16,16 @@ page one
 .. style:: :list.expose: fade
 
 1. numbered list with fade expose on
-2. with expose turned on
-3. .. image:: sample-image.png
-4. Simple table:
-
-   ========= =========
+2. .. image:: sample-image.png
+3. ========= =========
    Heading 1 Heading 2
    ========= =========
    Cell 1    Cell 2
    Cell 3    Cell 4
    ========= =========
+4. .. interpreter::
+      :width: 700
+      :height: 100
 5. last item
 
 ----

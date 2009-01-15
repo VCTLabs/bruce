@@ -141,6 +141,24 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.history = ['']
         self.history_pos = 0
 
+        # format the code
+        self.document = pyglet.text.document.FormattedDocument(self.content)
+        s = self.style.copy()
+        del s['background_color']
+        self.document.set_style(0, len(self.document.text), s)
+
+        # sure there's only one run *now*
+        iter = self.document.get_style_runs('color')
+        self.color_runs = [[s, e, c]
+            for s, e, c in iter.ranges(0, len(self.document.text))]
+
+        # remember the start of the line for later command handling and cursor movement
+        self.start_of_line = len(self.document.text)
+
+        self.quad = None
+        self.caret = None
+        self.opacity = 255
+
         super(InterpreterElement, self).__init__(self.height, 0, self.width)
 
     def set_scale(self, scale):
@@ -160,17 +178,30 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             self.quad.delete()
             self.caret.delete()
 
+    def set_opacity(self, layout, opacity):
+        self.opacity = int(opacity)
+
+        # background
+        if self.quad is not None:
+            c = self.style['background_color']
+            v = opacity/255.
+            c = c[:3] + (int(v * c[3]),)
+            self.quad.colors[:] = c * 4
+
+        # text color
+        for s, e, color in self.color_runs:
+            color = color[:3] + (int(v * color[3]),)
+            self.document.set_style(s, e, dict(color=color))
+
+        # caret too
+        if self.caret is not None:
+            self.caret.visible = bool(self.opacity)
+
+
     layout = None
     def place(self, layout, x, y):
-        # format the code
-        self.document = pyglet.text.document.FormattedDocument(self.content)
+        # XXX only do this when active
         director.window.push_handlers(self)
-
-        # set style information
-        self.document.set_style(0, len(self.document.text), self.style)
-
-        # remember the start of the line for later command handling and cursor movement
-        self.start_of_line = len(self.document.text)
 
         # XXX maybe allow myself to be added to multiple layouts for whatever that's worth
         if self.layout is not None:
@@ -183,9 +214,11 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             self.layout.end_update()
             return
 
-        bgcolor = self.style['background_color']
+        c = self.style['background_color']
+        v = self.opacity/255.
+        c = c[:3] + (int(v * c[3]),)
         self.quad = layout.batch.add(4, GL_QUADS, layout.top_group,
-            ('c4B', bgcolor*4),
+            ('c4B', c*4),
             ('v2i', (x, y, x, y+self.height, x+self.width, y+self.height, x+self.width, y))
         )
         self.layout = ScrolledIncrementalTextLayout(self.document,
@@ -207,14 +240,17 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.caret = pyglet.text.caret.Caret(self.layout, color=self.style['color'][:3])
         self.caret.on_activate()
         self.caret.position = len(self.document.text)
+        if not self.opacity:
+            self.caret.visible = False
 
     def remove(self, layout):
         director.window.pop_handlers()
-        self.document = None
         self.layout.delete()
         self.layout = None
         self.quad.delete()
+        self.quad = None
         self.caret.delete()
+        self.caret = None
 
     def on_key_press(self, symbol, modifiers):
         if symbol == pyglet.window.key.TAB:
