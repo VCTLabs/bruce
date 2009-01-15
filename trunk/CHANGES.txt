@@ -1,4 +1,4 @@
-3.2 - 2009-01-02 (r???)
+3.2 - 2009-01-02 (r216)
 
 - distribute as an application
 - add Bruce Style Sheets (BSS)
