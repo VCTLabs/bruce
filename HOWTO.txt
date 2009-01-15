@@ -3,7 +3,7 @@ How to write presentations using Bruce the Presentation Tool
 ============================================================
 
 Some of this document refers to the optional "examples" download
-from <http://pypi.python.org/pypi/bruce>.
+from <http://code.google.com/p/bruce-tpt/downloads/list>
 
 Bruce presentations are written as plain-text files in the
 ReStructuredText format with some extensions. If you have
@@ -37,7 +37,7 @@ of page content.
 
 There's a lot of examples in the examples download, showing off
 most of Bruce's features. Get the examples from
-<http://pypi.python.org/pypi/bruce>.
+<http://code.google.com/p/bruce-tpt/downloads/list>.
 
 
 More Detail
