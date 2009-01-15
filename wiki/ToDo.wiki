@@ -3,7 +3,6 @@
 =Random Stuff TO DO=
 
   * auto screenshot capture with timing information -> video
-  * auto timing / timing capture replay
   * use the second display
   * auto typing in interpreter
   * interpreter not blocking
