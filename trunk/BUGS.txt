@@ -1,7 +1,9 @@
 KNOWN BUGS
 
+- need avbin & pygments on dev laptop
+
 - line break before tables / interpreters in list items
-- table background not being faded correctly; also text appears to be rendered mutiple times
+- table background not being faded correctly; also text appears to be rendered multiple times
 - transitions sometimes get confused when in fullscreen
 - test_interpreter (first page) shows resizing issues
 - indentation of list item content varies when list enumeration gets wide

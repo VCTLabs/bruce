@@ -1,4 +1,9 @@
-3.2 - 2009-01-02 (r216)
+3.2.1 - 2009-01-?? (r???)
+
+- align tables so the header row rests on the baseline
+
+
+3.2 - 2009-01-16 (r216)
 
 - distribute as an application
 - add Bruce Style Sheets (BSS)

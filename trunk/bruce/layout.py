@@ -101,7 +101,7 @@ class LayoutLayer(cocos.layer.Layer):
         '''
         return self.limited_viewport
 
-    def on_enter(self):
+    def create(self):
         ow, oh = self.parent.desired_size
 
         # figure the offset we need to center the viewport
@@ -225,15 +225,11 @@ class LayoutLayer(cocos.layer.Layer):
                     h -= d
                     self.limited_viewport = (x, y, w, h)
 
-    def on_exit(self):
+    def handle_resize(self):
         for decoration in self.decorations:
             decoration.delete()
         self.batch = None
-
-    def handle_resize(self):
-        # handle resize by causing everything to layout again
-        self.on_exit()
-        self.on_enter()
+        self.create()
 
     def draw(self):
         self.batch.draw()

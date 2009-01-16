@@ -24,14 +24,17 @@ class Page(cocos.scene.Scene):
         self.docnode = docnode
         self.transition = stylesheet.get_transition()
 
-        viewport_width, viewport_height = director.get_window_size()
+    def create(self, desired_size):
+        self.desired_size = desired_size
+        self.layout.create()
+        self.content.create()
 
     def on_next(self):
         '''Invoked on the "next" event (cursor right or left mouse
         button). If the handler returns event.EVENT_HANDLED then
         the presentation does not leave this page.
         '''
-        # XXX consider that this is suboptimal
+        # XXX consider that this is inelegant
         return self.content.on_next()
 
     def on_previous(self):
@@ -101,20 +104,7 @@ class PageContent(cocos.layer.Layer):
         self.expose_text_runs = expose_text_runs
         super(PageContent, self).__init__()
 
-    def update(self, dt):
-        '''Invoked periodically with the time since the last
-        update()
-
-        XXX except not
-        '''
-        pass
-
-    def on_enter(self):
-        '''Invoked when the page is put up on the screen of the given
-        dimensions.
-        '''
-        super(PageContent, self).on_enter()
-
+    def create(self):
         # create the layout
         self.batch = pyglet.graphics.Batch()
         x, y, vw, vh = self.parent.get_viewport()
@@ -130,6 +120,28 @@ class PageContent(cocos.layer.Layer):
                 color = color[:3] + (0,)
                 self.document.set_style(s, e, dict(color=color))
         self.text_layout.end_update()
+
+    def update(self, dt):
+        '''Invoked periodically with the time since the last
+        update()
+
+        XXX except not
+        '''
+        pass
+
+    def on_exit(self):
+        '''Invoked when the page is removed from the screen.
+        '''
+        # now do me (this will remove my event handlers)
+        super(PageContent, self).on_exit()
+
+        # disable the mouse hiding
+        if self._cb_hide_mouse_scheduled:
+            self.cb_hide_mouse(0)
+
+        #self.text_layout.delete()
+        #self.text_layout = None
+        #self.batch = None
 
     def on_next(self):
         for section in self.expose_text_runs:
@@ -195,28 +207,19 @@ class PageContent(cocos.layer.Layer):
         # the style of the element, which will push the rest of the content
         # down when pyglet notices its size has increased
 
+    # XXX reinstate me
+    '''
     def handle_resize(self, x, y, vw, vh, scale):
         # detect no change
         if self._current_dimensions == (x, y, vw, vh, scale):
             return
 
         # force re-layout
+        for element in self.elements:
+            element.delete()
         self.text_layout.delete()
         self.create_layout(x, y, vw, vh, scale)
-
-    def on_exit(self):
-        '''Invoked when the page is removed from the screen.
-        '''
-        # now do me (this will remove my event handlers)
-        super(PageContent, self).on_exit()
-
-        # disable the mouse hiding
-        if self._cb_hide_mouse_scheduled:
-            self.cb_hide_mouse(0)
-
-        self.text_layout.delete()
-        self.text_layout = None
-        self.batch = None
+    '''
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         self.text_layout.view_x -= scroll_x

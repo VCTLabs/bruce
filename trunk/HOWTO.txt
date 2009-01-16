@@ -220,8 +220,7 @@ to run it for.
 
     fade
       Expose each item in the list in turn by fading them in (or out if
-      hiding the list). Fading of list items containing tables should
-      be avoided at this time.
+      hiding the list).
 
 The default builtin stylesheet may be seen in "examples/default_style.bss".
 

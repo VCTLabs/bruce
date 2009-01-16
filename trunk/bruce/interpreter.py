@@ -159,7 +159,11 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.caret = None
         self.opacity = 255
 
-        super(InterpreterElement, self).__init__(self.height, 0, self.width)
+        # figure the line height
+        l = pyglet.text.Label('My', font_size=self.style['font_size'],
+            font_name=self.style['font_name'], dpi=self.dpi)
+        super(InterpreterElement, self).__init__(l.content_height,
+            l.content_height - self.height, self.width)
 
     def set_scale(self, scale):
         self.width = int(self.width_spec * scale)
@@ -209,8 +213,8 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             self.layout.begin_update()
             self.layout.x = x
             self._placed_y = y
-            self.layout.y = y + self.height
-            self.layout.anchor_y = 'top'
+            self.layout.y = y
+            self.layout.anchor_y = 'bottom'
             self.layout.end_update()
             return
 
@@ -228,9 +232,9 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         # position
         self.layout.begin_update()
         self.layout.x = x
-        self.layout.y = y + self.height
+        self.layout.y = y
         self._placed_y = y
-        self.layout.anchor_y = 'top'
+        self.layout.anchor_y = 'bottom'
         self.layout.end_update()
 
         # store off a reference to the surrounding layout's group so we can

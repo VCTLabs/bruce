@@ -32,6 +32,7 @@ class Plugin(plugin.Plugin):
         if self.group.angle == 360:
             self.group.angle = 1
 
+    # XXX split into create /  place / destroy
     def place(self, layout, x, y):
         x1 = int(x)
         y1 = int(y)
