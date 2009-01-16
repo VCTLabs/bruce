@@ -405,7 +405,9 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def visit_interpreter(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
-        if not isinstance(node.parent, nodes.TextElement):
+        if self.paragraph_suppress_newline:
+            self.paragraph_suppress_newline = False
+        elif not isinstance(node.parent, nodes.TextElement):
             self.break_paragraph()
 
         self.add_element(node.get_interpreter(self.stylesheet))
@@ -413,7 +415,9 @@ class DocumentGenerator(structured.StructuredTextDecoder):
     def visit_table(self, node):
         # if the parent is structural - document, section, etc then we need
         # to break the previous paragraphish
-        if not isinstance(node.parent, nodes.TextElement):
+        if self.paragraph_suppress_newline:
+            self.paragraph_suppress_newline = False
+        elif not isinstance(node.parent, nodes.TextElement):
             self.break_paragraph()
 
         # avoid circular import

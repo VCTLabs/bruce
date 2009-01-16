@@ -27,7 +27,10 @@ class TableElement(pyglet.text.document.InlineElement):
         self.dpi = 96
         self.table.layout()
 
-        super(TableElement, self).__init__(self.table.height, 0, self.table.width)
+        ascent = self.table.row_heights[0]
+        descent = ascent - self.table.height
+
+        super(TableElement, self).__init__(ascent, descent, self.table.width)
 
     def set_scale(self, scale):
         if scale != self.scale:
@@ -42,8 +45,11 @@ class TableElement(pyglet.text.document.InlineElement):
     def place(self, layout, x, y):
         self.table.place(layout, x, y)
 
+    # stuffit, leave it be
     def remove(self, layout):
-        self.table.delete_layout(layout)
+        pass
+        # risky, but let the layout worry about collecting the garbage
+        #self.table.delete_layout(layout)
 
 
 class DummyReporter(object):
@@ -75,6 +81,7 @@ class TableGenerator(object):
         self.cell_colors = {}
         self.column_specs = []
         self.cell_decoration = {}
+        self.border_decoration = None
         self.body_rows = set()
         self.heading_rows = set()
 
@@ -133,14 +140,12 @@ class TableGenerator(object):
         self.parent_layout = layout
         self.x = self.y = None
 
-        # organise the layers
-        foreground = pyglet.graphics.OrderedGroup(1, layout.top_group)
-        background = pyglet.graphics.OrderedGroup(0, layout.top_group)
-
         # style info
         style = self.element.stylesheet['table']
         vpad = style['top_padding'] + style['bottom_padding']
         hpad = style['left_padding'] + style['right_padding']
+
+        v = self.opacity/255.
 
         # place in the real layout
         for row in range(self.num_rows):
@@ -154,10 +159,13 @@ class TableGenerator(object):
                     height -= 1
             for col in range(self.num_columns):
                 document = self.cells[row, col]
+                if (row, col) in self.cell_layouts:
+                    self.cell_layouts[row, col].delete()
                 l = pyglet.text.layout.IncrementalTextLayout(
                     document, self.column_widths[col]-hpad, height,
                     dpi=self.element.dpi, multiline=True,
-                    batch=layout.batch, group=foreground)
+                    batch=layout.batch, group=layout.top_group)
+
                 self.cell_layouts[row, col] = l
 
         # cell backgrounds
@@ -173,12 +181,15 @@ class TableGenerator(object):
                     color = style['odd_background_color']
                 else:
                     color = style['even_background_color']
+                color = color[:3] + (int(color[3] * v),)
                 r = layout.batch.add(4, pyglet.gl.GL_QUADS,
-                    BlendGroup(background),
+                    layout.background_group,
                     ('v2i', (x, 0, x2, 0, x2, height, x, height)),
                     ('c4B', color * 4),
                 )
                 x = x2
+                if (row, col) in self.cell_decoration:
+                    self.cell_decoration[row, col].delete()
                 self.cell_decoration[row, col] = r
 
         # border lines
@@ -186,8 +197,11 @@ class TableGenerator(object):
             color = style['border_color']
             l = [0] * 4 * (self.num_rows-1 + self.num_columns-1)
             n = len(l)//2
+            if self.border_decoration:
+                self.border_decoration.delete()
+            color = color[:3] + (int(color[3] * v),)
             self.border_decoration = layout.batch.add(n,
-                pyglet.gl.GL_LINES, BlendGroup(foreground),
+                pyglet.gl.GL_LINES, layout.foreground_decoration_group,
                 ('v2i', l), ('c4B', color * n),
             )
 
@@ -209,8 +223,9 @@ class TableGenerator(object):
         # style info
         style = self.element.stylesheet['table']
 
-        # we lay out from the top so start at the top
-        ry = y + sum(self.row_heights)
+        # we lay out from the top so start at the top - the first
+        # row is just above the baseline (the supplied y)
+        ry = y + self.row_heights[0]
         for row in range(self.num_rows):
             cx = x
             height = self.row_heights[row]
@@ -237,14 +252,14 @@ class TableGenerator(object):
             w = sum(self.column_widths)
             h = sum(self.row_heights)
             l = []
-            ry = y + sum(self.row_heights)
+            ty = ry = y + self.row_heights[0]
             for row in range(self.num_rows-1):
                 ry -= self.row_heights[row]
                 l.extend([x, ry, x+w, ry])
             cx = x
             for col in range(self.num_columns-1):
                 cx += self.column_widths[col]
-                l.extend([cx, y, cx, y+h])
+                l.extend([cx, ty, cx, ty-h])
             self.border_decoration.vertices[:] = l
 
         self.x, self.y = x, y

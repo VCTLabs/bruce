@@ -27,8 +27,9 @@ class Presentation(pyglet.event.EventDispatcher):
         self.desired_size = desired_size
 
     def start_presentation(self):
+        for page in self.pages:
+            page.create(self.desired_size)
         self.page = self.pages[self.page_num]
-        self.page.desired_size = self.desired_size
         director.window.set_caption('Presentation: Slide %s'%(self.page_num+1))
         self.dispatch_event('on_page_changed', self.page, self.page_num)
         director.run(self.page)
@@ -61,8 +62,9 @@ class Presentation(pyglet.event.EventDispatcher):
 
         director.window.set_caption('Presentation: Slide %s'%(self.page_num+1))
 
-    def on_resize(self, viewport_width, viewport_height):
-        self.page.on_resize(viewport_width, viewport_height)
+    # XXX reinstate me?
+    # def on_resize(self, viewport_width, viewport_height):
+        # self.page.on_resize(viewport_width, viewport_height)
 
     def change_page(self, dir):
         # determine the new page, with limits
