@@ -23,9 +23,15 @@ class TestGroup(pyglet.graphics.Group):
 
 
 class Plugin(plugin.Plugin):
-    needs_tick = True
     def resize(self, w, h):
         self.w, self.h = w, h
+
+    def set_active(self, active):
+        if active:
+            self.group.angle = 0
+            pyglet.clock.schedule(self.tick)
+        else:
+            pyglet.clock.unschedule(self.tick)
 
     def tick(self, dt):
         self.group.angle += 1

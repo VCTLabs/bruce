@@ -1,23 +1,14 @@
 KNOWN BUGS
 
-- need avbin & pygments on dev laptop
-- IMPLEMENT set_active(boolen) on elements (interpreter done)
+IMPORTANT:
+- Page.on_enter called twice during page transition
+- interpreter rendering gets garbled on scroll
 
+NOT SO:
 - transitions sometimes get confused when in fullscreen
 - test_interpreter (first page) shows resizing issues
-- interpreter rendering gets garbled on scroll
 - indentation of list item content varies when list enumeration gets wide
 - footer doesn't handle color changes
 - interpreter focus when multiple in page (should follow mouse)
   focus should be in first on page, then follow mouse if it changes focus
-- elements placed/removed TONS during page & list fade (& construction)
-  video playback stutters and table performance sucks ass because of this
-
-  Options:
-
-  1. layout all page scenes at startup,
-  2. modify IncrementalTextLayout._update_vertex_lists to not delete the
-     lines being changed but rather update them, or
-  3. extreme option is to avoid IncrementalTextLayout and switch to a
-     customised TextLayout that knows how to change colors.
 

@@ -446,6 +446,10 @@ by setting the property needs_tick either on your class or in your
 **resize(self, width, height)**
     Invoked when the page the element is on is scaled.
 
+**set_active(self, active)**
+    Invoked when the page containing the element becomes active or not
+    according to the boolean "active" value passed in.
+
 **place(self, layout, x, y)**
     Invoked when the page layout needs to position the element on screen.
     Passed a pyglet.text.IncrementalTextLayout instance and the pixel
@@ -467,11 +471,6 @@ by setting the property needs_tick either on your class or in your
 
 **remove(self, layout)**
     Invoked when page layout removes the element from display.
-
-**tick(self, dt)**
-    Invoked if the element defines needs_tick **before enter is invoked**.
-    Will be called once per "clock tick" with dt being the time in
-    seconds since the last call.
 
 Plugin contents should be rendered using the pyglet.graphics API with the
 Batch instance on the layout passed into the place() method.
@@ -511,14 +510,23 @@ The following is an example plugin file used in "examples/test_plugin.rst"::
             glPopMatrix()
 
     class Plugin(plugin.Plugin):
-        needs_tick = True
         def resize(self, w, h):
             self.w, self.h = w, h
+
+        def set_active(self, active):
+            '''Start or stop the clock ticking on my animation.
+            '''
+            if active:
+                pyglet.clock.schedule(self.tick)
+            else:
+                pyglet.clock.unschedule(self.tick)
 
         def tick(self, dt):
             self.group.angle += 1
 
         def place(self, layout, x, y):
+            '''Place my drawing in the layout.
+            '''
             x1 = int(x)
             y1 = int(y)
             x2 = int(x + self.w)
