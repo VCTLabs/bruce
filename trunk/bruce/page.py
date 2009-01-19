@@ -129,19 +129,27 @@ class PageContent(cocos.layer.Layer):
         '''
         pass
 
+    def on_enter(self):
+        '''Invoked when the page is removed from the screen.
+        '''
+        # now do me (this will remove my event handlers)
+        super(PageContent, self).on_enter()
+
+        for element in self.elements:
+            element.set_active(True)
+
     def on_exit(self):
         '''Invoked when the page is removed from the screen.
         '''
         # now do me (this will remove my event handlers)
         super(PageContent, self).on_exit()
 
+        for element in self.elements:
+            element.set_active(False)
+
         # disable the mouse hiding
         if self._cb_hide_mouse_scheduled:
             self.cb_hide_mouse(0)
-
-        #self.text_layout.delete()
-        #self.text_layout = None
-        #self.batch = None
 
     def on_next(self):
         for section in self.expose_text_runs:

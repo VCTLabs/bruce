@@ -54,8 +54,8 @@ class MyScrollableTextLayoutGroup(pyglet.text.layout.ScrollableTextLayoutGroup):
         glEnable(GL_SCISSOR_TEST)
 
         # offset the scissor based on the parent layout's screen translation
-        parent_x = self.parent_group.translate_x
-        parent_y = self.parent_group.translate_y
+        parent_x = getattr(self.parent_group, 'translate_x', 0)
+        parent_y = getattr(self.parent_group, 'translate_y', 0)
         glScissor(parent_x + self._clip_x - 1,
                   parent_y + self._clip_y - self._clip_height,
                   self._clip_width + 1,
@@ -79,8 +79,8 @@ class ScrolledIncrementalTextLayout(pyglet.text.layout.IncrementalTextLayout):
         by this Layout.
         '''
         tg = self.top_group
-        parent_x = tg.parent_group.translate_x
-        parent_y = tg.parent_group.translate_y
+        parent_x = getattr(tg.parent_group, 'translate_x', 0)
+        parent_y = getattr(tg.parent_group, 'translate_y', 0)
         return (parent_x + tg._clip_x - 1,
                   parent_y + tg._clip_y - tg._clip_height,
                   tg._clip_width + 1,
@@ -175,12 +175,13 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.descent = 0
         self.advance = self.width
 
-        # force re-layout if we're laid out
-        if self.layout is not None:
-            self.layout.delete()
-            self.layout = None
-            self.quad.delete()
-            self.caret.delete()
+    def set_active(self, active):
+        if active:
+            director.window.push_handlers(self)
+            self.caret.on_activate()
+        else:
+            director.window.pop_handlers()
+            self.caret.on_deactivate()
 
     def set_opacity(self, layout, opacity):
         self.opacity = int(opacity)
@@ -197,27 +198,7 @@ class InterpreterElement(pyglet.text.document.InlineElement):
             color = color[:3] + (int(v * color[3]),)
             self.document.set_style(s, e, dict(color=color))
 
-        # caret too
-        if self.caret is not None:
-            self.caret.visible = bool(self.opacity)
-
-
-    layout = None
     def place(self, layout, x, y):
-        # XXX only do this when active
-        director.window.push_handlers(self)
-
-        # XXX maybe allow myself to be added to multiple layouts for whatever that's worth
-        if self.layout is not None:
-            # just position
-            self.layout.begin_update()
-            self.layout.x = x
-            self._placed_y = y
-            self.layout.y = y
-            self.layout.anchor_y = 'bottom'
-            self.layout.end_update()
-            return
-
         c = self.style['background_color']
         v = self.opacity/255.
         c = c[:3] + (int(v * c[3]),)
@@ -242,13 +223,9 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.layout.top_group.parent_group = layout.top_group
 
         self.caret = pyglet.text.caret.Caret(self.layout, color=self.style['color'][:3])
-        self.caret.on_activate()
         self.caret.position = len(self.document.text)
-        if not self.opacity:
-            self.caret.visible = False
 
     def remove(self, layout):
-        director.window.pop_handlers()
         self.layout.delete()
         self.layout = None
         self.quad.delete()
@@ -352,4 +329,21 @@ class InterpreterElement(pyglet.text.document.InlineElement):
         self.layout.view_x -= scroll_x
         self.layout.view_y += scroll_y * 32
         return True
+
+
+if __name__ == '__main__':
+    win = pyglet.window.Window(width=640, height=400)
+    w, h = win.get_size()
+    from bruce import style
+    stylesheet = style.get('default')
+    i = InterpreterElement('', stylesheet, width=int(w/.75), height=int(h/.75), sysver=True)
+    i.set_scale(.75)
+    d = pyglet.text.document.UnformattedDocument('')
+    l = pyglet.text.layout.TextLayout(d, w, h)
+    i.place(l, 0, 0)
+    win.push_handlers(i)
+    @win.event
+    def on_draw():
+        l.draw()
+    pyglet.app.run()
 

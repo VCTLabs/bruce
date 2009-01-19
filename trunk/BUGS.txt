@@ -1,17 +1,15 @@
 KNOWN BUGS
 
 - need avbin & pygments on dev laptop
+- IMPLEMENT set_active(boolen) on elements (interpreter done)
 
-- line break before tables / interpreters in list items
-- table background not being faded correctly; also text appears to be rendered multiple times
 - transitions sometimes get confused when in fullscreen
 - test_interpreter (first page) shows resizing issues
+- interpreter rendering gets garbled on scroll
 - indentation of list item content varies when list enumeration gets wide
 - footer doesn't handle color changes
 - interpreter focus when multiple in page (should follow mouse)
   focus should be in first on page, then follow mouse if it changes focus
-- need additional set_active(boolen) on elements to disable plugins /
-  interpreter when they're not displayed
 - elements placed/removed TONS during page & list fade (& construction)
   video playback stutters and table performance sucks ass because of this
 
