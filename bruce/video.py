@@ -92,9 +92,29 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.descent = 0
         self.advance = self.width
 
-    def place(self, layout, x, y):
-        # create the player
+        # assumes only one player (layout) active at a time
+        self.player_needed = None
+
+    def set_active(self, active):
+        print self, 'SET_ACTIVE', `active`
+
+        if not active:
+            self.player.next()
+            self.player = None
+            self.video = None
+            self.vertex_list.delete()
+            self.vertex_list = None
+            return
+
+        if self.player_needed is None:
+            return
+
         self.video = pyglet.resource.media(self.video_filename)
+
+        layout, x, y = self.player_needed
+        self.player_needed = None
+
+        # create the player
         self.player = pyglet.media.Player()
         self.player.queue(self.video)
         if self.loop:
@@ -105,7 +125,7 @@ class VideoElement(pyglet.text.document.InlineElement):
 
         texture = self.player.texture
 
-        group = pyglet.sprite.SpriteGroup(self.player.texture,
+        group = pyglet.sprite.SpriteGroup(texture,
             pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA,
             layout.top_group)
 
@@ -118,19 +138,15 @@ class VideoElement(pyglet.text.document.InlineElement):
             ('v2i', (x1, y1, x2, y1, x2, y2, x1, y2)),
             ('c4B', (255, 255, 255, self.opacity) * 4),
             ('t3f', texture.tex_coords))
-        self.vertex_lists[layout] = vertex_list
+        self.vertex_list = vertex_list
 
     def set_opacity(self, opacity):
         self.opacity = int(opacity)
-        self.vertex_lists[layout].colors[:] = [255, 255, 255, self.opacity]*4
+        self.vertex_list.colors[:] = [255, 255, 255, self.opacity]*4
+
+    def place(self, layout, x, y):
+        self.player_needed = (layout, x, y)
 
     def remove(self, layout):
-        if layout in self.vertex_lists:
-            self.vertex_lists[layout].delete()
-            del self.vertex_lists[layout]
-
-        self.player.next()
-        self.player = None
-        self.video = None
-        self.texture = None
+        self.player_needed = None
 

@@ -32,6 +32,10 @@ class TableElement(pyglet.text.document.InlineElement):
 
         super(TableElement, self).__init__(ascent, descent, self.table.width)
 
+    def set_active(self, active):
+        # don't care
+        pass
+
     def set_scale(self, scale):
         if scale != self.scale:
             return

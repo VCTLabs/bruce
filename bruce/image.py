@@ -36,8 +36,11 @@ class ImageElement(structured.ImageElement):
 
         super(ImageElement, self).__init__(image, self.width, self.height)
 
-    def place(self, layout, x, y):
+    def set_active(self, active):
+        # not interested
+        pass
 
+    def place(self, layout, x, y):
         # override to use c4B and blending
         group = pyglet.sprite.SpriteGroup(self.image.texture,
             pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA,
