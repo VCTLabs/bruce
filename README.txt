@@ -13,15 +13,12 @@ from prior to version 3.0!
 
 Changes in this release:
 
-- distribute as an application
-- add Bruce Style Sheets (BSS)
-- add simpler vertical / horizontal gradients
-- add in gradual exposure of list items
-- add recording of timing and screenshots
-- add playback of previous recording
-- add playback at a constant speed
-- default to fade transition and use layout.background_color as tween color
-- fix layout losing footer alignment when going backwards
+- fix windows .pyw launcher script
+- make layout parsing more robust
+- raise specific warnigs about layout -> style sheet changes
+- add missing option values to GUI launcher
+- align tables so the header row rests on the baseline
+- have window be invisible until all initialisation is complete
 
 
 Bruce, the Presentation Tool Features
