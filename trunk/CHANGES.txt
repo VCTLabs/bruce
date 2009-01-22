@@ -1,6 +1,10 @@
 3.2.1 - 2009-01-?? (r???)
 
+- make layout parsing more robust
+- raise specific warnigs about layout -> style sheet changes
+- add missing option values to GUI launcher
 - align tables so the header row rests on the baseline
+- have window be invisible until all initialisation is complete
 
 
 3.2 - 2009-01-16 (r216)

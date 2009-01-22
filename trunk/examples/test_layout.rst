@@ -104,3 +104,25 @@ With a big literal block::
     With lots of stuff. With lots of stuff. 
     With lots of stuff. With lots of stuff. 
 
+
+Test regression
+---------------
+
+.. layout::
+   :bgcolor: white
+   :viewport: 0,0,w,h
+
+This page includes an old-style layout background / viewport spec which
+have been replaced by stylesheet elements. Warnings should have been
+generated in the console. The specific change::
+
+    .. layout::
+       :bgcolor: white
+       :viewport: 0,0,w,h
+
+becomes::
+
+    .. style::
+       :layout.background_color: white
+       :layout.viewport: 0,0,w,h
+

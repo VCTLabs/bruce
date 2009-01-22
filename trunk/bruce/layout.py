@@ -3,6 +3,7 @@
 Handles the directive declaration and rendering of the layout.
 '''
 import os
+import warnings
 
 from docutils.parsers.rst import directives
 from docutils import nodes
@@ -246,7 +247,18 @@ class LayoutParser(object):
         for line in content.splitlines():
             if line[0] == ':': line = line[1:]
             directive, rest = line.split(':', 2)
-            getattr(self, 'handle_%s'%directive.strip())(rest.strip())
+            handler = getattr(self, 'handle_%s'%directive.strip(), None)
+            if handler is None:
+                if directive == 'bgcolor':
+                    warnings.warn('layout "bgcolor" is now style '
+                        '"layout.background_color"')
+                elif directive == 'viewport':
+                    warnings.warn('layout "viewport" is now style '
+                        '"layout.viewport"')
+                else:
+                    warnings.warn('unknown layout argument "%s"'%directive)
+            else:
+                handler(rest.strip())
 
     def handle_image(self, image):
         halign='left'
