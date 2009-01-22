@@ -31,7 +31,7 @@ MimeType=text/x-rst
 OSX_SCRIPT = LINUX_SCRIPT.replace('python', 'pythonw')
 WINDOWS_SCRIPT = '''import sys\r
 # force module loading from my zip file first\r
-sys.path.insert('bruce-library.zip')\r
+sys.path.insert(0, 'bruce-library.zip')\r
 \r
 from bruce import run\r
 run.main()\r

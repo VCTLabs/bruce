@@ -1,5 +1,6 @@
-3.2.1 - 2009-01-?? (r???)
+3.2.1 - 2009-01-23 (r???)
 
+- fix windows .pyw launcher script
 - make layout parsing more robust
 - raise specific warnigs about layout -> style sheet changes
 - add missing option values to GUI launcher
