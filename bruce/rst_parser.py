@@ -1,4 +1,5 @@
 import os
+import re
 import warnings
 
 import docutils.parsers.rst
@@ -9,6 +10,24 @@ from docutils.transforms import references, Transform
 import pyglet
 from pyglet.text.formats import structured
 
+try:
+    import smartypants
+    def curlify(text):
+        """Replace quotes in `text` with curly equivalents."""
+        if config.options.no_curlify:
+            return text
+        # Replace any ampersands with an entity so we don't harm the text.
+        text = text.replace('&', '&#38;')
+        # Use smartypants to curl the quotes, creating HTML entities
+        text = smartypants.smartyPants(text, "qbd")
+        # Replace the entities with real Unicode characters.
+        text = re.sub('&#(\d+);', lambda m: unichr(int(m.group(1))), text)
+        return text
+except ImportError:
+    # No smartypants: no curly quotes for you!
+    def curlify(text):
+        return text
+
 # these imports simply cause directives to be registered
 from bruce import page
 from bruce import layout
@@ -16,6 +35,7 @@ from bruce import interpreter, video, plugin
 from bruce import code_block
 from bruce import blank
 from bruce import resource
+from bruce import config
 from bruce.image import ImageElement
 from bruce import pygments_parser
 
@@ -289,7 +309,9 @@ class DocumentGenerator(structured.StructuredTextDecoder):
 
     def visit_title(self, node):
         # title is handled separately so it may be placed nicely
-        self.stylesheet['layout'].title = node.children[0].astext().replace('\n', ' ')
+        title = node.children[0].astext().replace('\n', ' ')
+        title = curlify(title)
+        self.stylesheet['layout'].title = title
         self.prune()
 
     def visit_substitution_definition(self, node):
@@ -311,6 +333,7 @@ class DocumentGenerator(structured.StructuredTextDecoder):
         else:
             # collapse newlines to reintegrate para
             text = text.replace('\n', ' ')
+            text = curlify(text)
         self.add_text(text)
 
     def break_paragraph(self):

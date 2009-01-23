@@ -14,6 +14,7 @@ from bruce import presentation
 from bruce import display_source
 from bruce import style
 from bruce import auto_player
+from bruce import config
 
 def main():
     '''Run either the command-line or gui interface depending on whether any
@@ -105,6 +106,8 @@ class GUI(object):
             playspeed = ''
             loop = False
             autoquit = False
+            no_curlify = False
+        config.options = options
         run(self.filename, options)
 
 def cmd_line():
@@ -159,7 +162,10 @@ def cmd_line():
                       help="specify style (name or filename)")
     p.add_option("", "--list-styles", dest="list_styles",
                       action="store_true", default=False,
-                      help="list available style names")
+                      help="list available style names"),
+    p.add_option("", "--no-curlify", dest="no_curlify", default=False,
+                      help="turn off smartypants.curlify use (only relevant"
+                      " if smartypants is installed"),
 
     #p.add_option("-d", "--progress-screen", dest="progress_screen",
     #                  default=None,
@@ -169,6 +175,7 @@ def cmd_line():
                       help="display source in terminal")
 
     (options, args) = p.parse_args()
+    config.options = options
 
     if options.version:
         print __version__

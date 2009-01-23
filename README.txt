@@ -13,6 +13,7 @@ from prior to version 3.0!
 
 Changes in this release:
 
+- add optional use of smartypants curlify if installed (thanks Ned Batchelder)
 - fix windows .pyw launcher script
 - make layout parsing more robust
 - raise specific warnigs about layout -> style sheet changes
@@ -57,6 +58,7 @@ Bruce, the Presentation Tool Features
 - control which screen to open on in multihead
 - run fullscreen at native resolution
 - may switch to/from fullscreen quickly
+- automatic typographic glyph generation if smartypants is installed
 
 
 Installation
@@ -75,6 +77,12 @@ Please download the Bruce version for your operating system from
 Unzip the application and double-click the "bruce" program in the created
 folder. The program may be shown with a ".sh" or ".pyw" extension. Linux
 users may choose to run the program in a terminal.
+
+Bruce may optionally use the **smartypants** module's **curlify** to
+automatically produce typograpically correct quotation marks (also known
+as "smart quotes"), en- and em-dashes and ellipses. Get smartypants from:
+
+   http://web.chad.org/projects/smartypants.py/
 
 If the application does not work and you're on Linux you may need to
 install an optional python tkinter package. This is usually achieved
@@ -246,27 +254,10 @@ There's a few options for automatically playing a presentation:
 License
 =======
 
-Copyright (c) 2005-2009 Richard Jones <richard@mechanicalcat.net>
+The original software comprising Bruce, the Presentation Tool is
+copyright (c) 2005-2009 Richard Jones <richard@mechanicalcat.net>.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+It is shipped with many contributing parts.
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-3. The name of the author may not be used to endorse or promote products
-   derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
-NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+See LICENSE.txt for full licensing information.
 
