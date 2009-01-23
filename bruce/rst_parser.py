@@ -19,7 +19,7 @@ try:
         # Replace any ampersands with an entity so we don't harm the text.
         text = text.replace('&', '&#38;')
         # Use smartypants to curl the quotes, creating HTML entities
-        text = smartypants.smartyPants(text, "qbd")
+        text = smartypants.smartyPants(text, "qbD")
         # Replace the entities with real Unicode characters.
         text = re.sub('&#(\d+);', lambda m: unichr(int(m.group(1))), text)
         return text
