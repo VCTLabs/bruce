@@ -1,13 +1,7 @@
-.. style::
-   :font_size: 100
-   :transition.duration: 2
+.. load-style:: corporate-style.bss
 
-.. layout::
-   bgcolor: silver
-   image:pyglet-trans-64.png;halign=right;valign=bottom
-   quad:C#ffc0a0;V0,h;V0,h-48;Vw,h-48;Vw,h
-   quad:C#ffc0a0;V0,0;V0,64;Cblack;Vw,64;Vw,0
-   viewport:0,64,w,h-(64+48)
+.. style::
+   :transition.duration: 1
 
 first page, no transition
 
