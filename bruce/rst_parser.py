@@ -14,12 +14,12 @@ try:
     import smartypants
     def curlify(text):
         """Replace quotes in `text` with curly equivalents."""
-        if config.options.no_curlify:
+        if config.options.smartypants == 'off':
             return text
         # Replace any ampersands with an entity so we don't harm the text.
         text = text.replace('&', '&#38;')
         # Use smartypants to curl the quotes, creating HTML entities
-        text = smartypants.smartyPants(text, "qbD")
+        text = smartypants.smartyPants(text, config.options.smartypants)
         # Replace the entities with real Unicode characters.
         text = re.sub('&#(\d+);', lambda m: unichr(int(m.group(1))), text)
         return text

@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import re
+import textwrap
 from cgi import escape as html_quote
 
 import pyglet
@@ -106,7 +107,7 @@ class GUI(object):
             playspeed = ''
             loop = False
             autoquit = False
-            no_curlify = False
+            smartypants = 'qbD'
         config.options = options
         run(self.filename, options)
 
@@ -163,9 +164,11 @@ def cmd_line():
     p.add_option("", "--list-styles", dest="list_styles",
                       action="store_true", default=False,
                       help="list available style names"),
-    p.add_option("", "--no-curlify", dest="no_curlify", default=False,
-                      help="turn off smartypants.curlify use (only relevant"
-                      " if smartypants is installed"),
+    p.add_option("", "--smartypants", dest="smartypants", default=False,
+                      help="supply smartypants options (only relevant if"
+                      "smartypants is installed)"),
+    p.add_option("", "--smartypants-help", dest="help_smartypants", default=False,
+                      action="store_true", help="list smartypants options"),
 
     #p.add_option("-d", "--progress-screen", dest="progress_screen",
     #                  default=None,
@@ -184,6 +187,23 @@ def cmd_line():
     if options.list_styles:
         print 'Available built-in style names:'
         print '\n'.join(sorted(style.stylesheets.keys()))
+        sys.exit(0)
+
+    if options.help_smartypants:
+        print '''
+The --smartpants switch accepts a number of single-character
+arguments. The default is "qbD". Your options are:
+
+    "q"  Curlifies normal quote characters: (") and (').
+    "b"  Curlifies ``backticks'' -style double quotes.
+    "B"  Curlifies ``backticks'' -style double quotes and `single' quotes.
+    "d"  Converts "--" into em-dashes and "---" into en-dashes.
+    "D"  Converts "--" into en-dashes and "---" into em-dashes.
+    "e"  Converts "..." into ellipses.
+
+Alternatively pass the option "off" to turn smartypants
+transformations completely off.
+'''
         sys.exit(0)
 
     if not args:
