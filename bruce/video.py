@@ -95,9 +95,8 @@ class VideoElement(pyglet.text.document.InlineElement):
         # assumes only one player (layout) active at a time
         self.player_needed = None
 
+    player = video = None
     def set_active(self, active):
-        print self, 'SET_ACTIVE', `active`
-
         if not active:
             self.player.next()
             self.player = None
@@ -112,7 +111,6 @@ class VideoElement(pyglet.text.document.InlineElement):
         self.video = pyglet.resource.media(self.video_filename)
 
         layout, x, y = self.player_needed
-        self.player_needed = None
 
         # create the player
         self.player = pyglet.media.Player()
