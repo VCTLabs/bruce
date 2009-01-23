@@ -43,22 +43,13 @@ and C:
         }
 
 
-and C with no idenfication (will generate errors):
+and C with no idenfication (the "!" is an error):
 
 .. code::
 
-    #include "Python.h"
 
-    static int
-    internal_bisect_right(PyObject *list, PyObject *item, Py_ssize_t lo, Py_ssize_t hi)
-    {
-        PyObject *litem;
-        Py_ssize_t mid, res;
-
-        if (lo < 0) {
-            PyErr_SetString(PyExc_ValueError, "lo must be non-negative");
-            return -1;
-        }
+    if (!PyArg_ParseTuple(args, "si:string_peek", &pstr, &index)) {
+        return NULL;
     }
 
 fin

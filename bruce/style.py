@@ -313,6 +313,11 @@ default_stylesheet = Stylesheet(
         italic=True,
         color=(0x40, 0x80, 0x80, 255),
     ),
+    code_error = dict(
+        italic=True,
+        bold=True,
+        color=(0xDA, 0x21, 0x21, 255),
+    ),
 
     table = dict(
         heading_background_color=(210, 210, 210, 255),

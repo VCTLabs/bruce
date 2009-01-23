@@ -1,5 +1,6 @@
-3.2.1 - 2009-01-23 (r???)
+3.2.1 - 2009-01-23 (r229)
 
+- handle errors from pygments
 - add optional use of smartypants curlify if installed (thanks Ned Batchelder)
 - fix windows .pyw launcher script
 - make layout parsing more robust
