@@ -1,0 +1,160 @@
+Bruce is comprised of many parts. It couldn't exist without the hard
+work of many other developers.
+
+
+Bruce, the Presentation Tool
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Copyright (c) 2005-2009 Richard Jones <richard@mechanicalcat.net>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
+NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Cocos2d
+~~~~~~~
+
+Copyright (c) 2008 Daniel Moisset, Ricardo Quesada, Rayentray Tappa, Lucio Torre
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+  * Neither the name of cocos2d nor the names of its
+    contributors may be used to endorse or promote products
+    derived from this software without specific prior written
+    permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+
+pyglet
+~~~~~~
+
+Copyright (c) 2006-2008 Alex Holkner
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+  * Neither the name of pyglet nor the names of its
+    contributors may be used to endorse or promote products
+    derived from this software without specific prior written
+    permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+
+docutils
+~~~~~~~~
+
+The persons who have associated their work with this project (the
+"Dedicator": David Goodger and the many contributors to the Docutils
+project) hereby dedicate the entire copyright, less the exceptions_
+listed below, in the work of authorship known as "Docutils" identified
+below (the "Work") to the public domain.
+
+The primary repository for the Work is the Internet World Wide Web
+site <http://docutils.sourceforge.net/>.  The Work consists of the
+files within the "docutils" module of the Docutils project Subversion
+repository (Internet host svn.berlios.de, filesystem path
+/svnroot/repos/docutils), whose Internet web interface is located at
+<http://svn.berlios.de/viewcvs/docutils/>.  Files dedicated to the
+public domain may be identified by the inclusion, near the beginning
+of each file, of a declaration of the form::
+
+	Copyright: This document/module/DTD/stylesheet/file/etc. has been
+   		placed in the public domain.
+
+Dedicator makes this dedication for the benefit of the public at large
+and to the detriment of Dedicator's heirs and successors.  Dedicator
+intends this dedication to be an overt act of relinquishment in
+perpetuity of all present and future rights under copyright law,
+whether vested or contingent, in the Work.  Dedicator understands that
+such relinquishment of all rights includes the relinquishment of all
+rights to enforce (by lawsuit or otherwise) those copyrights in the
+Work.
+
+Dedicator recognizes that, once placed in the public domain, the Work
+may be freely reproduced, distributed, transmitted, used, modified,
+built upon, or otherwise exploited by anyone for any purpose,
+commercial or non-commercial, and in any way, including by methods
+that have not yet been invented or conceived.
+
+(This dedication is derived from the text of the `Creative Commons
+Public Domain Dedication <http://creativecommons.org/licenses/publicdomain>`_.)
+
+Exceptions
+==========
+
+* docutils/writers/s5_html/themes/default/iepngfix.htc:
+
+        IE5.5+ PNG Alpha Fix v1.0 by Angus Turnbull
+	    <http://www.twinhelix.com>.  Free usage permitted as long as
+		this notice remains intact.
+
+* extras/textwrap.py, copyright by Gregory P. Ward and the Python
+  Software Foundation, released under the Python 2.3 license:
+
+    http://www.python.org/download/releases/2.3/license/
+
+* extras/optparse.py, copyright by Gregory P. Ward, released under a
+  BSD-style license (which can be found in the module's source code).
+
+* extras/roman.py, copyright by Mark Pilgrim, released under the
+  Python 2.1.1 license:
+
+    http://www.python.org/download/releases/2.1.1/license/
+
