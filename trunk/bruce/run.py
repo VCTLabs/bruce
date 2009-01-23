@@ -164,7 +164,7 @@ def cmd_line():
     p.add_option("", "--list-styles", dest="list_styles",
                       action="store_true", default=False,
                       help="list available style names"),
-    p.add_option("", "--smartypants", dest="smartypants", default=False,
+    p.add_option("", "--smartypants", dest="smartypants", default='qbD',
                       help="supply smartypants options (only relevant if"
                       "smartypants is installed)"),
     p.add_option("", "--smartypants-help", dest="help_smartypants", default=False,
