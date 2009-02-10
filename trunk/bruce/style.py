@@ -96,8 +96,6 @@ def load_style_directive(name, arguments, options, content, lineno,
         return [ load_style(arguments[0]) ]
 load_style_directive.arguments = (1, 0, 1)
 load_style_directive.content = False
-directives.register_directive('load-style', load_style_directive)
-directives.register_directive('page-load-style', load_style_directive)
 
 class style(nodes.Special, nodes.Invisible, nodes.Element):
     '''Document tree node representing a style directive.
@@ -169,9 +167,6 @@ for group in 'default literal_block line_block'.split():
         style_directive.options[group + '.margin_' + margin] = directives.positive_int
 
 style_directive.content = False
-directives.register_directive('style', style_directive)
-
-directives.register_directive('page-style', style_directive)
 
 class Stylesheet(dict):
     '''Container for the styles used in rendering Bruce pages.
@@ -454,6 +449,11 @@ def parse_directives(f):
 
     return sections
 
+def register_directives():
+    directives.register_directive('load-style', load_style_directive)
+    directives.register_directive('page-load-style', load_style_directive)
+    directives.register_directive('style', style_directive)
+    directives.register_directive('page-style', style_directive)
 
-__all__ = ['get', 'stylesheets']
+__all__ = ['get', 'stylesheets', 'register_directives', 'style_directive']
 

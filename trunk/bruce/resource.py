@@ -18,5 +18,6 @@ def resource_directive(name, arguments, options, content, lineno,
     return [ resource(arguments[0]) ]
 resource_directive.arguments = (1, 0, 1)
 resource_directive.content = False
-directives.register_directive('resource', resource_directive)
+def register_directives():
+    directives.register_directive('resource', resource_directive)
 

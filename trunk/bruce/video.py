@@ -31,7 +31,8 @@ video_directive.options = dict(
      loop=directives.flag,
 )
 video_directive.content = True
-directives.register_directive('video', video_directive)
+def register_directives():
+    directives.register_directive('video', video_directive)
 
 class VideoElement(pyglet.text.document.InlineElement):
     def __init__(self, video_filename, width=None, height=None, loop=False):

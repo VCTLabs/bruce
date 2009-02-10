@@ -36,7 +36,8 @@ plugin_directive.options = dict(
      height=directives.positive_int,
 )
 plugin_directive.content = True
-directives.register_directive('plugin', plugin_directive)
+def register_directives():
+    directives.register_directive('plugin', plugin_directive)
 
 class PluginElement(pyglet.text.document.InlineElement):
     def __init__(self, content, width=800, height=400):

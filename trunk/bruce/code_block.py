@@ -20,5 +20,6 @@ def code_directive(name, arguments, options, content, lineno,
 # arguments: 
 code_directive.arguments = (0, 1, 0)
 code_directive.content = True
-directives.register_directive('code', code_directive)
+def register_directives():
+    directives.register_directive('code', code_directive)
 

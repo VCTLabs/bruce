@@ -28,18 +28,20 @@ except ImportError:
     def curlify(text):
         return text
 
-# these imports simply cause directives to be registered
 from bruce import page
-from bruce import layout
-from bruce import interpreter, video, plugin
-from bruce import code_block
-from bruce import blank
-from bruce import resource
+from bruce import pygments_parser
 from bruce import config
 from bruce.image import ImageElement
-from bruce import pygments_parser
 
-from bruce.style import *
+# custom reST directives
+from bruce import layout; layout.register_directives()
+from bruce import interpreter; interpreter.register_directives()
+from bruce import video; video.register_directives()
+from bruce import plugin; plugin.register_directives()
+from bruce import code_block; code_block.register_directives()
+from bruce import blank; blank.register_directives()
+from bruce import resource; resource.register_directives()
+from bruce import style; style.register_directives()
 
 class Section(object):
     def __init__(self, level):
