@@ -15,4 +15,5 @@ def blank_directive(name, arguments, options, content, lineno,
 blank_directive.arguments = (0, 0, 0)
 blank_directive.options = {}
 blank_directive.content = False
-directives.register_directive('blank', blank_directive)
+def register_directives():
+    directives.register_directive('blank', blank_directive)

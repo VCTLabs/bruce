@@ -29,7 +29,9 @@ def layout_directive(name, arguments, options, content, lineno,
     return [ layout('\n'.join(content)) ]
 layout_directive.arguments = (0, 0, 0)
 layout_directive.content = True
-directives.register_directive('layout', layout_directive)
+
+def register_directives():
+    directives.register_directive('layout', layout_directive)
 
 class QuadGroup(pyglet.graphics.Group):
     ' pyglet.graphics group defining the blending operation for layout quads '

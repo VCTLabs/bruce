@@ -39,7 +39,8 @@ interpreter_directive.options = dict(
      sysver=directives.flag,
 )
 interpreter_directive.content = True
-directives.register_directive('interpreter', interpreter_directive)
+def register_directives():
+    directives.register_directive('interpreter', interpreter_directive)
 
 class MyScrollableTextLayoutGroup(pyglet.text.layout.ScrollableTextLayoutGroup):
     '''Extend the base pyglet scrollable text layout group to handle being

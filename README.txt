@@ -13,6 +13,7 @@ from prior to version 3.0!
 
 Changes in this release:
 
+- handle errors from pygments
 - add optional use of smartypants curlify if installed (thanks Ned Batchelder)
 - fix windows .pyw launcher script
 - make layout parsing more robust

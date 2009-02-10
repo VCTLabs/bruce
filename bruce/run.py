@@ -10,8 +10,6 @@ import pyglet
 from cocos.director import director
 from cocos import actions
 
-from bruce import rst_parser
-from bruce import presentation
 from bruce import display_source
 from bruce import style
 from bruce import auto_player
@@ -216,7 +214,10 @@ transformations completely off.
 
     run(args[0], options)
 
+
 def run(filename, options):
+    from bruce import rst_parser
+    from bruce import presentation
 
     display = pyglet.window.get_platform().get_default_display()
     screen = int(options.screen)-1

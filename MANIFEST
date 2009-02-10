@@ -2,6 +2,7 @@ BUGS.txt
 CHANGES.txt
 HOWTO.txt
 INSTALL.txt
+LICENSE.txt
 MANIFEST
 MANIFEST.in
 README.txt
@@ -12,6 +13,7 @@ bruce/auto_player.py
 bruce/blank.py
 bruce/code_block.py
 bruce/color.py
+bruce/config.py
 bruce/display_source.py
 bruce/image.py
 bruce/info_layer.py
@@ -68,6 +70,7 @@ examples/test_page_style.rst
 examples/test_plugin.py
 examples/test_plugin.rst
 examples/test_sectioning.rst
+examples/test_smartypants.py
 examples/test_style.rst
 examples/test_style_sheet.rst
 examples/test_table.rst

@@ -16,8 +16,8 @@ import sys
 # force module loading from my zip file first
 sys.path.insert(0, 'bruce-library.zip')
 
-from bruce import run
-run.main()
+from bruce import %(module_name)s
+%(module_name)s.main()
 '''
 LINUX_DESKTOP = '''[Desktop Entry]
 Version=1.0
@@ -33,9 +33,14 @@ WINDOWS_SCRIPT = '''import sys\r
 # force module loading from my zip file first\r
 sys.path.insert(0, 'bruce-library.zip')\r
 \r
-from bruce import run\r
-run.main()\r
+from bruce import %(module_name)s\r
+%(module_name)s.main()\r
 '''
+
+SCRIPTS = [
+    ('bruce', 'run'),
+    ('bruce2html', 'html_ouput'),
+]
 
 class BuildApps(Command):
     '''Special distutils command used to build the application zip files
@@ -90,23 +95,26 @@ class BuildApps(Command):
 
         # build Linux
         z = basics('dist/bruce-%s-linux.zip'%__version__)
-        open('build/bruce.sh', 'w').write(LINUX_SCRIPT)
-        os.chmod('build/bruce.sh', 0755)
-        z.write('build/bruce.sh', '%s/bruce.sh'%(dirname, ))
-        z.close()
+        for script, module_name in SCRIPTS:
+            open('build/%s.sh'%script, 'w').write(LINUX_SCRIPT%locals())
+            os.chmod('build/%s.sh'%script, 0755)
+            z.write('build/%s.sh'%script, '%s/%s.sh'%(dirname, script))
+            z.close()
 
         # build OS X
         z = basics('dist/bruce-%s-osx.zip'%__version__)
-        open('build/bruce.sh', 'w').write(OSX_SCRIPT)
-        os.chmod('build/bruce.sh', 0755)
-        z.write('build/bruce.sh', '%s/bruce.sh'%(dirname, ))
-        z.close()
+        for script, module_name in SCRIPTS:
+            open('build/%s.sh'%script, 'w').write(OSX_SCRIPT%locals())
+            os.chmod('build/%s.sh'%script, 0755)
+            z.write('build/%s.sh'%script, '%s/%s.sh'%(dirname, script))
+            z.close()
 
         # build WINDOWS
         z = basics('dist/bruce-%s-windows.zip'%__version__)
-        open('build/bruce.pyw', 'w').write(WINDOWS_SCRIPT)
-        z.write('build/bruce.pyw', '%s/bruce.pyw'%(dirname, ))
-        z.close()
+        for script, module_name in SCRIPTS:
+            open('build/%s.pyw'%script, 'w').write(WINDOWS_SCRIPT%locals())
+            z.write('build/%s.pyw'%script, '%s/%s.pyw'%(dirname, script))
+            z.close()
 
         # build examples
         zipname = 'dist/bruce-%s-examples.zip'%__version__
