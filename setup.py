@@ -12,9 +12,10 @@ from bruce import __version__
 # Application script file contents
 LINUX_SCRIPT = '''#! /usr/bin/env python
 
-import sys
 # force module loading from my zip file first
-sys.path.insert(0, 'bruce-library.zip')
+import sys, os
+zip_path = os.path.join(os.path.dirname(sys.argv[0]), 'bruce-library.zip')
+sys.path.insert(0, zip_path
 
 from bruce import %(module_name)s
 %(module_name)s.main()
