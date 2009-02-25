@@ -116,7 +116,7 @@ def main():
     command-line arguments were provided.
     '''
     if len(sys.argv) > 1:
-        generate_html(sys.argv)
+        generate_html(sys.argv[1:])
     else:
         gui()
 
