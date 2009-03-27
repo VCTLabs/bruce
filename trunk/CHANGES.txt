@@ -1,3 +1,8 @@
+3.2.2
+
+- fix development run_bruce to include docutils-extras
+
+
 3.2.1 - 2009-01-23 (r231)
 
 - handle errors from pygments
